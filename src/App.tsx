@@ -1,31 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, Scale, ListFilter, ChevronLeft, Terminal, MonitorSmartphone, Code2, PlaySquare, Calendar } from 'lucide-react';
+
+const navigate = (path: string) => {
+  window.history.pushState({}, '', path);
+  window.dispatchEvent(new Event('popstate'));
+};
+
+function Link({ href, className, children }: { href: string, className?: string, children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      className={className}
+      onClick={(e) => {
+        if (!e.ctrlKey && !e.metaKey) {
+          e.preventDefault();
+          navigate(href);
+        }
+      }}
+    >
+      {children}
+    </a>
+  );
+}
 
 function Header() {
   return (
     <header className="flex h-24 items-center justify-between">
-      <a className="flex items-center gap-3 text-2xl font-bold" href="/">
+      <Link className="flex items-center gap-3 text-2xl font-bold" href="/">
         Gliph UI
         <span className="rounded-full bg-white/75 px-2.5 py-0.5 text-xs font-semibold text-black">
           Beta
         </span>
-      </a>
+      </Link>
 
       <nav className="hidden items-center gap-10 text-sm font-semibold text-white/85 md:flex">
-        <a className="transition hover:text-white" href="/components">
+        <Link className="transition hover:text-white" href="/components">
           Components
-        </a>
-        <a className="transition hover:text-white" href="/pricing">
+        </Link>
+        <Link className="transition hover:text-white" href="/pricing">
           Pricing
-        </a>
+        </Link>
       </nav>
 
-      <a
+      <Link
         className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-black shadow-[0_16px_38px_rgba(255,255,255,0.12)] transition duration-200 hover:-translate-y-0.5 hover:bg-zinc-200"
         href="/components"
       >
         Get Started
-      </a>
+      </Link>
     </header>
   );
 }
@@ -46,12 +68,12 @@ function HomePage() {
         </p>
 
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-          <a
+          <Link
             className="rounded-xl bg-white px-6 py-3.5 text-center text-base font-bold text-black shadow-[0_18px_44px_rgba(255,255,255,0.1)] transition duration-200 hover:-translate-y-0.5 hover:bg-zinc-200"
             href="/components"
           >
             Browse Components
-          </a>
+          </Link>
         </div>
       </div>
     </section>
@@ -334,7 +356,14 @@ function ComponentsPage() {
 }
 
 function App() {
-  const path = window.location.pathname;
+  const [path, setPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handlePopState = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const page = path.startsWith("/components") ? <ComponentsPage /> : <HomePage />;
 
   return (
