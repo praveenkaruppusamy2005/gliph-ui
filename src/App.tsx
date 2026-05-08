@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Scale, ListFilter, ChevronLeft, Terminal, MonitorSmartphone, Code2, PlaySquare, Calendar, Smartphone, Copy, Check, ExternalLink, Settings, Layout, Zap, Sun, Moon, Ruler } from 'lucide-react';
+import { Clock, Scale, ListFilter, ChevronLeft, Terminal, Code2, PlaySquare, Calendar, Smartphone, Copy, Check, Settings, Layout, Sun, Moon, Ruler } from 'lucide-react';
 
 type Platform = 'react-native' | 'flutter';
 type Theme = 'light' | 'dark';
@@ -128,7 +128,7 @@ function HomePage({ platform, navigate, theme }: { platform: Platform, navigate:
   );
 }
 
-type MainSection = 'scroll-picker' | 'scale-picker';
+
 type Category = 'time' | 'weight' | 'value' | 'date' | 'scale';
 
 const CATEGORY_CONTENT = {
@@ -359,7 +359,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
 
               <img
                 key={`${category}-${platform}`}
-                src={platformData.previewGif || data.previewGif}
+                src={(platformData as { previewGif?: string }).previewGif || (data as { previewGif?: string }).previewGif || ''}
                 alt={`${data.title} Preview`}
                 className={`absolute inset-0 h-full w-full object-cover rounded-[2.2rem] transition-opacity duration-500 ${gifLoading ? 'opacity-0' : 'opacity-100'}`}
                 onLoad={() => setGifLoading(false)}
@@ -530,11 +530,10 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeCategory === comp.id
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
                   ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
                   : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
-              }`}
+                }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#fb923c]' : 'text-[#ea580c]') : ''}>{comp.icon}</span>
               {comp.title}
@@ -549,11 +548,10 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeCategory === comp.id
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
                   ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
                   : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
-              }`}
+                }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#38bdf8]' : 'text-[#0ea5e9]') : ''}>{comp.icon}</span>
               {comp.title}
