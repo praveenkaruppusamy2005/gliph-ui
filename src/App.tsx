@@ -676,7 +676,6 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
 
   const rnGif = data.reactNative?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
   const flutterGif = data.flutter?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
-  const hasSeparatePreviews = !!(data.reactNative?.previewGif && data.flutter?.previewGif);
 
   useEffect(() => {
     setRnLoading(true);
