@@ -66,7 +66,7 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
         </a>
       </nav>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 sm:gap-6">
         <button
           onClick={toggleTheme}
           className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/15' : 'border-black/10 bg-black/5 text-black hover:bg-black/10'}`}
@@ -75,18 +75,26 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
           {isDark ? <Sun size={20} /> : <Moon size={20} />}
         </button>
 
-        {isRN && (
-          <a
-            className={`text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
-            onClick={(e) => { e.preventDefault(); navigate('/flutter'); }}
-            href="/flutter"
-          >
-            Are you a Flutter developer?
-          </a>
-        )}
+        <a
+          className={`text-xs sm:text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
+          onClick={(e) => { e.preventDefault(); navigate(isRN ? '/flutter' : '/'); }}
+          href={isRN ? "/flutter" : "/"}
+        >
+          {isRN ? (
+            <>
+              <span className="hidden sm:inline">Are you a Flutter developer?</span>
+              <span className="sm:hidden">Flutter Version</span>
+            </>
+          ) : (
+            <>
+              <span className="hidden sm:inline">Switch to React Native</span>
+              <span className="sm:hidden">RN Version</span>
+            </>
+          )}
+        </a>
 
         <a
-          className={`rounded-xl px-5 py-3 text-sm font-bold shadow-xl transition duration-200 hover:-translate-y-0.5 cursor-pointer ${isDark ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-black/5'}`}
+          className={`rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold shadow-xl transition duration-200 hover:-translate-y-0.5 cursor-pointer ${isDark ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-black/5'}`}
           onClick={(e) => { e.preventDefault(); navigate(componentsPath); }}
           href={componentsPath}
         >
