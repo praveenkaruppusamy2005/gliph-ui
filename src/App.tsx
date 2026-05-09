@@ -66,7 +66,7 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
         </a>
       </nav>
 
-      <div className="flex items-center gap-4 sm:gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
         <button
           onClick={toggleTheme}
           className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/15' : 'border-black/10 bg-black/5 text-black hover:bg-black/10'}`}
@@ -76,21 +76,11 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
         </button>
 
         <a
-          className={`text-xs sm:text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
+          className={`hidden sm:flex text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
           onClick={(e) => { e.preventDefault(); navigate(isRN ? '/flutter' : '/'); }}
           href={isRN ? "/flutter" : "/"}
         >
-          {isRN ? (
-            <>
-              <span className="hidden sm:inline">Are you a Flutter developer?</span>
-              <span className="sm:hidden">Flutter Version</span>
-            </>
-          ) : (
-            <>
-              <span className="hidden sm:inline">Switch to React Native</span>
-              <span className="sm:hidden">RN Version</span>
-            </>
-          )}
+          {isRN ? "Are you a Flutter developer?" : "Switch to React Native"}
         </a>
 
         <a
@@ -102,6 +92,17 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
         </a>
       </div>
     </header>
+    
+    {/* Mobile Only Platform Switcher */}
+    <div className="sm:hidden mb-6">
+      <button
+        onClick={() => navigate(isRN ? '/flutter' : '/')}
+        className={`w-full py-3 px-4 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all ${isDark ? 'border-white/10 bg-white/5 text-white/70 active:bg-white/10' : 'border-black/10 bg-black/5 text-black/70 active:bg-black/10'}`}
+      >
+        {isRN ? <Smartphone size={14} className="text-[#38bdf8]" /> : <Code2 size={14} className="text-[#61dafb]" />}
+        {isRN ? "Are you a Flutter developer?" : "Switch to React Native"}
+      </button>
+    </div>
   );
 }
 
@@ -139,7 +140,28 @@ function HomePage({ platform, navigate, theme }: { platform: Platform, navigate:
 
 type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar';
 
-const CATEGORY_CONTENT = {
+interface PickerProp {
+  name: string;
+  type: string;
+  default: string;
+  desc: string;
+}
+
+interface PlatformData {
+  previewGif?: string;
+  usage: string;
+  props: PickerProp[];
+}
+
+interface CategoryData {
+  title: string;
+  description: string;
+  previewGif?: string;
+  reactNative: PlatformData;
+  flutter: PlatformData;
+}
+
+const CATEGORY_CONTENT: Record<Category, CategoryData> = {
   scale: {
     title: 'Scale Picker',
     description: 'A horizontal ruler-style picker for height, weight, and other linear measurements.',
@@ -650,9 +672,9 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
   const [rnLoading, setRnLoading] = useState(true);
   const [flutterLoading, setFlutterLoading] = useState(true);
 
-  const rnGif = data.reactNative?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : null);
-  const flutterGif = data.flutter?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : null);
-  const hasSeparatePreviews = data.reactNative?.previewGif && data.flutter?.previewGif;
+  const rnGif = data.reactNative?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
+  const flutterGif = data.flutter?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
+  const hasSeparatePreviews = !!(data.reactNative?.previewGif && data.flutter?.previewGif);
 
   useEffect(() => {
     setRnLoading(true);
