@@ -77,7 +77,7 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
 
         {isRN && (
           <a
-            className={`hidden lg:block text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
+            className={`text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
             onClick={(e) => { e.preventDefault(); navigate('/flutter'); }}
             href="/flutter"
           >
@@ -517,6 +517,7 @@ export default function App() {
     reactNative: {
       previewGif: 'https://www.dropbox.com/scl/fi/awi0fk291sgrtyu49ez0j/SVID_20260509_093240_1.gif?rlkey=qxd0mlunj9n1rb5z4rcail8sv&st=ce8k0sfa&dl=1',
       usage: `import React, { useState } from 'react';
+import { View } from 'react-native';
 import { CalendarPicker } from 'gliph-ui';
 
 export default function App() {
@@ -527,16 +528,18 @@ export default function App() {
   });
 
   return (
-    <CalendarPicker
-      value={date}
-      onChange={setDate}
-      theme={{
-        accent: '#38BDF8',
-        surface: '#111827',
-      }}
-      showTodayButton
-      enableYearDropdown
-    />
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <CalendarPicker
+        value={date}
+        onChange={setDate}
+        theme={{
+          accent: '#38BDF8',
+          surface: '#111827',
+        }}
+        showTodayButton
+        enableYearDropdown
+      />
+    </View>
   );
 }`,
       props: [
@@ -565,10 +568,50 @@ export default function App() {
       ]
     },
     flutter: {
-      usage: `// CalendarPicker is currently React Native only.
-// Flutter support is coming soon.`,
+      previewGif: 'https://www.dropbox.com/scl/fi/0fu21vlqhvze8xgy65p7i/SVID_20260509_104006_1.gif?rlkey=bis04b2arr84x3laeactp8ila&st=iip6zn5v&dl=1',
+      usage: `import 'package:gliph_ui/gliph_ui.dart';
+
+CalendarPicker(
+  value: CalendarDate(year: 2025, month: 5, day: 9),
+  onChange: (date) => setState(() => _date = date),
+  width: 320,
+  height: 400,
+  showTodayButton: true,
+  showOutsideDays: true,
+  enableYearDropdown: true,
+  theme: const CalendarPickerTheme(
+    accent: Color(0xFF38BDF8),
+    onAccent: Color(0xFF082F49),
+    surface: Color(0xFF111827),
+    surfaceSoft: Color(0xFF1F2937),
+    text: Color(0xFFF9FAFB),
+    mutedText: Color(0xFFCBD5E1),
+    faintText: Color(0xFF64748B),
+    border: Color(0xFF334155),
+  ),
+)`,
       props: [
-        { name: '-', type: '-', default: '-', desc: 'Flutter support coming soon.' },
+        { name: 'value', type: 'CalendarDate?', default: 'today', desc: 'Controlled selection (year, month, day).' },
+        { name: 'onChange', type: 'ValueChanged<CalendarDate>?', default: 'null', desc: 'Fires when a day is tapped.' },
+        { name: 'minDate', type: 'CalendarDate?', default: 'null', desc: 'Earliest selectable date — earlier days are disabled.' },
+        { name: 'maxDate', type: 'CalendarDate?', default: 'null', desc: 'Latest selectable date — later days are disabled.' },
+        { name: 'yearRange', type: 'CalendarYearRange?', default: '±60 years', desc: 'Overrides the range of years in the year dropdown.' },
+        { name: 'showOutsideDays', type: 'bool', default: 'true', desc: 'Show greyed-out days from adjacent months.' },
+        { name: 'showTodayButton', type: 'bool', default: 'true', desc: "Show a 'Today' shortcut button." },
+        { name: 'enableYearDropdown', type: 'bool', default: 'true', desc: 'Allow tapping the year to open a picker.' },
+        { name: 'width', type: 'double?', default: 'null', desc: 'Override the width of the calendar container.' },
+        { name: 'height', type: 'double?', default: 'null', desc: 'Override the height of the calendar container.' },
+        { name: 'maxWidth', type: 'double?', default: '390', desc: 'Maximum width. Defaults to 390 when width is unset.' },
+        { name: 'theme.accent', type: 'Color', default: 'Color(0xFF38BDF8)', desc: 'Highlight color for selected day circle and today dot.' },
+        { name: 'theme.onAccent', type: 'Color', default: 'Color(0xFF082F49)', desc: 'Text color on top of the accent (selected day number).' },
+        { name: 'theme.surface', type: 'Color', default: 'Color(0xFF111827)', desc: 'Background color of the entire calendar card.' },
+        { name: 'theme.surfaceSoft', type: 'Color', default: 'Color(0xFF1F2937)', desc: 'Background for the year dropdown and icon buttons.' },
+        { name: 'theme.text', type: 'Color', default: 'Color(0xFFF9FAFB)', desc: 'Primary text color for day numbers.' },
+        { name: 'theme.mutedText', type: 'Color', default: 'Color(0xFFCBD5E1)', desc: 'Color for the month title.' },
+        { name: 'theme.faintText', type: 'Color', default: 'Color(0xFF64748B)', desc: 'Color for weekday labels and out-of-month days.' },
+        { name: 'theme.disabledText', type: 'Color', default: 'Color(0xFF475569)', desc: 'Color for days disabled by minDate/maxDate.' },
+        { name: 'theme.border', type: 'Color', default: 'Color(0xFF334155)', desc: 'Border color for the card and year dropdown.' },
+        { name: 'theme.pressed', type: 'Color', default: 'Color(0xFF263244)', desc: 'Background tint shown on press.' },
       ]
     }
   }
@@ -687,8 +730,8 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                 {category === 'calendar'
                   ? 'Tap any day, open the year dropdown, or jump to today — all running live on device via Expo Go.'
                   : category === 'scale'
-                  ? 'Drag the ruler left and right to pick a value — run it live on your device via Expo Go.'
-                  : 'Test the 120hz momentum scrolling in the browser, or scan the QR code to run it on your device.'}
+                    ? 'Drag the ruler left and right to pick a value — run it live on your device via Expo Go.'
+                    : 'Test the 120hz momentum scrolling in the browser, or scan the QR code to run it on your device.'}
               </p>
               <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                 <iframe
