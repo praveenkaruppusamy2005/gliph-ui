@@ -137,7 +137,32 @@ const CATEGORY_CONTENT = {
     description: 'A horizontal ruler-style picker for height, weight, and other linear measurements.',
     reactNative: {
       previewGif: 'https://www.dropbox.com/scl/fi/cevifhhaubqobza5ft1pw/SVID_20260508_222010_1.gif?rlkey=950pp5hlbaqol46bbkohrrp8h&st=hu4gpr3r&dl=1',
-      usage: `import React, { useState } from 'react';\nimport { ScalePicker } from 'gliph-ui';\n\nexport default function App() {\n  const [value, setValue] = useState(88);\n\n  return (\n    <ScalePicker\n      value={value}\n      onChange={setValue}\n      min={40}\n      max={200}\n      step={1}\n      subdivisions={10}\n      unit="cm"\n      theme={{\n        activeColor: '#000000',\n        indicatorColor: '#000000',\n        textColor: '#000000'\n      }}\n    />\n  );\n}`,
+      usage: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { ScalePicker } from 'gliph-ui';
+
+export default function App() {
+  const [value, setValue] = useState(88);
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <ScalePicker
+        value={value}
+        onChange={setValue}
+        min={40}
+        max={200}
+        step={1}
+        subdivisions={10}
+        unit="cm"
+        theme={{
+          activeColor: '#000000',
+          indicatorColor: '#000000',
+          textColor: '#000000'
+        }}
+      />
+    </View>
+  );
+}`,
       props: [
         { name: 'value', type: 'number', default: 'required', desc: 'Current controlled value shown on the ruler.' },
         { name: 'onChange', type: '(val: number) => void', default: 'required', desc: 'Fires on every scroll update with the snapped value.' },
@@ -189,7 +214,42 @@ const CATEGORY_CONTENT = {
     description: 'A 12-hour or 24-hour time selector with smooth momentum scrolling.',
     previewGif: 'https://www.dropbox.com/scl/fi/hs4nqtoggmg0wa36ezf4g/SVID_20260508_125930_1.gif?rlkey=gzg001e5qun2hbmqf5fg6y8mj&st=etfyjqc3&dl=1',
     reactNative: {
-      usage: `import React, { useState } from 'react';\nimport { View } from 'react-native';\nimport { TimeScrollPicker } from 'gliph-ui';\n\nexport default function App() {\n  const [time, setTime] = useState({ hour: 7, minute: 30, ampm: 'am' });\n\n  return (\n    <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#000' }}>\n      <TimeScrollPicker\n        value={time}\n        onChange={setTime}\n        limits={{\n          is12Hour: true,\n          minuteStep: 1,\n          hourMin: 0,\n          hourMax: 23\n        }}\n        theme={{\n          activeTextColor: '#ffffff',\n          inactiveTextColor: 'rgba(255,255,255,0.2)',\n          accentColor: '#ffffff',\n          separatorColor: '#ffffff'\n        }}\n        layout={{\n          itemHeight: 72,\n          visibleRows: 3,\n          fontSize: 44\n        }}\n        motion={{\n          decelerationRate: 0.992\n        }}\n      />\n    </View>\n  );\n}`,
+      usage: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { TimeScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [time, setTime] = useState({ hour: 7, minute: 30, ampm: 'am' });
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <TimeScrollPicker
+        value={time}
+        onChange={setTime}
+        limits={{
+          is12Hour: true,
+          minuteStep: 1,
+          hourMin: 0,
+          hourMax: 23
+        }}
+        theme={{
+          activeTextColor: '#ffffff',
+          inactiveTextColor: 'rgba(255,255,255,0.2)',
+          accentColor: '#ffffff',
+          separatorColor: '#ffffff'
+        }}
+        layout={{
+          itemHeight: 72,
+          visibleRows: 3,
+          fontSize: 44
+        }}
+        motion={{
+          decelerationRate: 0.992
+        }}
+      />
+    </View>
+  );
+}`,
       props: [
         { name: 'value', type: 'TimeValue', default: 'undefined', desc: 'Controlled state { hour, minute, ampm? }.' },
         { name: 'defaultValue', type: 'TimeValue', default: '{hour:7, minute:30}', desc: 'Initial uncontrolled selection.' },
@@ -242,7 +302,32 @@ const CATEGORY_CONTENT = {
     description: 'A dedicated numeric picker for weights, including whole numbers, decimals, and units.',
     previewGif: "https://www.dropbox.com/scl/fi/b6iq20hqdv91hdtyayexi/SVID_20260508_131439_1.gif?rlkey=0h1fp00rtrxotbjqxvgqsrkim&st=nj32h4zb&dl=1",
     reactNative: {
-      usage: `import React, { useState } from 'react';\nimport { View } from 'react-native';\nimport { WeightScrollPicker } from 'gliph-ui';\n\nexport default function App() {\n  const [weight, setWeight] = useState({ whole: 70, decimal: 5, unit: 'kg' });\n\n  return (\n    <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#000' }}>\n      <WeightScrollPicker\n        value={weight}\n        onChange={setWeight}\n        limits={{\n          wholeMin: 40,\n          wholeMax: 200,\n          units: ['kg', 'lbs'],\n          decimalValues: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\n        }}\n        theme={{\n          activeTextColor: '#ffffff',\n          inactiveTextColor: 'rgba(255,255,255,0.14)'\n        }}\n      />\n    </View>\n  );\n}`,
+      usage: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { WeightScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [weight, setWeight] = useState({ whole: 70, decimal: 5, unit: 'kg' });
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <WeightScrollPicker
+        value={weight}
+        onChange={setWeight}
+        limits={{
+          wholeMin: 40,
+          wholeMax: 200,
+          units: ['kg', 'lbs'],
+          decimalValues: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        }}
+        theme={{
+          activeTextColor: '#ffffff',
+          inactiveTextColor: 'rgba(255,255,255,0.14)'
+        }}
+      />
+    </View>
+  );
+}`,
       props: [
         { name: 'value', type: 'WeightValue', default: 'undefined', desc: 'Controlled state { whole, decimal, unit }.' },
         { name: 'defaultValue', type: 'WeightValue', default: '{whole:72, decimal:5, unit:"kg"}', desc: 'Initial uncontrolled value.' },
@@ -292,7 +377,35 @@ const CATEGORY_CONTENT = {
     description: 'Simple momentum-scrolling picker for any list of items.',
     previewGif: "https://www.dropbox.com/scl/fi/sgprz1zdibw2uie1ktc0n/SVID_20260508_132953_1-1.gif?rlkey=33g2lt9mk1e9cgck5h5zenjoc&st=o6sqvllk&dl=1",
     reactNative: {
-      usage: `import { ValueScrollPicker } from 'gliph-ui';\n\n<ValueScrollPicker\n  items={[\n    { label: 'Low', value: 'low' },\n    { label: 'Medium', value: 'medium' },\n    { label: 'High', value: 'high' }\n  ]}\n  value={val}\n  onChange={setVal}\n  theme={{\n    activeTextColor: '#ffffff',\n    inactiveTextColor: 'rgba(255,255,255,0.14)'\n  }}\n  layout={{\n    itemHeight: 72,\n    visibleRows: 3\n  }}\n/>`,
+      usage: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { ValueScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [val, setVal] = useState('medium');
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <ValueScrollPicker
+        items={[
+          { label: 'Low', value: 'low' },
+          { label: 'Medium', value: 'medium' },
+          { label: 'High', value: 'high' }
+        ]}
+        value={val}
+        onChange={setVal}
+        theme={{
+          activeTextColor: '#ffffff',
+          inactiveTextColor: 'rgba(255,255,255,0.14)'
+        }}
+        layout={{
+          itemHeight: 72,
+          visibleRows: 3
+        }}
+      />
+    </View>
+  );
+}`,
       props: [
         { name: 'items', type: 'ScrollPickerItem<T>[]', default: 'required', desc: 'Array of { label, value } objects to display.' },
         { name: 'value', type: 'T', default: 'undefined', desc: 'Currently selected value (controlled).' },
@@ -335,7 +448,30 @@ const CATEGORY_CONTENT = {
     description: 'Dynamic date selector with leap-year awareness.',
     previewGif: "https://www.dropbox.com/scl/fi/pi4c6rbd6urk66wgetzed/SVID_20260508_134712_1.gif?rlkey=2ngcbm6kupts4bzrvpng9uile&st=v540tqlz&dl=1",
     reactNative: {
-      usage: `import { DateScrollPicker } from 'gliph-ui';\n\n<DateScrollPicker\n  value={date}\n  onChange={setDate}\n  limits={{\n    yearMin: 1990,\n    yearMax: 2030\n  }}\n  theme={{\n    activeTextColor: '#ffffff',\n    inactiveTextColor: 'rgba(255,255,255,0.14)'\n  }}\n/>`,
+      usage: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { DateScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [date, setDate] = useState({ year: 2025, month: 5, day: 9 });
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <DateScrollPicker
+        value={date}
+        onChange={setDate}
+        limits={{
+          yearMin: 1990,
+          yearMax: 2030
+        }}
+        theme={{
+          activeTextColor: '#ffffff',
+          inactiveTextColor: 'rgba(255,255,255,0.14)'
+        }}
+      />
+    </View>
+  );
+}`,
       props: [
         { name: 'value', type: 'DateValue', default: 'today', desc: 'Controlled selection { year, month, day }.' },
         { name: 'defaultValue', type: 'DateValue', default: 'today', desc: 'Initial uncontrolled value.' },
@@ -541,7 +677,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
           </div>
 
 
-          {platform === 'react-native' && category !== 'scale' && (
+          {platform === 'react-native' && (
             <div className={`flex flex-col w-full pt-8 border-t animate-in fade-in duration-500 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
               <div className="mb-6 flex items-center gap-3">
                 <PlaySquare className="text-[#38bdf8]" size={28} />
@@ -550,6 +686,8 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
               <p className={`mb-6 text-base ${isDark ? 'text-white/60' : 'text-black/60'}`}>
                 {category === 'calendar'
                   ? 'Tap any day, open the year dropdown, or jump to today — all running live on device via Expo Go.'
+                  : category === 'scale'
+                  ? 'Drag the ruler left and right to pick a value — run it live on your device via Expo Go.'
                   : 'Test the 120hz momentum scrolling in the browser, or scan the QR code to run it on your device.'}
               </p>
               <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
