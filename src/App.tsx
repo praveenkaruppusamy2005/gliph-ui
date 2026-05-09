@@ -129,7 +129,7 @@ function HomePage({ platform, navigate, theme }: { platform: Platform, navigate:
 }
 
 
-type Category = 'time' | 'weight' | 'value' | 'date' | 'scale';
+type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar';
 
 const CATEGORY_CONTENT = {
   scale: {
@@ -139,31 +139,48 @@ const CATEGORY_CONTENT = {
       previewGif: 'https://www.dropbox.com/scl/fi/cevifhhaubqobza5ft1pw/SVID_20260508_222010_1.gif?rlkey=950pp5hlbaqol46bbkohrrp8h&st=hu4gpr3r&dl=1',
       usage: `import React, { useState } from 'react';\nimport { ScalePicker } from 'gliph-ui';\n\nexport default function App() {\n  const [value, setValue] = useState(88);\n\n  return (\n    <ScalePicker\n      value={value}\n      onChange={setValue}\n      min={40}\n      max={200}\n      step={1}\n      subdivisions={10}\n      unit="cm"\n      theme={{\n        activeColor: '#000000',\n        indicatorColor: '#000000',\n        textColor: '#000000'\n      }}\n    />\n  );\n}`,
       props: [
-        { name: 'value', type: 'number', default: 'undefined', desc: 'Current selection value.' },
-        { name: 'onChange', type: '(val: number) => void', default: 'undefined', desc: 'Fires when selection changes.' },
-        { name: 'min', type: 'number', default: '0', desc: 'Minimum allowed value.' },
-        { name: 'max', type: 'number', default: '100', desc: 'Maximum allowed value.' },
-        { name: 'step', type: 'number', default: '1', desc: 'Value increment step.' },
-        { name: 'subdivisions', type: 'number', default: '10', desc: 'Number of ticks between each unit.' },
-        { name: 'unit', type: 'string', default: '"cm"', desc: 'Measurement unit display label.' },
-        { name: 'showLabels', type: 'boolean', default: 'true', desc: 'Toggle the visibility of numeric labels on the scale.' },
-        { name: 'theme.subdivisionColor', type: 'string', default: 'rgba(0,0,0,0.2)', desc: 'Color of the small subdivision ticks.' },
-        { name: 'theme.labelColor', type: 'string', default: 'rgba(0,0,0,0.4)', desc: 'Color of the numeric labels.' },
+        { name: 'value', type: 'number', default: 'required', desc: 'Current controlled value shown on the ruler.' },
+        { name: 'onChange', type: '(val: number) => void', default: 'required', desc: 'Fires on every scroll update with the snapped value.' },
+        { name: 'min', type: 'number', default: 'required', desc: 'Minimum allowed value on the ruler.' },
+        { name: 'max', type: 'number', default: 'required', desc: 'Maximum allowed value on the ruler.' },
+        { name: 'step', type: 'number', default: '1', desc: 'Major tick interval (distance between labeled numbers).' },
+        { name: 'subdivisions', type: 'number', default: '10', desc: 'Number of minor ticks between each major step.' },
+        { name: 'unit', type: 'string', default: '"cm"', desc: 'Unit label shown next to the value readout.' },
+        { name: 'tickWidth', type: 'number', default: '10', desc: 'Width of each tick in pixels — controls density of the ruler.' },
+        { name: 'height', type: 'number', default: '140', desc: 'Total height of the ScalePicker component.' },
+        { name: 'showLabels', type: 'boolean', default: 'true', desc: 'Show or hide the numeric labels above major ticks.' },
+        { name: 'fractionDigits', type: 'number', default: '1', desc: 'Number of decimal places shown in the value readout.' },
+        { name: 'theme.activeColor', type: 'string', default: '#000000', desc: 'Color of the major ticks.' },
+        { name: 'theme.inactiveColor', type: 'string', default: 'rgba(0,0,0,0.2)', desc: 'Color of minor (subdivision) ticks.' },
+        { name: 'theme.textColor', type: 'string', default: '#000000', desc: 'Color of the numeric value readout.' },
+        { name: 'theme.indicatorColor', type: 'string', default: '#000000', desc: 'Color of the center indicator line.' },
+        { name: 'theme.subdivisionColor', type: 'string', default: 'rgba(0,0,0,0.2)', desc: 'Color of the small subdivision ticks (alias of inactiveColor).' },
+        { name: 'theme.labelColor', type: 'string', default: 'rgba(0,0,0,0.4)', desc: 'Color of the tick number labels.' },
+        { name: 'theme.fontFamily', type: 'string', default: 'System', desc: 'Font family for the value readout and tick labels.' },
       ]
     },
     flutter: {
       previewGif: 'https://www.dropbox.com/scl/fi/xoiawxojcd31ai29frr26/SVID_20260508_220213_1.gif?rlkey=rhgmopbi22o69yvhvtezxjk6e&st=t4y8zqva&dl=1',
       usage: `import 'package:gliph_ui/gliph_ui.dart';\n\nScalePicker(\n  value: 88.0,\n  min: 40.0,\n  max: 200.0,\n  unit: 'cm',\n  theme: const ScalePickerTheme(\n    textColor: Colors.black,\n    indicatorColor: Colors.black,\n  ),\n  onChange: (val) => print(val),\n)`,
       props: [
-        { name: 'value', type: 'double', default: '0.0', desc: 'Current selection value.' },
-        { name: 'min', type: 'double', default: '0.0', desc: 'Minimum range boundary.' },
-        { name: 'max', type: 'double', default: '100.0', desc: 'Maximum range boundary.' },
-        { name: 'unit', type: 'String', default: '"cm"', desc: 'Label displayed next to value.' },
-        { name: 'subdivisions', type: 'int', default: '10', desc: 'Number of small ticks between major units.' },
-        { name: 'showLabels', type: 'bool', default: 'true', desc: 'Whether to show numbers on the scale.' },
-        { name: 'theme.subdivisionColor', type: 'Color', default: 'Colors.black26', desc: 'Color of the minor tick marks.' },
-        { name: 'theme.labelColor', type: 'Color', default: 'Colors.black45', desc: 'Color of the numeric labels.' },
-        { name: 'theme', type: 'ScalePickerTheme', default: 'ScalePickerTheme()', desc: 'Customizes colors and fonts.' },
+        { name: 'value', type: 'double', default: 'required', desc: 'Current controlled value.' },
+        { name: 'onChange', type: 'ValueChanged<double>?', default: 'null', desc: 'Fires on scroll with snapped value.' },
+        { name: 'min', type: 'double', default: 'required', desc: 'Minimum ruler boundary.' },
+        { name: 'max', type: 'double', default: 'required', desc: 'Maximum ruler boundary.' },
+        { name: 'unit', type: 'String', default: '"cm"', desc: 'Unit label displayed next to the readout.' },
+        { name: 'step', type: 'double', default: '1.0', desc: 'Major tick interval.' },
+        { name: 'subdivisions', type: 'int', default: '10', desc: 'Minor ticks between each major step.' },
+        { name: 'tickWidth', type: 'double', default: '10.0', desc: 'Width of each tick in logical pixels.' },
+        { name: 'height', type: 'double', default: '140.0', desc: 'Height of the widget.' },
+        { name: 'showLabels', type: 'bool', default: 'true', desc: 'Show numeric labels above major ticks.' },
+        { name: 'fractionDigits', type: 'int', default: '1', desc: 'Decimal places in the value readout.' },
+        { name: 'theme.activeColor', type: 'Color', default: 'Colors.black', desc: 'Color of major ticks.' },
+        { name: 'theme.inactiveColor', type: 'Color', default: 'Colors.black26', desc: 'Color of minor ticks.' },
+        { name: 'theme.textColor', type: 'Color', default: 'Colors.black', desc: 'Color of the value readout.' },
+        { name: 'theme.indicatorColor', type: 'Color', default: 'Colors.black', desc: 'Color of the center indicator line.' },
+        { name: 'theme.subdivisionColor', type: 'Color', default: 'Colors.black26', desc: 'Color of the subdivision ticks.' },
+        { name: 'theme.labelColor', type: 'Color', default: 'Colors.black45', desc: 'Color of tick number labels.' },
+        { name: 'theme.fontFamily', type: 'String?', default: 'null', desc: 'Font family for readout and labels.' },
       ]
     }
   },
@@ -174,25 +191,49 @@ const CATEGORY_CONTENT = {
     reactNative: {
       usage: `import React, { useState } from 'react';\nimport { View } from 'react-native';\nimport { TimeScrollPicker } from 'gliph-ui';\n\nexport default function App() {\n  const [time, setTime] = useState({ hour: 7, minute: 30, ampm: 'am' });\n\n  return (\n    <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#000' }}>\n      <TimeScrollPicker\n        value={time}\n        onChange={setTime}\n        limits={{\n          is12Hour: true,\n          minuteStep: 1,\n          hourMin: 0,\n          hourMax: 23\n        }}\n        theme={{\n          activeTextColor: '#ffffff',\n          inactiveTextColor: 'rgba(255,255,255,0.2)',\n          accentColor: '#ffffff',\n          separatorColor: '#ffffff'\n        }}\n        layout={{\n          itemHeight: 72,\n          visibleRows: 3,\n          fontSize: 44\n        }}\n        motion={{\n          decelerationRate: 0.992\n        }}\n      />\n    </View>\n  );\n}`,
       props: [
-        { name: 'value', type: 'TimeValue', default: 'undefined', desc: 'Controlled state { hour, minute, ampm }.' },
-        { name: 'defaultValue', type: 'TimeValue', default: '{hour:7, minute:30}', desc: 'Initial selection for uncontrolled use.' },
-        { name: 'onChange', type: '(val: TimeValue) => void', default: 'undefined', desc: 'Callback fired on selection snap.' },
-        { name: 'limits.hourMin/Max', type: 'number', default: '0/23', desc: 'Constraint for hour range.' },
-        { name: 'limits.minuteMin/Max', type: 'number', default: '0/59', desc: 'Constraint for minute range.' },
-        { name: 'limits.minuteStep', type: 'number', default: '1', desc: 'Step between minute items.' },
-        { name: 'limits.is12Hour', type: 'boolean', default: 'false', desc: 'Toggle AM/PM format.' },
+        { name: 'value', type: 'TimeValue', default: 'undefined', desc: 'Controlled state { hour, minute, ampm? }.' },
+        { name: 'defaultValue', type: 'TimeValue', default: '{hour:7, minute:30}', desc: 'Initial uncontrolled selection.' },
+        { name: 'onChange', type: '(val: TimeValue) => void', default: 'undefined', desc: 'Callback fired when selection snaps.' },
+        { name: 'style', type: 'ViewStyle', default: 'undefined', desc: 'Style overrides for the root container.' },
+        { name: 'limits.is12Hour', type: 'boolean', default: 'false', desc: 'Show AM/PM column and constrain hours 1–12.' },
+        { name: 'limits.hourMin', type: 'number', default: '0 (1 in 12h)', desc: 'Minimum selectable hour.' },
+        { name: 'limits.hourMax', type: 'number', default: '23 (12 in 12h)', desc: 'Maximum selectable hour.' },
+        { name: 'limits.minuteMin', type: 'number', default: '0', desc: 'Minimum selectable minute.' },
+        { name: 'limits.minuteMax', type: 'number', default: '59', desc: 'Maximum selectable minute.' },
+        { name: 'limits.minuteStep', type: 'number', default: '1', desc: 'Interval between minute items (e.g. 5 = 0,5,10…).' },
+        { name: 'theme.activeTextColor', type: 'string', default: '#ffffff', desc: 'Color of the centered (selected) item text.' },
+        { name: 'theme.inactiveTextColor', type: 'string', default: 'rgba(255,255,255,0.14)', desc: 'Color of non-centered item text.' },
+        { name: 'theme.accentColor', type: 'string', default: 'rgba(255,255,255,0.72)', desc: 'Color of the separator colon character.' },
+        { name: 'theme.separatorColor', type: 'string', default: 'rgba(255,255,255,0.72)', desc: 'Color of the ":" between hour and minute columns.' },
+        { name: 'theme.fontFamily', type: 'string', default: '""', desc: 'Custom font family applied to all picker text.' },
+        { name: 'layout.itemHeight', type: 'number', default: '72', desc: 'Height of each row item in pixels.' },
+        { name: 'layout.visibleRows', type: 'number', default: '3', desc: 'Number of items visible at once.' },
+        { name: 'layout.fontSize', type: 'number', default: '44', desc: 'Font size for picker item labels.' },
+        { name: 'motion.decelerationRate', type: 'number', default: '0.992', desc: 'How quickly scroll momentum slows (higher = slower stop).' },
+        { name: 'motion.scrollEventThrottle', type: 'number', default: '8', desc: 'Frequency of scroll events in ms.' },
       ]
     },
     flutter: {
       usage: `import 'package:flutter/material.dart';\nimport 'package:gliph_ui/gliph_ui.dart';\n\nclass ExampleApp extends StatelessWidget {\n  @override\n  Widget build(BuildContext context) {\n    return TimeScrollPicker(\n      theme: const ScrollPickerTheme(\n        activeTextColor: Colors.white,\n        inactiveTextColor: Colors.white24,\n        accentColor: Colors.blueAccent,\n        separatorColor: Colors.blueAccent,\n      ),\n      layout: const ScrollPickerLayout(\n        itemHeight: 72,\n        visibleRows: 3,\n        fontSize: 44,\n      ),\n      motion: const ScrollPickerMotion(\n        decelerationRate: 0.992,\n      ),\n      limits: const TimeScrollPickerLimits(\n        is12Hour: true,\n        minuteStep: 1,\n        hourMin: 1,\n        hourMax: 12,\n      ),\n      onChange: (TimeValue val) {\n        print('Selected: \${val.hour}:\${val.minute} \${val.ampm}');\n      },\n    );\n  }\n}`,
       props: [
-        { name: 'value', type: 'TimeValue?', default: 'null', desc: 'Controlled selection state.' },
-        { name: 'defaultValue', type: 'TimeValue', default: '7:30', desc: 'Initial selection.' },
-        { name: 'onChange', type: 'ValueChanged<TimeValue>?', default: 'null', desc: 'Fires when selection changes.' },
-        { name: 'limits.hourMin/Max', type: 'int', default: '0/23', desc: 'Hour constraints.' },
-        { name: 'limits.minuteMin/Max', type: 'int', default: '0/59', desc: 'Minute constraints.' },
-        { name: 'limits.minuteStep', type: 'int', default: '1', desc: 'Step between items.' },
-        { name: 'limits.is12Hour', type: 'bool', default: 'false', desc: 'Enable AM/PM column.' },
+        { name: 'value', type: 'TimeValue?', default: 'null', desc: 'Controlled selection { hour, minute, ampm }.' },
+        { name: 'defaultValue', type: 'TimeValue?', default: '7:30', desc: 'Initial uncontrolled value.' },
+        { name: 'onChange', type: 'ValueChanged<TimeValue>?', default: 'null', desc: 'Fires when selection snaps.' },
+        { name: 'limits.is12Hour', type: 'bool', default: 'false', desc: 'Show AM/PM column; constrains hours 1–12.' },
+        { name: 'limits.hourMin', type: 'int', default: '0 (1 in 12h)', desc: 'Minimum hour.' },
+        { name: 'limits.hourMax', type: 'int', default: '23 (12 in 12h)', desc: 'Maximum hour.' },
+        { name: 'limits.minuteMin', type: 'int', default: '0', desc: 'Minimum minute.' },
+        { name: 'limits.minuteMax', type: 'int', default: '59', desc: 'Maximum minute.' },
+        { name: 'limits.minuteStep', type: 'int', default: '1', desc: 'Interval between minute options.' },
+        { name: 'theme.activeTextColor', type: 'Color', default: 'Colors.white', desc: 'Color of the centered item.' },
+        { name: 'theme.inactiveTextColor', type: 'Color', default: 'Colors.white24', desc: 'Color of non-centered items.' },
+        { name: 'theme.accentColor', type: 'Color', default: 'Colors.white', desc: 'Accent/highlight color.' },
+        { name: 'theme.separatorColor', type: 'Color', default: 'Colors.white', desc: 'Color of the ":" separator.' },
+        { name: 'theme.fontFamily', type: 'String?', default: 'null', desc: 'Font family for all picker text.' },
+        { name: 'layout.itemHeight', type: 'double', default: '72', desc: 'Height of each row.' },
+        { name: 'layout.visibleRows', type: 'int', default: '3', desc: 'Rows visible simultaneously.' },
+        { name: 'layout.fontSize', type: 'double', default: '44', desc: 'Font size for labels.' },
+        { name: 'motion.decelerationRate', type: 'double', default: '0.992', desc: 'Scroll deceleration speed.' },
       ]
     }
   },
@@ -203,21 +244,46 @@ const CATEGORY_CONTENT = {
     reactNative: {
       usage: `import React, { useState } from 'react';\nimport { View } from 'react-native';\nimport { WeightScrollPicker } from 'gliph-ui';\n\nexport default function App() {\n  const [weight, setWeight] = useState({ whole: 70, decimal: 5, unit: 'kg' });\n\n  return (\n    <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#000' }}>\n      <WeightScrollPicker\n        value={weight}\n        onChange={setWeight}\n        limits={{\n          wholeMin: 40,\n          wholeMax: 200,\n          units: ['kg', 'lbs'],\n          decimalValues: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\n        }}\n        theme={{\n          activeTextColor: '#ffffff',\n          inactiveTextColor: 'rgba(255,255,255,0.14)'\n        }}\n      />\n    </View>\n  );\n}`,
       props: [
-        { name: 'value', type: 'WeightValue', default: 'undefined', desc: 'State { whole, decimal, unit }.' },
-        { name: 'onChange', type: '(val: WeightValue) => void', default: 'undefined', desc: 'Fires on snap.' },
-        { name: 'limits.wholeMin/Max', type: 'number', default: '0/500', desc: 'Whole number range.' },
-        { name: 'limits.decimalValues', type: 'number[]', default: '[0..9]', desc: 'Allowed decimal values.' },
-        { name: 'limits.units', type: 'string[]', default: "['kg', 'lbs']", desc: 'Unit selection options.' },
+        { name: 'value', type: 'WeightValue', default: 'undefined', desc: 'Controlled state { whole, decimal, unit }.' },
+        { name: 'defaultValue', type: 'WeightValue', default: '{whole:72, decimal:5, unit:"kg"}', desc: 'Initial uncontrolled value.' },
+        { name: 'onChange', type: '(val: WeightValue) => void', default: 'undefined', desc: 'Fires when any column snaps.' },
+        { name: 'style', type: 'ViewStyle', default: 'undefined', desc: 'Style overrides for the root container.' },
+        { name: 'limits.wholeMin', type: 'number', default: '30', desc: 'Minimum whole-number value.' },
+        { name: 'limits.wholeMax', type: 'number', default: '180', desc: 'Maximum whole-number value.' },
+        { name: 'limits.decimalValues', type: 'number[]', default: '[0,2,5,7]', desc: 'Allowed decimal options shown in the decimal column.' },
+        { name: 'limits.units', type: 'string[]', default: '["kg","lb"]', desc: 'Unit options shown in the unit column.' },
+        { name: 'theme.activeTextColor', type: 'string', default: '#ffffff', desc: 'Color of the centered (selected) item.' },
+        { name: 'theme.inactiveTextColor', type: 'string', default: 'rgba(255,255,255,0.14)', desc: 'Color of non-centered items.' },
+        { name: 'theme.accentColor', type: 'string', default: 'rgba(255,255,255,0.72)', desc: 'Accent highlight color.' },
+        { name: 'theme.separatorColor', type: 'string', default: 'rgba(255,255,255,0.72)', desc: 'Color of the "." decimal separator.' },
+        { name: 'theme.fontFamily', type: 'string', default: '""', desc: 'Font family for all picker text.' },
+        { name: 'layout.itemHeight', type: 'number', default: '72', desc: 'Height of each row in pixels.' },
+        { name: 'layout.visibleRows', type: 'number', default: '3', desc: 'Number of rows visible at once.' },
+        { name: 'layout.fontSize', type: 'number', default: '44', desc: 'Font size of picker labels.' },
+        { name: 'motion.decelerationRate', type: 'number', default: '0.992', desc: 'Scroll deceleration speed.' },
+        { name: 'motion.scrollEventThrottle', type: 'number', default: '8', desc: 'Scroll event frequency in ms.' },
       ]
     },
     flutter: {
       usage: `import 'package:flutter/material.dart';\nimport 'package:gliph_ui/gliph_ui.dart';\n\nclass ExampleApp extends StatelessWidget {\n  @override\n  Widget build(BuildContext context) {\n    return WeightScrollPicker(\n      theme: const ScrollPickerTheme(\n        activeTextColor: Colors.white,\n        inactiveTextColor: Colors.white24,\n      ),\n      limits: const WeightScrollPickerLimits(\n        wholeMin: 40,\n        wholeMax: 150,\n        units: ['kg', 'lbs'],\n        decimalMin: 0,\n        decimalMax: 9,\n      ),\n      onChange: (WeightValue val) => print(val.whole),\n    );\n  }\n}`,
       props: [
-        { name: 'value', type: 'WeightValue?', default: 'null', desc: 'Selection state.' },
-        { name: 'onChange', type: 'ValueChanged<WeightValue>?', default: 'null', desc: 'Fires on selection change.' },
-        { name: 'limits.wholeMin/Max', type: 'int', default: '0/500', desc: 'Whole number constraints.' },
-        { name: 'limits.decimalMin/Max', type: 'int', default: '0/9', desc: 'Decimal constraints.' },
-        { name: 'limits.units', type: 'List<String>', default: "['kg']", desc: 'Available units.' },
+        { name: 'value', type: 'WeightValue?', default: 'null', desc: 'Controlled state { whole, decimal, unit }.' },
+        { name: 'defaultValue', type: 'WeightValue?', default: '{whole:72, decimal:5, unit:"kg"}', desc: 'Initial uncontrolled value.' },
+        { name: 'onChange', type: 'ValueChanged<WeightValue>?', default: 'null', desc: 'Fires when a column snaps.' },
+        { name: 'limits.wholeMin', type: 'int', default: '30', desc: 'Minimum whole number.' },
+        { name: 'limits.wholeMax', type: 'int', default: '180', desc: 'Maximum whole number.' },
+        { name: 'limits.decimalMin', type: 'int', default: '0', desc: 'Minimum decimal digit.' },
+        { name: 'limits.decimalMax', type: 'int', default: '9', desc: 'Maximum decimal digit.' },
+        { name: 'limits.units', type: 'List<String>', default: '["kg"]', desc: 'Available unit options.' },
+        { name: 'theme.activeTextColor', type: 'Color', default: 'Colors.white', desc: 'Color of the centered item.' },
+        { name: 'theme.inactiveTextColor', type: 'Color', default: 'Colors.white24', desc: 'Color of non-centered items.' },
+        { name: 'theme.accentColor', type: 'Color', default: 'Colors.white', desc: 'Accent highlight color.' },
+        { name: 'theme.separatorColor', type: 'Color', default: 'Colors.white', desc: 'Color of the decimal separator.' },
+        { name: 'theme.fontFamily', type: 'String?', default: 'null', desc: 'Font family for all text.' },
+        { name: 'layout.itemHeight', type: 'double', default: '72', desc: 'Row height.' },
+        { name: 'layout.visibleRows', type: 'int', default: '3', desc: 'Visible rows at once.' },
+        { name: 'layout.fontSize', type: 'double', default: '44', desc: 'Label font size.' },
+        { name: 'motion.decelerationRate', type: 'double', default: '0.992', desc: 'Scroll deceleration speed.' },
       ]
     }
   },
@@ -228,17 +294,39 @@ const CATEGORY_CONTENT = {
     reactNative: {
       usage: `import { ValueScrollPicker } from 'gliph-ui';\n\n<ValueScrollPicker\n  items={[\n    { label: 'Low', value: 'low' },\n    { label: 'Medium', value: 'medium' },\n    { label: 'High', value: 'high' }\n  ]}\n  value={val}\n  onChange={setVal}\n  theme={{\n    activeTextColor: '#ffffff',\n    inactiveTextColor: 'rgba(255,255,255,0.14)'\n  }}\n  layout={{\n    itemHeight: 72,\n    visibleRows: 3\n  }}\n/>`,
       props: [
-        { name: 'items', type: 'ScrollPickerItem[]', default: '[]', desc: 'List of {label, value} pairs.' },
-        { name: 'value', type: 'T', default: 'undefined', desc: 'Currently selected value.' },
-        { name: 'onChange', type: '(val: T) => void', default: 'undefined', desc: 'Fires when user stops scrolling.' },
+        { name: 'items', type: 'ScrollPickerItem<T>[]', default: 'required', desc: 'Array of { label, value } objects to display.' },
+        { name: 'value', type: 'T', default: 'undefined', desc: 'Currently selected value (controlled).' },
+        { name: 'defaultValue', type: 'T', default: 'items[0]', desc: 'Initial uncontrolled selection.' },
+        { name: 'onChange', type: '(val: T) => void', default: 'undefined', desc: 'Fires when the user stops scrolling.' },
+        { name: 'width', type: 'number', default: '96', desc: 'Width of the column in pixels.' },
+        { name: 'style', type: 'ViewStyle', default: 'undefined', desc: 'Style overrides for the root container.' },
+        { name: 'theme.activeTextColor', type: 'string', default: '#ffffff', desc: 'Color of the centered (selected) item.' },
+        { name: 'theme.inactiveTextColor', type: 'string', default: 'rgba(255,255,255,0.14)', desc: 'Color of non-centered items.' },
+        { name: 'theme.accentColor', type: 'string', default: 'rgba(255,255,255,0.72)', desc: 'Accent highlight color.' },
+        { name: 'theme.fontFamily', type: 'string', default: '""', desc: 'Font family for picker labels.' },
+        { name: 'layout.itemHeight', type: 'number', default: '72', desc: 'Height of each row.' },
+        { name: 'layout.visibleRows', type: 'number', default: '3', desc: 'Rows visible at once.' },
+        { name: 'layout.fontSize', type: 'number', default: '44', desc: 'Font size of labels.' },
+        { name: 'motion.decelerationRate', type: 'number', default: '0.992', desc: 'Scroll deceleration speed.' },
+        { name: 'motion.scrollEventThrottle', type: 'number', default: '8', desc: 'Scroll event frequency in ms.' },
       ]
     },
     flutter: {
       usage: `import 'package:gliph_ui/gliph_ui.dart';\n\nValueScrollPicker<String>(\n  items: [\n    ScrollPickerItem(label: 'A', value: 'a'),\n    ScrollPickerItem(label: 'B', value: 'b'),\n  ],\n  theme: const ScrollPickerTheme(\n    activeTextColor: Colors.white,\n    inactiveTextColor: Colors.white24,\n  ),\n  layout: const ScrollPickerLayout(\n    itemHeight: 72,\n    visibleRows: 3,\n  ),\n  onChange: (val) => print(val),\n)`,
       props: [
-        { name: 'items', type: 'List<ScrollPickerItem<T>>', default: '[]', desc: 'List of items to display.' },
-        { name: 'value', type: 'T?', default: 'null', desc: 'Currently selected value.' },
-        { name: 'onChange', type: 'ValueChanged<T>?', default: 'null', desc: 'Callback for selection changes.' },
+        { name: 'items', type: 'List<ScrollPickerItem<T>>', default: 'required', desc: 'Items to display in the picker column.' },
+        { name: 'value', type: 'T?', default: 'null', desc: 'Currently selected value (controlled).' },
+        { name: 'defaultValue', type: 'T?', default: 'items[0]', desc: 'Initial uncontrolled value.' },
+        { name: 'onChange', type: 'ValueChanged<T>?', default: 'null', desc: 'Fires when selection changes.' },
+        { name: 'width', type: 'double?', default: 'null', desc: 'Column width override.' },
+        { name: 'theme.activeTextColor', type: 'Color', default: 'Colors.white', desc: 'Color of the selected item.' },
+        { name: 'theme.inactiveTextColor', type: 'Color', default: 'Colors.white24', desc: 'Color of non-selected items.' },
+        { name: 'theme.accentColor', type: 'Color', default: 'Colors.white', desc: 'Accent highlight color.' },
+        { name: 'theme.fontFamily', type: 'String?', default: 'null', desc: 'Font family for labels.' },
+        { name: 'layout.itemHeight', type: 'double', default: '72', desc: 'Row height.' },
+        { name: 'layout.visibleRows', type: 'int', default: '3', desc: 'Rows visible at once.' },
+        { name: 'layout.fontSize', type: 'double', default: '44', desc: 'Label font size.' },
+        { name: 'motion.decelerationRate', type: 'double', default: '0.992', desc: 'Scroll deceleration speed.' },
       ]
     }
   },
@@ -249,17 +337,102 @@ const CATEGORY_CONTENT = {
     reactNative: {
       usage: `import { DateScrollPicker } from 'gliph-ui';\n\n<DateScrollPicker\n  value={date}\n  onChange={setDate}\n  limits={{\n    yearMin: 1990,\n    yearMax: 2030\n  }}\n  theme={{\n    activeTextColor: '#ffffff',\n    inactiveTextColor: 'rgba(255,255,255,0.14)'\n  }}\n/>`,
       props: [
-        { name: 'value', type: 'DateValue', default: 'today', desc: 'Controlled selection {year, month, day}.' },
-        { name: 'onChange', type: '(val: DateValue) => void', default: 'undefined', desc: 'Fires on snap.' },
-        { name: 'limits.yearMin/Max', type: 'number', default: '1900/2100', desc: 'Year selection range.' },
+        { name: 'value', type: 'DateValue', default: 'today', desc: 'Controlled selection { year, month, day }.' },
+        { name: 'defaultValue', type: 'DateValue', default: 'today', desc: 'Initial uncontrolled value.' },
+        { name: 'onChange', type: '(val: DateValue) => void', default: 'undefined', desc: 'Fires when any column snaps.' },
+        { name: 'style', type: 'ViewStyle', default: 'undefined', desc: 'Style overrides for the root container.' },
+        { name: 'limits.yearMin', type: 'number', default: '1900', desc: 'Minimum selectable year.' },
+        { name: 'limits.yearMax', type: 'number', default: '2100', desc: 'Maximum selectable year.' },
+        { name: 'theme.activeTextColor', type: 'string', default: '#ffffff', desc: 'Color of the centered (selected) item.' },
+        { name: 'theme.inactiveTextColor', type: 'string', default: 'rgba(255,255,255,0.14)', desc: 'Color of non-centered items.' },
+        { name: 'theme.accentColor', type: 'string', default: 'rgba(255,255,255,0.72)', desc: 'Accent highlight color.' },
+        { name: 'theme.separatorColor', type: 'string', default: 'rgba(255,255,255,0.72)', desc: 'Color of column separator character.' },
+        { name: 'theme.fontFamily', type: 'string', default: '""', desc: 'Font family for all picker text.' },
+        { name: 'layout.itemHeight', type: 'number', default: '72', desc: 'Height of each row in pixels.' },
+        { name: 'layout.visibleRows', type: 'number', default: '3', desc: 'Rows visible at once.' },
+        { name: 'layout.fontSize', type: 'number', default: '44', desc: 'Font size of picker labels.' },
+        { name: 'motion.decelerationRate', type: 'number', default: '0.992', desc: 'Scroll deceleration speed.' },
+        { name: 'motion.scrollEventThrottle', type: 'number', default: '8', desc: 'Scroll event frequency in ms.' },
       ]
     },
     flutter: {
       usage: `import 'package:gliph_ui/gliph_ui.dart';\n\nDateScrollPicker(\n  limits: const DateScrollPickerLimits(\n    yearMin: 1990,\n    yearMax: 2030,\n  ),\n  theme: const ScrollPickerTheme(\n    activeTextColor: Colors.white,\n    inactiveTextColor: Colors.white24,\n  ),\n  onChange: (val) => print(val.year),\n)`,
       props: [
-        { name: 'value', type: 'DateValue?', default: 'today', desc: 'Current selection.' },
-        { name: 'onChange', type: 'ValueChanged<DateValue>?', default: 'null', desc: 'Callback for date change.' },
-        { name: 'limits.yearMin/Max', type: 'int', default: '1900/2100', desc: 'Year selection range.' },
+        { name: 'value', type: 'DateValue?', default: 'today', desc: 'Controlled selection { year, month, day }.' },
+        { name: 'defaultValue', type: 'DateValue?', default: 'today', desc: 'Initial uncontrolled value.' },
+        { name: 'onChange', type: 'ValueChanged<DateValue>?', default: 'null', desc: 'Fires when a column snaps.' },
+        { name: 'limits.yearMin', type: 'int', default: '1900', desc: 'Minimum selectable year.' },
+        { name: 'limits.yearMax', type: 'int', default: '2100', desc: 'Maximum selectable year.' },
+        { name: 'theme.activeTextColor', type: 'Color', default: 'Colors.white', desc: 'Color of the centered item.' },
+        { name: 'theme.inactiveTextColor', type: 'Color', default: 'Colors.white24', desc: 'Color of non-centered items.' },
+        { name: 'theme.accentColor', type: 'Color', default: 'Colors.white', desc: 'Accent highlight color.' },
+        { name: 'theme.separatorColor', type: 'Color', default: 'Colors.white', desc: 'Column separator color.' },
+        { name: 'theme.fontFamily', type: 'String?', default: 'null', desc: 'Font family for all picker text.' },
+        { name: 'layout.itemHeight', type: 'double', default: '72', desc: 'Row height.' },
+        { name: 'layout.visibleRows', type: 'int', default: '3', desc: 'Rows visible at once.' },
+        { name: 'layout.fontSize', type: 'double', default: '44', desc: 'Label font size.' },
+        { name: 'motion.decelerationRate', type: 'double', default: '0.992', desc: 'Scroll deceleration speed.' },
+      ]
+    }
+  },
+  calendar: {
+    title: 'Calendar Picker',
+    description: 'A full-featured monthly calendar with animated day selection, year dropdown, and min/max date constraints.',
+    reactNative: {
+      previewGif: 'https://www.dropbox.com/scl/fi/awi0fk291sgrtyu49ez0j/SVID_20260509_093240_1.gif?rlkey=qxd0mlunj9n1rb5z4rcail8sv&st=ce8k0sfa&dl=1',
+      usage: `import React, { useState } from 'react';
+import { CalendarPicker } from 'gliph-ui';
+
+export default function App() {
+  const [date, setDate] = useState({
+    year: 2025,
+    month: 5,
+    day: 9,
+  });
+
+  return (
+    <CalendarPicker
+      value={date}
+      onChange={setDate}
+      theme={{
+        accent: '#38BDF8',
+        surface: '#111827',
+      }}
+      showTodayButton
+      enableYearDropdown
+    />
+  );
+}`,
+      props: [
+        { name: 'value', type: 'CalendarDate', default: 'today', desc: 'Controlled selection { year, month, day }.' },
+        { name: 'onChange', type: '(val: CalendarDate) => void', default: 'undefined', desc: 'Fires when a day is tapped.' },
+        { name: 'minDate', type: 'CalendarDate', default: 'undefined', desc: 'Earliest selectable date — earlier days are disabled.' },
+        { name: 'maxDate', type: 'CalendarDate', default: 'undefined', desc: 'Latest selectable date — later days are disabled.' },
+        { name: 'yearRange', type: '{ start: number, end: number }', default: '±60 years', desc: 'Overrides the range of years shown in the year dropdown.' },
+        { name: 'showOutsideDays', type: 'boolean', default: 'true', desc: 'Show greyed-out days from the previous/next month.' },
+        { name: 'showTodayButton', type: 'boolean', default: 'true', desc: "Show a 'Today' shortcut button to jump to the current date." },
+        { name: 'enableYearDropdown', type: 'boolean', default: 'true', desc: 'Allow tapping the year badge to open a scrollable year picker.' },
+        { name: 'width', type: 'ViewStyle[\'width\']', default: 'undefined', desc: 'Override the width of the calendar container.' },
+        { name: 'height', type: 'ViewStyle[\'height\']', default: 'undefined', desc: 'Override the height of the calendar container.' },
+        { name: 'maxWidth', type: 'ViewStyle[\'maxWidth\']', default: '390', desc: 'Maximum width. Defaults to 390 when width is unset.' },
+        { name: 'style', type: 'ViewStyle', default: 'undefined', desc: 'Additional style overrides applied to the root container.' },
+        { name: 'theme.accent', type: 'string', default: '#38BDF8', desc: 'Highlight color for the selected day circle and today dot.' },
+        { name: 'theme.onAccent', type: 'string', default: '#082F49', desc: 'Text color rendered on top of the accent (selected day number).' },
+        { name: 'theme.surface', type: 'string', default: '#111827', desc: 'Background color of the entire calendar card.' },
+        { name: 'theme.surfaceSoft', type: 'string', default: '#1F2937', desc: 'Background for the year dropdown panel and icon buttons.' },
+        { name: 'theme.text', type: 'string', default: '#F9FAFB', desc: 'Primary text color for day numbers and year button.' },
+        { name: 'theme.mutedText', type: 'string', default: '#CBD5E1', desc: 'Color for the month title.' },
+        { name: 'theme.faintText', type: 'string', default: '#64748B', desc: 'Color for weekday labels and out-of-month days.' },
+        { name: 'theme.disabledText', type: 'string', default: '#475569', desc: 'Color applied to days that are disabled by minDate/maxDate.' },
+        { name: 'theme.border', type: 'string', default: '#334155', desc: 'Border color for the card, buttons, and year dropdown.' },
+        { name: 'theme.pressed', type: 'string', default: '#263244', desc: 'Background tint shown on press (reserved for future use).' },
+      ]
+    },
+    flutter: {
+      usage: `// CalendarPicker is currently React Native only.
+// Flutter support is coming soon.`,
+      props: [
+        { name: '-', type: '-', default: '-', desc: 'Flutter support coming soon.' },
       ]
     }
   }
@@ -375,11 +548,13 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                 <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Live Playground</h3>
               </div>
               <p className={`mb-6 text-base ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-                Test the 120hz momentum scrolling in the browser, or scan the QR code to run it on your device.
+                {category === 'calendar'
+                  ? 'Tap any day, open the year dropdown, or jump to today — all running live on device via Expo Go.'
+                  : 'Test the 120hz momentum scrolling in the browser, or scan the QR code to run it on your device.'}
               </p>
               <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                 <iframe
-                  src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.1.1&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(platformData.usage)}`}
+                  src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.1&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(platformData.usage)}`}
                   style={{ width: '100%', height: '650px', border: 0 }}
                   title="Gliph UI Expo Preview"
                 />
@@ -440,7 +615,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
       </div>
 
       {/* Common Configuration */}
-      {category !== 'scale' && (
+      {category !== 'scale' && category !== 'calendar' && (
         <div className={`mt-20 border-t pt-16 pb-20 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
           <div className="mb-12">
             <div className="mb-6 flex items-center gap-3">
@@ -505,10 +680,12 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
     { id: 'date', title: 'Date Picker', icon: <Calendar size={16} />, group: 'Scroll' },
     { id: 'weight', title: 'Weight Picker', icon: <Scale size={16} />, group: 'Scroll' },
     { id: 'value', title: 'Value Picker', icon: <ListFilter size={16} />, group: 'Scroll' },
+    { id: 'calendar', title: 'Calendar Picker', icon: <Calendar size={16} />, group: 'Calendar' },
   ];
 
   const scaleComponents = allComponents.filter(c => c.group === 'Scale');
   const scrollComponents = allComponents.filter(c => c.group === 'Scroll');
+  const calendarComponents = allComponents.filter(c => c.group === 'Calendar');
 
   return (
     <section className="grid flex-1 py-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
@@ -531,8 +708,8 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
-                  ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
-                  : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#fb923c]' : 'text-[#ea580c]') : ''}>{comp.icon}</span>
@@ -549,11 +726,29 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
-                  ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
-                  : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#38bdf8]' : 'text-[#0ea5e9]') : ''}>{comp.icon}</span>
+              {comp.title}
+            </button>
+          ))}
+
+          {/* Calendar Picker group */}
+          <p className={`w-full px-3 pt-6 pb-1 text-[11px] font-bold uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/30'}`}>
+            Calendar Picker
+          </p>
+          {calendarComponents.map((comp) => (
+            <button
+              key={comp.id}
+              onClick={() => setActiveCategory(comp.id)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+                }`}
+            >
+              <span className={activeCategory === comp.id ? (isDark ? 'text-[#4ade80]' : 'text-[#16a34a]') : ''}>{comp.icon}</span>
               {comp.title}
             </button>
           ))}
