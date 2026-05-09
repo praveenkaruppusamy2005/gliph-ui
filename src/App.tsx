@@ -725,82 +725,59 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-12 lg:gap-20">
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24 w-full">
-            {/* React Native Preview */}
-            {(rnGif || hasSeparatePreviews) && (
-              <div className="flex flex-col items-center w-full max-w-[320px]">
-                <div className={`mb-6 flex items-center gap-2 px-3 py-1 rounded-full border ${isDark ? 'border-[#61dafb]/20 bg-[#61dafb]/5 text-[#61dafb]' : 'border-[#61dafb]/30 bg-[#61dafb]/5 text-[#0891b2]'}`}>
-                  <Code2 size={14} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">React Native</span>
-                </div>
+        <div className="flex flex-col items-center gap-16">
+          <div className="flex flex-col items-center w-full max-w-md">
+            <p className={`mb-6 text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+              {platform === 'react-native' ? 'React Native' : 'Flutter'} Demonstration
+            </p>
 
-                <div className={`relative w-full aspect-[9/19.5] rounded-[3rem] border-[12px] bg-black shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
-                  <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
-                    <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
-                  </div>
-
-                  {rnLoading && (
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0a] rounded-[2.2rem] gap-4">
-                      <div className="relative w-10 h-10">
-                        <div className="absolute inset-0 rounded-full border-[3px] border-white/10"></div>
-                        <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#61dafb] animate-spin"></div>
-                      </div>
-                    </div>
-                  )}
-
-                  {rnGif ? (
-                    <img
-                      src={rnGif}
-                      alt="React Native Preview"
-                      className={`absolute inset-0 h-full w-full object-cover rounded-[2.2rem] transition-opacity duration-700 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
-                      onLoad={() => setRnLoading(false)}
-                    />
-                  ) : (
-                    <div className="text-white/20 text-xs font-medium text-center px-8">Preview not available</div>
-                  )}
-                </div>
+            <div className={`relative w-[300px] aspect-[9/19] rounded-[3rem] border-[12px] bg-black shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
+              {/* Notch */}
+              <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
+                <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
               </div>
-            )}
 
-            {/* Flutter Preview */}
-            {(flutterGif || hasSeparatePreviews) && (
-              <div className="flex flex-col items-center w-full max-w-[320px]">
-                <div className={`mb-6 flex items-center gap-2 px-3 py-1 rounded-full border ${isDark ? 'border-[#38bdf8]/20 bg-[#38bdf8]/5 text-[#38bdf8]' : 'border-[#38bdf8]/30 bg-[#38bdf8]/5 text-[#0369a1]'}`}>
-                  <Smartphone size={14} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">Flutter</span>
-                </div>
-
-                <div className={`relative w-full aspect-[9/19.5] rounded-[3rem] border-[12px] bg-black shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
-                  <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
-                    <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
+              {/* Loading overlay */}
+              {(platform === 'react-native' ? rnLoading : flutterLoading) && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0a] rounded-[2.2rem] gap-4">
+                  {/* Spinner */}
+                  <div className="relative w-12 h-12">
+                    <div className="absolute inset-0 rounded-full border-[3px] border-white/10"></div>
+                    <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-white animate-spin"></div>
                   </div>
-
-                  {flutterLoading && (
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0a] rounded-[2.2rem] gap-4">
-                      <div className="relative w-10 h-10">
-                        <div className="absolute inset-0 rounded-full border-[3px] border-white/10"></div>
-                        <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#38bdf8] animate-spin"></div>
-                      </div>
-                    </div>
-                  )}
-
-                  {flutterGif ? (
-                    <img
-                      src={flutterGif}
-                      alt="Flutter Preview"
-                      className={`absolute inset-0 h-full w-full object-cover rounded-[2.2rem] transition-opacity duration-700 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
-                      onLoad={() => setFlutterLoading(false)}
-                    />
-                  ) : (
-                    <div className="text-white/20 text-xs font-medium text-center px-8 flex flex-col items-center gap-3">
-                      <Smartphone size={32} className="opacity-20" />
-                      Flutter Preview Coming Soon
-                    </div>
-                  )}
+                  <span className="text-white/40 text-xs font-medium tracking-widest uppercase">Loading</span>
                 </div>
-              </div>
-            )}
+              )}
+
+              {platform === 'react-native' ? (
+                rnGif ? (
+                  <img
+                    key={`${category}-rn`}
+                    src={rnGif}
+                    alt="React Native Preview"
+                    className={`absolute inset-0 h-full w-full object-cover rounded-[2.2rem] transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
+                    onLoad={() => setRnLoading(false)}
+                  />
+                ) : (
+                  <div className="text-white/20 text-xs font-medium text-center px-8">RN Preview not available</div>
+                )
+              ) : (
+                flutterGif ? (
+                  <img
+                    key={`${category}-flutter`}
+                    src={flutterGif}
+                    alt="Flutter Preview"
+                    className={`absolute inset-0 h-full w-full object-cover rounded-[2.2rem] transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
+                    onLoad={() => setFlutterLoading(false)}
+                  />
+                ) : (
+                  <div className="text-white/20 text-xs font-medium text-center px-8 flex flex-col items-center gap-3">
+                    <Smartphone size={32} className="opacity-20" />
+                    Flutter Preview Coming Soon
+                  </div>
+                )
+              )}
+            </div>
           </div>
 
 
