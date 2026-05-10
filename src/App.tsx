@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Scale, ListFilter, ChevronLeft, Terminal, Code2, PlaySquare, Calendar, Smartphone, Copy, Check, Settings, Layout, Sun, Moon, Ruler } from 'lucide-react';
+import { Clock, Scale, ListFilter, ChevronLeft, Terminal, Code2, PlaySquare, Calendar, Smartphone, Copy, Check, Settings, Layout, Zap, Sun, Moon, Ruler } from 'lucide-react';
 
 type Platform = 'react-native' | 'flutter';
 type Theme = 'light' | 'dark';
@@ -140,7 +140,7 @@ function HomePage({ platform, navigate, theme }: { platform: Platform, navigate:
 }
 
 
-type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar';
+type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar' | 'navbar';
 
 interface PickerProp {
   name: string;
@@ -164,6 +164,94 @@ interface CategoryData {
 }
 
 const CATEGORY_CONTENT: Record<Category, CategoryData> = {
+  navbar: {
+    title: 'Navbar',
+    description: 'A premium, animated glassmorphism navbar with spring physics and custom icon support.',
+    reactNative: {
+      previewGif: 'https://www.dropbox.com/scl/fi/jtgtmlmuzhcrce569ml8a/SVID_20260510_170411_1.gif?rlkey=al5h4its78i3q2cun7xjfkdj0&st=o9e36gp1&dl=1',
+      usage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User, Settings } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+
+  const tabs = [
+    { 
+      id: 'home', 
+      label: 'Home',
+      icon: (color, size) => <Home color={color} size={size} /> 
+    },
+    { 
+      id: 'search', 
+      label: 'Explore', // Custom label
+      icon: (color, size) => <Search color={color} size={size} /> 
+    },
+    { 
+      id: 'profile',
+      // label is optional
+      icon: (color, size) => <User color={color} size={size} />,
+      activeIcon: (color, size) => <User color={color} size={size + 2} strokeWidth={3} />
+    }
+  ];
+
+  return (
+    <View style={styles.container}>
+      <Navbar
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        theme={{
+          background: 'rgba(15, 15, 20, 0.9)',
+          activeColor: '#818cf8',
+          indicatorColor: 'rgba(129, 140, 248, 0.15)',
+          borderColor: 'rgba(255, 255, 255, 0.05)'
+        }}
+        activeScale={1.3}
+        iconSize={22}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#050505',
+  },
+});`,
+      props: [
+        { name: 'tabs', type: 'NavbarTab[]', default: 'required', desc: 'Array of tab configurations. See Tab Props below.' },
+        { name: 'activeTab', type: 'string', default: 'required', desc: 'ID of the currently selected tab.' },
+        { name: 'onTabChange', type: '(id: string) => void', default: 'required', desc: 'Callback function triggered on tab press.' },
+        { name: 'width', type: 'number | string', default: 'SCREEN_WIDTH - 40', desc: 'Total width of the navbar container.' },
+        { name: 'height', type: 'number', default: '70', desc: 'Height of the navbar container.' },
+        { name: 'bottom', type: 'number', default: '30', desc: 'Vertical offset from the bottom of the screen.' },
+        { name: 'borderRadius', type: 'number', default: '35', desc: 'Corner radius of the navbar.' },
+        { name: 'padding', type: 'number', default: '5', desc: 'Horizontal padding inside the container.' },
+        { name: 'showIndicator', type: 'boolean', default: 'true', desc: 'Whether to show the animated active indicator pill.' },
+        { name: 'indicatorHeight', type: 'number', default: '50', desc: 'Height of the active indicator pill.' },
+        { name: 'indicatorBorderRadius', type: 'number', default: '25', desc: 'Corner radius of the indicator pill.' },
+        { name: 'iconSize', type: 'number', default: '24', desc: 'Base size for tab icons.' },
+        { name: 'activeScale', type: 'number', default: '1.25', desc: 'Scaling factor for the active tab icon.' },
+        { name: 'theme.background', type: 'string', default: 'rgba(18, 18, 24, 0.85)', desc: 'Background color of the navbar (supports transparency).' },
+        { name: 'theme.activeColor', type: 'string', default: '#6366f1', desc: 'Color of the active icon and label.' },
+        { name: 'theme.inactiveColor', type: 'string', default: '#94a3b8', desc: 'Color of inactive icons.' },
+        { name: 'theme.indicatorColor', type: 'string', default: 'rgba(99, 102, 241, 0.15)', desc: 'Color of the active indicator pill.' },
+        { name: 'theme.borderColor', type: 'string', default: 'rgba(255, 255, 255, 0.1)', desc: 'Border color of the navbar.' },
+        { name: 'Tab: id', type: 'string', default: 'required', desc: 'Unique identifier for the tab.' },
+        { name: 'Tab: label', type: 'string', default: 'optional', desc: 'Text label shown below the icon when active. If omitted, only the icon is shown.' },
+        { name: 'Tab: icon', type: 'RenderProp', default: 'default svg', desc: '(color, size) => ReactNode. Base icon for the tab.' },
+        { name: 'Tab: activeIcon', type: 'RenderProp', default: 'icon', desc: 'Specific icon to show when the tab is active.' },
+        { name: 'Tab: inactiveIcon', type: 'RenderProp', default: 'icon', desc: 'Specific icon to show when the tab is inactive.' },
+      ]
+    },
+    flutter: {
+      usage: `// Flutter navbar coming soon`,
+      props: []
+    }
+  },
   scale: {
     title: 'Scale Picker',
     description: 'A horizontal ruler-style picker for height, weight, and other linear measurements.',
@@ -171,7 +259,7 @@ const CATEGORY_CONTENT: Record<Category, CategoryData> = {
       previewGif: 'https://www.dropbox.com/scl/fi/cevifhhaubqobza5ft1pw/SVID_20260508_222010_1.gif?rlkey=950pp5hlbaqol46bbkohrrp8h&st=hu4gpr3r&dl=1',
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { ScalePicker } from 'gliph-ui';
+import { ScalePicker } from '@praveenkaruppusamy2005/gliph-ui';
 
 export default function App() {
   const [value, setValue] = useState(88);
@@ -248,7 +336,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { TimeScrollPicker } from 'gliph-ui';
+import { TimeScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
 
 export default function App() {
   const [time, setTime] = useState({ hour: 7, minute: 30, ampm: 'am' });
@@ -336,7 +424,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { WeightScrollPicker } from 'gliph-ui';
+import { WeightScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
 
 export default function App() {
   const [weight, setWeight] = useState({ whole: 70, decimal: 5, unit: 'kg' });
@@ -411,7 +499,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { ValueScrollPicker } from 'gliph-ui';
+import { ValueScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
 
 export default function App() {
   const [val, setVal] = useState('medium');
@@ -482,7 +570,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { DateScrollPicker } from 'gliph-ui';
+import { DateScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
 
 export default function App() {
   const [date, setDate] = useState({ year: 2025, month: 5, day: 9 });
@@ -550,7 +638,7 @@ export default function App() {
       previewGif: 'https://www.dropbox.com/scl/fi/awi0fk291sgrtyu49ez0j/SVID_20260509_093240_1.gif?rlkey=qxd0mlunj9n1rb5z4rcail8sv&st=ce8k0sfa&dl=1',
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { CalendarPicker } from 'gliph-ui';
+import { CalendarPicker } from '@praveenkaruppusamy2005/gliph-ui';
 
 export default function App() {
   const [date, setDate] = useState({
@@ -730,7 +818,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
               {platform === 'react-native' ? 'React Native' : 'Flutter'} Demonstration
             </p>
 
-            <div className={`relative w-[300px] aspect-[9/19] rounded-[3rem] border-[12px] bg-black shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
+            <div className={`relative ${category === 'navbar' ? 'w-[240px]' : 'w-[300px]'} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
               {/* Notch */}
               <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
                 <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
@@ -754,7 +842,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                     key={`${category}-rn`}
                     src={rnGif}
                     alt="React Native Preview"
-                    className={`absolute inset-0 h-full w-full object-cover rounded-[2.2rem] transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
+                    className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain scale-[0.9]' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
                     onLoad={() => setRnLoading(false)}
                   />
                 ) : (
@@ -766,7 +854,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                     key={`${category}-flutter`}
                     src={flutterGif}
                     alt="Flutter Preview"
-                    className={`absolute inset-0 h-full w-full object-cover rounded-[2.2rem] transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
+                    className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain scale-[0.9]' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
                     onLoad={() => setFlutterLoading(false)}
                   />
                 ) : (
@@ -795,7 +883,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
               </p>
               <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                 <iframe
-                  src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.1&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(platformData.usage)}`}
+                  src={`https://snack.expo.dev/embedded?dependencies=@praveenkaruppusamy2005/gliph-ui@1.2.2&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(platformData.usage)}`}
                   style={{ width: '100%', height: '650px', border: 0 }}
                   title="Gliph UI Expo Preview"
                 />
@@ -811,6 +899,21 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
           <Terminal className="text-[#4ade80]" size={28} />
           <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Installation</h3>
         </div>
+
+        {platform === 'react-native' && (
+          <div className={`mb-6 p-4 rounded-xl border ${isDark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-500/20 bg-amber-500/5'}`}>
+            <p className={`text-sm font-semibold flex items-center gap-2 ${isDark ? 'text-amber-500' : 'text-amber-600'}`}>
+              <Zap size={16} /> Prerequisite: react-native-svg
+            </p>
+            <p className={`mt-1 text-sm ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+              Most Gliph UI components require <code className="font-mono text-xs">react-native-svg</code> to render icons. Ensure it is installed in your project.
+            </p>
+            <div className="mt-3">
+              <CodeBlock code="npm install react-native-svg" language="bash" theme={theme} />
+            </div>
+          </div>
+        )}
+
         <CodeBlock
           code={platform === 'react-native' ? 'npm install gliph-ui' : 'flutter pub add gliph_ui'}
           language={platform === 'react-native' ? 'npm' : 'shell'}
@@ -916,6 +1019,7 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
   const isDark = theme === 'dark';
 
   const allComponents: { id: Category, title: string, icon: React.ReactNode, group: string }[] = [
+    { id: 'navbar', title: 'Navbar', icon: <Layout size={16} />, group: 'Navigation' },
     { id: 'scale', title: 'Scale Picker', icon: <Ruler size={16} />, group: 'Scale' },
     { id: 'time', title: 'Time Picker', icon: <Clock size={16} />, group: 'Scroll' },
     { id: 'date', title: 'Date Picker', icon: <Calendar size={16} />, group: 'Scroll' },
@@ -924,6 +1028,7 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
     { id: 'calendar', title: 'Calendar Picker', icon: <Calendar size={16} />, group: 'Calendar' },
   ];
 
+  const navigationComponents = allComponents.filter(c => c.group === 'Navigation');
   const scaleComponents = allComponents.filter(c => c.group === 'Scale');
   const scrollComponents = allComponents.filter(c => c.group === 'Scroll');
   const calendarComponents = allComponents.filter(c => c.group === 'Calendar');
@@ -939,6 +1044,24 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
           >
             ← Home
           </button>
+
+          {/* Navigation group */}
+          <p className={`w-full px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/30'}`}>
+            Navigation
+          </p>
+          {navigationComponents.map((comp) => (
+            <button
+              key={comp.id}
+              onClick={() => setActiveCategory(comp.id)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+                }`}
+            >
+              <span className={activeCategory === comp.id ? (isDark ? 'text-[#818cf8]' : 'text-[#6366f1]') : ''}>{comp.icon}</span>
+              {comp.title}
+            </button>
+          ))}
 
           {/* Scale Picker group */}
           <p className={`w-full px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/30'}`}>
