@@ -27,7 +27,7 @@ function CodeBlock({ code, language, theme }: { code: string, language: string, 
       <div className={`absolute right-16 top-6 z-10 text-[10px] font-bold uppercase tracking-widest ${isDark ? 'text-white/20' : 'text-black/20'}`}>
         {language}
       </div>
-      <pre className={`overflow-x-auto text-[14px] leading-relaxed font-mono whitespace-pre-wrap selection:bg-[#38bdf8]/30 ${isDark ? 'text-[#c9d1d9]' : 'text-zinc-800'}`}>
+      <pre className={`overflow-x-auto text-[14px] leading-relaxed whitespace-pre-wrap selection:bg-[#38bdf8]/30 ${isDark ? 'text-[#c9d1d9]' : 'text-zinc-800'}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
         <code>{code}</code>
       </pre>
     </div>
@@ -155,12 +155,19 @@ interface PlatformData {
   props: PickerProp[];
 }
 
+interface Variant {
+  name: string;
+  previewGif?: string;
+  usage: string;
+}
+
 interface CategoryData {
   title: string;
   description: string;
   previewGif?: string;
   reactNative: PlatformData;
   flutter: PlatformData;
+  variants?: Variant[];
 }
 
 const CATEGORY_CONTENT: Record<Category, CategoryData> = {
@@ -247,6 +254,128 @@ const styles = StyleSheet.create({
         { name: 'Tab: inactiveIcon', type: 'RenderProp', default: 'icon', desc: 'Specific icon to show when the tab is inactive.' },
       ]
     },
+    variants: [
+      {
+        name: 'Floating',
+        previewGif: 'https://www.dropbox.com/scl/fi/4itsw2gk2jbro5urcpfmv/SVID_20260510_175553_1.gif?rlkey=zzz269muydo8udcpgxuaoy2tf&st=hzf5acaa&dl=1',
+        usage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="floating"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' }
+});`
+      },
+      {
+        name: 'Classic',
+        previewGif: 'https://www.dropbox.com/scl/fi/p5rfxpwd6nukl60uz68z7/SVID_20260510_175614_1.mp4?rlkey=6wwnt6wja6v8oje3x1ot4g94r&st=pi7e1wfs&dl=1',
+        usage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="classic"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' }
+});`
+      },
+      {
+        name: 'Minimal',
+        previewGif: 'https://www.dropbox.com/scl/fi/swztrtal3ao8zhv8x50tc/SVID_20260510_175630_1.mp4?rlkey=3omvdiea8nixxdg60urc94tfe&st=87unlzl7&dl=1',
+        usage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="minimal"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' }
+});`
+      },
+      {
+        name: 'IOS',
+        previewGif: 'https://www.dropbox.com/scl/fi/2bx3b0gfbrrod6xwd5cdq/SVID_20260510_175648_1.mp4?rlkey=31v8wz8hir01sgmj32ydiox7t&st=67pt0s3g&dl=1',
+        usage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="ios"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' }
+});`
+      }
+    ],
     flutter: {
       usage: `// Flutter navbar coming soon`,
       props: []
@@ -259,7 +388,7 @@ const styles = StyleSheet.create({
       previewGif: 'https://www.dropbox.com/scl/fi/cevifhhaubqobza5ft1pw/SVID_20260508_222010_1.gif?rlkey=950pp5hlbaqol46bbkohrrp8h&st=hu4gpr3r&dl=1',
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { ScalePicker } from '@praveenkaruppusamy2005/gliph-ui';
+import { ScalePicker } from 'gliph-ui';
 
 export default function App() {
   const [value, setValue] = useState(88);
@@ -336,7 +465,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { TimeScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
+import { TimeScrollPicker } from 'gliph-ui';
 
 export default function App() {
   const [time, setTime] = useState({ hour: 7, minute: 30, ampm: 'am' });
@@ -424,7 +553,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { WeightScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
+import { WeightScrollPicker } from 'gliph-ui';
 
 export default function App() {
   const [weight, setWeight] = useState({ whole: 70, decimal: 5, unit: 'kg' });
@@ -499,7 +628,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { ValueScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
+import { ValueScrollPicker } from 'gliph-ui';
 
 export default function App() {
   const [val, setVal] = useState('medium');
@@ -570,7 +699,7 @@ export default function App() {
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { DateScrollPicker } from '@praveenkaruppusamy2005/gliph-ui';
+import { DateScrollPicker } from 'gliph-ui';
 
 export default function App() {
   const [date, setDate] = useState({ year: 2025, month: 5, day: 9 });
@@ -638,7 +767,7 @@ export default function App() {
       previewGif: 'https://www.dropbox.com/scl/fi/awi0fk291sgrtyu49ez0j/SVID_20260509_093240_1.gif?rlkey=qxd0mlunj9n1rb5z4rcail8sv&st=ce8k0sfa&dl=1',
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
-import { CalendarPicker } from '@praveenkaruppusamy2005/gliph-ui';
+import { CalendarPicker } from 'gliph-ui';
 
 export default function App() {
   const [date, setDate] = useState({
@@ -761,6 +890,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
   const isDark = theme === 'dark';
   const [rnLoading, setRnLoading] = useState(true);
   const [flutterLoading, setFlutterLoading] = useState(true);
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0);
 
   const rnGif = data.reactNative?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
   const flutterGif = data.flutter?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
@@ -768,6 +898,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
   useEffect(() => {
     setRnLoading(true);
     setFlutterLoading(true);
+    setActiveVariantIndex(0);
     const timer = setTimeout(() => {
       setRnLoading(false);
       setFlutterLoading(false);
@@ -803,95 +934,197 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
         {data.description}
       </p>
 
-      {/* Previews Grid */}
-      <div className={`mt-16 border-t pt-16 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-        <div className={`mb-8 flex items-center justify-between gap-3 ${isDark ? 'text-white' : 'text-black'}`}>
-          <div className="flex items-center gap-3">
-            <PlaySquare className="text-[#38bdf8]" size={28} />
-            <h3 className="text-2xl font-bold">Live Previews</h3>
+      {data.variants ? (
+        <div className="mt-16">
+          <div className="flex flex-wrap gap-3 sm:gap-4 mb-12">
+            {data.variants.map((v, idx) => (
+              <button
+                key={v.name}
+                onClick={() => setActiveVariantIndex(idx)}
+                className={`rounded-xl px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold transition-all border ${activeVariantIndex === idx
+                  ? (isDark ? 'bg-white text-black border-white shadow-lg shadow-white/10' : 'bg-black text-white border-black shadow-lg shadow-black/10')
+                  : (isDark ? 'border-white/10 text-white/50 hover:border-white/20 hover:text-white bg-white/[0.02]' : 'border-black/10 text-black/50 hover:border-black/20 hover:text-black bg-black/[0.02]')
+                }`}
+              >
+                {v.name}
+              </button>
+            ))}
+          </div>
+
+          <div key={`${category}-${activeVariantIndex}`} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {(() => {
+              const variant = data.variants[activeVariantIndex];
+              return (
+                <div className="flex flex-col gap-8">
+                  <div>
+                    <h3 className={`text-3xl font-bold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>{variant.name} Variant</h3>
+                    <p className={`text-lg ${isDark ? 'text-white/50' : 'text-black/50'}`}>
+                      The {variant.name.toLowerCase()} design for the {data.title.toLowerCase()}.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-16 items-center">
+                    {/* Phone Preview */}
+                    <div className="flex flex-col items-center">
+                      <p className={`mb-6 text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+                        Visual Preview
+                      </p>
+                      <div className={`relative w-[280px] aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl overflow-hidden ${isDark ? 'border-[#1a1a1a]' : 'border-zinc-800'}`}>
+                        <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
+                          <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
+                        </div>
+
+                        {variant.previewGif?.includes('.mp4') ? (
+                          <video
+                            src={variant.previewGif}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem]`}
+                          />
+                        ) : (
+                          <img
+                            src={variant.previewGif}
+                            alt={variant.name}
+                            className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem]`}
+                          />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expo Playground */}
+                    <div className="flex flex-col gap-6 w-full max-w-4xl">
+                      <p className={`text-sm font-semibold uppercase tracking-wider text-center ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+                        Live Playground
+                      </p>
+                      <div className={`overflow-hidden rounded-2xl border shadow-xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
+                        <iframe
+                          src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.2&name=${encodeURIComponent(variant.name)}&platform=android&theme=dark&code=${encodeURIComponent(variant.usage)}`}
+                          style={{ width: '100%', height: '600px', border: 0 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
+      ) : (
+        <>
+          {/* Previews Grid */}
+          <div className={`mt-16 border-t pt-16 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+            <div className={`mb-8 flex items-center justify-between gap-3 ${isDark ? 'text-white' : 'text-black'}`}>
+              <div className="flex items-center gap-3">
+                <PlaySquare className="text-[#38bdf8]" size={28} />
+                <h3 className="text-2xl font-bold">Live Previews</h3>
+              </div>
+            </div>
 
-        <div className="flex flex-col items-center gap-16">
-          <div className="flex flex-col items-center w-full max-w-md">
-            <p className={`mb-6 text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-black/40'}`}>
-              {platform === 'react-native' ? 'React Native' : 'Flutter'} Demonstration
-            </p>
+            <div className="flex flex-col items-center gap-16">
+              <div className="flex flex-col items-center w-full max-w-md">
+                <p className={`mb-6 text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+                  {platform === 'react-native' ? 'React Native' : 'Flutter'} Demonstration
+                </p>
 
-            <div className={`relative ${category === 'navbar' ? 'w-[240px]' : 'w-[300px]'} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
-              {/* Notch */}
-              <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
-                <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
+                <div className={`relative ${category === 'navbar' ? 'w-[240px]' : 'w-[300px]'} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
+                  {/* Notch */}
+                  <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
+                    <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
+                  </div>
+
+                  {/* Loading overlay */}
+                  {(platform === 'react-native' ? rnLoading : flutterLoading) && (
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0a] rounded-[2.2rem] gap-4">
+                      {/* Spinner */}
+                      <div className="relative w-12 h-12">
+                        <div className="absolute inset-0 rounded-full border-[3px] border-white/10"></div>
+                        <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-white animate-spin"></div>
+                      </div>
+                      <span className="text-white/40 text-xs font-medium tracking-widest uppercase">Loading</span>
+                    </div>
+                  )}
+
+                  {platform === 'react-native' ? (
+                    rnGif ? (
+                      <img
+                        key={`${category}-rn`}
+                        src={rnGif}
+                        alt="React Native Preview"
+                        className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
+                        onLoad={() => setRnLoading(false)}
+                      />
+                    ) : (
+                      <div className="text-white/20 text-xs font-medium text-center px-8">RN Preview not available</div>
+                    )
+                  ) : (
+                    flutterGif ? (
+                      <img
+                        key={`${category}-flutter`}
+                        src={flutterGif}
+                        alt="Flutter Preview"
+                        className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
+                        onLoad={() => setFlutterLoading(false)}
+                      />
+                    ) : (
+                      <div className="text-white/20 text-xs font-medium text-center px-8 flex flex-col items-center gap-3">
+                        <Smartphone size={32} className="opacity-20" />
+                        Flutter Preview Coming Soon
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
 
-              {/* Loading overlay */}
-              {(platform === 'react-native' ? rnLoading : flutterLoading) && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0a] rounded-[2.2rem] gap-4">
-                  {/* Spinner */}
-                  <div className="relative w-12 h-12">
-                    <div className="absolute inset-0 rounded-full border-[3px] border-white/10"></div>
-                    <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-white animate-spin"></div>
+
+              {platform === 'react-native' && (
+                <div className={`flex flex-col w-full pt-8 border-t animate-in fade-in duration-500 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+                  <div className="mb-6 flex items-center gap-3">
+                    <PlaySquare className="text-[#38bdf8]" size={28} />
+                    <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Live Playground</h3>
                   </div>
-                  <span className="text-white/40 text-xs font-medium tracking-widest uppercase">Loading</span>
+                  <p className={`mb-6 text-base ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+                    {category === 'calendar'
+                      ? 'Tap any day, open the year dropdown, or jump to today — all running live on device via Expo Go.'
+                      : category === 'scale'
+                        ? 'Drag the ruler left and right to pick a value — run it live on your device via Expo Go.'
+                        : 'Test the 120hz momentum scrolling in the browser, or scan the QR code to run it on your device.'}
+                  </p>
+                  <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
+                    <iframe
+                      src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.2&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(platformData.usage)}`}
+                      style={{ width: '100%', height: '650px', border: 0 }}
+                      title="Gliph UI Expo Preview"
+                    />
+                  </div>
                 </div>
               )}
-
-              {platform === 'react-native' ? (
-                rnGif ? (
-                  <img
-                    key={`${category}-rn`}
-                    src={rnGif}
-                    alt="React Native Preview"
-                    className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain scale-[0.9]' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
-                    onLoad={() => setRnLoading(false)}
-                  />
-                ) : (
-                  <div className="text-white/20 text-xs font-medium text-center px-8">RN Preview not available</div>
-                )
-              ) : (
-                flutterGif ? (
-                  <img
-                    key={`${category}-flutter`}
-                    src={flutterGif}
-                    alt="Flutter Preview"
-                    className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain scale-[0.9]' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
-                    onLoad={() => setFlutterLoading(false)}
-                  />
-                ) : (
-                  <div className="text-white/20 text-xs font-medium text-center px-8 flex flex-col items-center gap-3">
-                    <Smartphone size={32} className="opacity-20" />
-                    Flutter Preview Coming Soon
-                  </div>
-                )
-              )}
             </div>
           </div>
+        </>
+      )}
 
-
-          {platform === 'react-native' && (
-            <div className={`flex flex-col w-full pt-8 border-t animate-in fade-in duration-500 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-              <div className="mb-6 flex items-center gap-3">
-                <PlaySquare className="text-[#38bdf8]" size={28} />
-                <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Live Playground</h3>
-              </div>
-              <p className={`mb-6 text-base ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-                {category === 'calendar'
-                  ? 'Tap any day, open the year dropdown, or jump to today — all running live on device via Expo Go.'
-                  : category === 'scale'
-                    ? 'Drag the ruler left and right to pick a value — run it live on your device via Expo Go.'
-                    : 'Test the 120hz momentum scrolling in the browser, or scan the QR code to run it on your device.'}
-              </p>
-              <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
-                <iframe
-                  src={`https://snack.expo.dev/embedded?dependencies=@praveenkaruppusamy2005/gliph-ui@1.2.2&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(platformData.usage)}`}
-                  style={{ width: '100%', height: '650px', border: 0 }}
-                  title="Gliph UI Expo Preview"
-                />
-              </div>
+      {/* Unified Usage Code Section */}
+      <div key={`${category}-${activeVariantIndex}-usage`} className={`mt-24 border-t pt-20 animate-in fade-in slide-in-from-bottom-4 duration-700 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+        <div className="flex flex-col gap-10 max-w-4xl mx-auto">
+          <div className="flex flex-col items-center gap-3">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isDark ? 'bg-white/5 text-[#4ade80]' : 'bg-black/5 text-[#22c55e]'}`}>
+              <Terminal size={24} />
             </div>
-          )}
+            <h3 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Usage Code</h3>
+            <p className={`text-sm font-medium ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+              Import and implement the {data.title} in your React Native project.
+            </p>
+          </div>
+          <CodeBlock 
+            code={data.variants ? data.variants[activeVariantIndex].usage : platformData.usage} 
+            language={platform === 'react-native' ? 'tsx' : 'dart'} 
+            theme={theme} 
+          />
         </div>
       </div>
+
 
       {/* Installation */}
       <div className={`mt-20 border-t pt-16 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
@@ -921,14 +1154,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
         />
       </div>
 
-      {/* Usage */}
-      <div className={`mt-20 border-t pt-16 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-        <div className="mb-6 flex items-center gap-3">
-          <Code2 className="text-[#f5d0a9]" size={28} />
-          <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Usage</h3>
-        </div>
-        <CodeBlock code={platformData.usage} language={platform === 'react-native' ? 'tsx' : 'dart'} theme={theme} />
-      </div>
+
 
       {/* Specific Props */}
       <div className={`mt-20 border-t pt-16 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
