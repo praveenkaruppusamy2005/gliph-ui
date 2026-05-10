@@ -179,7 +179,7 @@ const CATEGORY_CONTENT: Record<Category, CategoryData> = {
       usage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
-import { Home, Search, User, Settings } from 'lucide-react-native';
+import { Home, Search, User, Settings, Plus } from 'lucide-react-native';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -217,6 +217,11 @@ export default function App() {
         }}
         activeScale={1.3}
         iconSize={22}
+        actionButton={{
+          icon: (color, size) => <Plus color={color} size={size} />,
+          onPress: () => console.log('Action Pressed'),
+          color: '#818cf8'
+        }}
       />
     </View>
   );
@@ -232,6 +237,7 @@ const styles = StyleSheet.create({
         { name: 'tabs', type: 'NavbarTab[]', default: 'required', desc: 'Array of tab configurations. See Tab Props below.' },
         { name: 'activeTab', type: 'string', default: 'required', desc: 'ID of the currently selected tab.' },
         { name: 'onTabChange', type: '(id: string) => void', default: 'required', desc: 'Callback function triggered on tab press.' },
+        { name: 'actionButton', type: 'ActionButtonProps', default: 'undefined', desc: 'Optional center action button configuration { icon, onPress, color }.' },
         { name: 'width', type: 'number | string', default: 'SCREEN_WIDTH - 40', desc: 'Total width of the navbar container.' },
         { name: 'height', type: 'number', default: '70', desc: 'Height of the navbar container.' },
         { name: 'bottom', type: 'number', default: '30', desc: 'Vertical offset from the bottom of the screen.' },
@@ -377,8 +383,65 @@ const styles = StyleSheet.create({
       }
     ],
     flutter: {
-      usage: `// Flutter navbar coming soon`,
-      props: []
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _activeTab = 'home';
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        bottomNavigationBar: Navbar(
+          variant: NavbarVariant.floating,
+          activeTab: _activeTab,
+          onTabChange: (id) => setState(() => _activeTab = id),
+          tabs: [
+            NavbarTab(
+              id: 'home',
+              label: 'Home',
+              icon: (c, s) => Icon(Icons.home_outlined, color: c, size: s),
+              activeIcon: (c, s) => Icon(Icons.home, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'search',
+              label: 'Search',
+              icon: (c, s) => Icon(Icons.search, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'profile',
+              label: 'Profile',
+              icon: (c, s) => Icon(Icons.person_outline, color: c, size: s),
+            ),
+          ],
+          actionButton: ActionButtonObj(
+            icon: (c, s) => Icon(Icons.add, color: c, size: s),
+            onPress: () => print('Action Pressed'),
+            color: Colors.indigoAccent,
+          ),
+        ),
+      ),
+    );
+  }`,
+      props: [
+        { name: 'variant', type: 'NavbarVariant', default: 'floating', desc: 'The visual style: floating, classic, minimal, ios.' },
+        { name: 'tabs', type: 'List<NavbarTab>', default: 'required', desc: 'List of tab configurations.' },
+        { name: 'activeTab', type: 'String', default: 'required', desc: 'ID of the selected tab.' },
+        { name: 'onTabChange', type: 'Function(String)', default: 'required', desc: 'Callback when a tab is pressed.' },
+        { name: 'actionButton', type: 'ActionButtonObj', default: 'null', desc: 'Optional center action button.' },
+        { name: 'theme', type: 'NavbarTheme', default: 'default', desc: 'Theme colors and aesthetics.' },
+      ]
     }
   },
   scale: {
