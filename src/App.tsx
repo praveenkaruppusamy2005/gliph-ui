@@ -27,7 +27,7 @@ function CodeBlock({ code, language, theme }: { code: string, language: string, 
       <div className={`absolute right-16 top-6 z-10 text-[10px] font-bold uppercase tracking-widest ${isDark ? 'text-white/20' : 'text-black/20'}`}>
         {language}
       </div>
-      <pre className={`overflow-x-auto text-[14px] leading-relaxed whitespace-pre-wrap selection:bg-[#38bdf8]/30 ${isDark ? 'text-[#c9d1d9]' : 'text-zinc-800'}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+      <pre className={`overflow-x-auto text-[14px] leading-relaxed whitespace-pre-wrap selection:bg-[#38bdf8]/30 ${isDark ? 'text-[#c9d1d9]' : 'text-zinc-800'}`} style={{ fontFamily: '"Fira Code", "JetBrains Mono", monospace' }}>
         <code>{code}</code>
       </pre>
     </div>
@@ -157,8 +157,12 @@ interface PlatformData {
 
 interface Variant {
   name: string;
+  reactNativePreview?: string;
+  flutterPreview?: string;
   previewGif?: string;
-  usage: string;
+  reactNativeUsage?: string;
+  flutterUsage?: string;
+  usage: string; // fallback
 }
 
 interface CategoryData {
@@ -179,48 +183,69 @@ const CATEGORY_CONTENT: Record<Category, CategoryData> = {
       usage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
-import { Home, Search, User, Settings, Plus } from 'lucide-react-native';
+import { Home, Search, User, Plus } from 'lucide-react-native';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
 
-  const tabs = [
-    { 
-      id: 'home', 
-      label: 'Home',
-      icon: (color, size) => <Home color={color} size={size} /> 
-    },
-    { 
-      id: 'search', 
-      label: 'Explore', // Custom label
-      icon: (color, size) => <Search color={color} size={size} /> 
-    },
-    { 
-      id: 'profile',
-      // label is optional
-      icon: (color, size) => <User color={color} size={size} />,
-      activeIcon: (color, size) => <User color={color} size={size + 2} strokeWidth={3} />
-    }
-  ];
-
   return (
     <View style={styles.container}>
       <Navbar
-        tabs={tabs}
+        /**
+         * Design variant of the navbar.
+         * Options: 'floating', 'classic', 'minimal', 'ios'
+         */
+        variant="floating"
+
+        /**
+         * List of tabs to display.
+         */
+        tabs={[
+          { 
+            id: 'home', 
+            label: 'Home', 
+            icon: (c, s) => <Home color={c} size={s} />,
+            activeIcon: (c, s) => <Home color={c} size={s} strokeWidth={3} />
+          },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+
+        /**
+         * The active tab ID. Should be managed via state.
+         */
         activeTab={activeTab}
-        onTabChange={setActiveTab}
-        theme={{
-          background: 'rgba(15, 15, 20, 0.9)',
-          activeColor: '#818cf8',
-          indicatorColor: 'rgba(129, 140, 248, 0.15)',
-          borderColor: 'rgba(255, 255, 255, 0.05)'
-        }}
-        activeScale={1.3}
-        iconSize={22}
+
+        /**
+         * Callback fired when a tab is pressed.
+         */
+        onTabChange={(id) => setActiveTab(id)}
+
+        /**
+         * Optional: Floating action button in the center.
+         */
         actionButton={{
-          icon: (color, size) => <Plus color={color} size={size} />,
+          icon: (c, s) => <Plus color="#fff" size={s} />,
           onPress: () => console.log('Action Pressed'),
-          color: '#818cf8'
+          color: '#6366f1'
+        }}
+
+        /**
+         * Visual fine-tuning
+         */
+        activeScale={1.3}  // Scale of active tab (Default: 1.25)
+        iconSize={22}      // Size of icons (Default: 24)
+        height={70}        // Navbar height (Default: 70)
+        bottom={30}        // Offset from bottom (Floating variant)
+
+        /**
+         * Theme customization
+         */
+        theme={{
+          background: 'rgba(18, 18, 24, 0.85)',
+          activeColor: '#6366f1',
+          indicatorColor: 'rgba(99, 102, 241, 0.15)',
+          borderColor: 'rgba(255, 255, 255, 0.1)'
         }}
       />
     </View>
@@ -228,12 +253,10 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#050505',
-  },
+  container: { flex: 1, backgroundColor: '#050505' }
 });`,
       props: [
+        { name: 'variant', type: "'floating' | 'classic' | 'minimal' | 'ios'", default: "'floating'", desc: 'The visual style of the navbar.' },
         { name: 'tabs', type: 'NavbarTab[]', default: 'required', desc: 'Array of tab configurations. See Tab Props below.' },
         { name: 'activeTab', type: 'string', default: 'required', desc: 'ID of the currently selected tab.' },
         { name: 'onTabChange', type: '(id: string) => void', default: 'required', desc: 'Callback function triggered on tab press.' },
@@ -247,30 +270,22 @@ const styles = StyleSheet.create({
         { name: 'indicatorHeight', type: 'number', default: '50', desc: 'Height of the active indicator pill.' },
         { name: 'indicatorBorderRadius', type: 'number', default: '25', desc: 'Corner radius of the indicator pill.' },
         { name: 'iconSize', type: 'number', default: '24', desc: 'Base size for tab icons.' },
-        { name: 'activeScale', type: 'number', default: '1.25', desc: 'Scaling factor for the active tab icon.' },
-        { name: 'theme.background', type: 'string', default: 'rgba(18, 18, 24, 0.85)', desc: 'Background color of the navbar (supports transparency).' },
-        { name: 'theme.activeColor', type: 'string', default: '#6366f1', desc: 'Color of the active icon and label.' },
-        { name: 'theme.inactiveColor', type: 'string', default: '#94a3b8', desc: 'Color of inactive icons.' },
-        { name: 'theme.indicatorColor', type: 'string', default: 'rgba(99, 102, 241, 0.15)', desc: 'Color of the active indicator pill.' },
-        { name: 'theme.borderColor', type: 'string', default: 'rgba(255, 255, 255, 0.1)', desc: 'Border color of the navbar.' },
-        { name: 'Tab: id', type: 'string', default: 'required', desc: 'Unique identifier for the tab.' },
-        { name: 'Tab: label', type: 'string', default: 'optional', desc: 'Text label shown below the icon when active. If omitted, only the icon is shown.' },
-        { name: 'Tab: icon', type: 'RenderProp', default: 'default svg', desc: '(color, size) => ReactNode. Base icon for the tab.' },
-        { name: 'Tab: activeIcon', type: 'RenderProp', default: 'icon', desc: 'Specific icon to show when the tab is active.' },
-        { name: 'Tab: inactiveIcon', type: 'RenderProp', default: 'icon', desc: 'Specific icon to show when the tab is inactive.' },
+        { name: 'activeScale', type: 'number', default: '1.25', desc: 'Scaling factor for the active tab icon.' }
       ]
     },
     variants: [
       {
         name: 'Floating',
-        previewGif: 'https://www.dropbox.com/scl/fi/4itsw2gk2jbro5urcpfmv/SVID_20260510_175553_1.gif?rlkey=zzz269muydo8udcpgxuaoy2tf&st=hzf5acaa&dl=1',
-        usage: `import React, { useState } from 'react';
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/4itsw2gk2jbro5urcpfmv/SVID_20260510_175553_1.gif?rlkey=zzz269muydo8udcpgxuaoy2tf&st=hzf5acaa&dl=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/yttjp5wexsyz5utnqg3g3/SVID_20260510_221611_2.mp4?rlkey=1ux0ay9ysxp8fkwghriyqkqny&st=wrpv81ew&dl=1',
+        reactNativeUsage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
-import { Home, Search, User } from 'lucide-react-native';
+import { Home, Search, User, Plus } from 'lucide-react-native';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
+
   return (
     <View style={styles.container}>
       <Navbar
@@ -281,109 +296,43 @@ export default function App() {
           { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
         ]}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(id) => setActiveTab(id)}
+        
+        /**
+         * Optional: Floating action button configuration.
+         */
+        actionButton={{
+          icon: (c, s) => <Plus color="#fff" size={s} />,
+          onPress: () => console.log('Action Pressed'),
+          color: '#6366f1'
+        }}
+
+        /**
+         * Visual fine-tuning
+         */
+        activeScale={1.3}  // Scale factor for active icon
+        iconSize={22}      // Size of icons in pixels
+        height={70}        // Navbar height
+        bottom={30}        // Offset from screen bottom
+
+        /**
+         * Theme customization
+         */
+        theme={{
+          background: 'rgba(18, 18, 24, 0.85)',
+          activeColor: '#6366f1',
+          indicatorColor: 'rgba(99, 102, 241, 0.15)',
+          borderColor: 'rgba(255, 255, 255, 0.1)'
+        }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' }
-});`
-      },
-      {
-        name: 'Classic',
-        previewGif: 'https://www.dropbox.com/scl/fi/p5rfxpwd6nukl60uz68z7/SVID_20260510_175614_1.mp4?rlkey=6wwnt6wja6v8oje3x1ot4g94r&st=pi7e1wfs&dl=1',
-        usage: `import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Navbar } from 'gliph-ui';
-import { Home, Search, User } from 'lucide-react-native';
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  return (
-    <View style={styles.container}>
-      <Navbar
-        variant="classic"
-        tabs={[
-          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
-          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
-          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' }
-});`
-      },
-      {
-        name: 'Minimal',
-        previewGif: 'https://www.dropbox.com/scl/fi/swztrtal3ao8zhv8x50tc/SVID_20260510_175630_1.mp4?rlkey=3omvdiea8nixxdg60urc94tfe&st=87unlzl7&dl=1',
-        usage: `import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Navbar } from 'gliph-ui';
-import { Home, Search, User } from 'lucide-react-native';
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  return (
-    <View style={styles.container}>
-      <Navbar
-        variant="minimal"
-        tabs={[
-          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
-          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
-          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' }
-});`
-      },
-      {
-        name: 'IOS',
-        previewGif: 'https://www.dropbox.com/scl/fi/2bx3b0gfbrrod6xwd5cdq/SVID_20260510_175648_1.mp4?rlkey=31v8wz8hir01sgmj32ydiox7t&st=67pt0s3g&dl=1',
-        usage: `import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Navbar } from 'gliph-ui';
-import { Home, Search, User } from 'lucide-react-native';
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  return (
-    <View style={styles.container}>
-      <Navbar
-        variant="ios"
-        tabs={[
-          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
-          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
-          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' }
-});`
-      }
-    ],
-    flutter: {
-      usage: `import 'package:flutter/material.dart';
+  container: { flex: 1, backgroundColor: '#050505' }
+});`,
+        flutterUsage: `import 'package:flutter/material.dart';
 import 'package:gliph_ui/gliph_ui.dart';
 
 void main() => runApp(const MyApp());
@@ -426,9 +375,409 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
           actionButton: ActionButtonObj(
-            icon: (c, s) => Icon(Icons.add, color: c, size: s),
+            icon: (c, s) => Icon(Icons.add, color: Colors.white, size: s),
             onPress: () => print('Action Pressed'),
-            color: Colors.indigoAccent,
+            color: const Color(0xFF6366F1),
+          ),
+        ),
+      ),
+    );
+  }`,
+        usage: `// ... Same as basic usage with variant="floating"`
+      },
+      {
+        name: 'Classic',
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/p5rfxpwd6nukl60uz68z7/SVID_20260510_175614_1.mp4?rlkey=6wwnt6wja6v8oje3x1ot4g94r&st=pi7e1wfs&dl=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/mhrx3jd8imyqkyeylfoib/SVID_20260510_221703_1.mp4?rlkey=jcog8hhbyochnl5lec37wac05&st=zauzyI0n&dl=1',
+        reactNativeUsage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User, Plus } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="classic"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id)}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#050505' }
+});`,
+        flutterUsage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _activeTab = 'home';
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        bottomNavigationBar: Navbar(
+          variant: NavbarVariant.classic,
+          activeTab: _activeTab,
+          onTabChange: (id) => setState(() => _activeTab = id),
+          
+          /**
+           * Visual customization.
+           */
+          height: 70.0,
+          iconSize: 24.0,
+
+          /**
+           * Theme customization.
+           */
+          theme: const NavbarTheme(
+            background: Color(0xFF0A0A0A),
+            activeColor: Color(0xFF6366F1),
+            inactiveColor: Color(0xFF4B5563),
+          ),
+          tabs: [
+            NavbarTab(
+              id: 'home',
+              label: 'Home',
+              icon: (c, s) => Icon(Icons.home_outlined, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'search',
+              label: 'Search',
+              icon: (c, s) => Icon(Icons.search, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'profile',
+              label: 'Profile',
+              icon: (c, s) => Icon(Icons.person_outline, color: c, size: s),
+            ),
+          ],
+        ),
+      ),
+    );
+  }`,
+        usage: `// ... Same as basic usage with variant="classic"`
+      },
+      {
+        name: 'Minimal',
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/swztrtal3ao8zhv8x50tc/SVID_20260510_175630_1.mp4?rlkey=3omvdiea8nixxdg60urc94tfe&st=87unlzl7&dl=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/pf5fd0kuqwdi1dac8cyxc/SVID_20260510_221859_1.mp4?rlkey=nip0gurj6q6x4d3qxyoha1y6o&st=ki8pjalg&dl=1',
+        reactNativeUsage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User, Plus } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="minimal"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id)}
+
+        /**
+         * Visual fine-tuning
+         */
+        height={60}        // Reduced height for minimal look
+        iconSize={22}      // Slightly smaller icons
+        
+        /**
+         * In minimal variant, the background is transparent by default.
+         * You can still customize active/inactive colors.
+         */
+        theme={{
+          activeColor: '#f43f5e',
+          inactiveColor: '#94a3b8',
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#050505' }
+});`,
+        flutterUsage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _activeTab = 'home';
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        bottomNavigationBar: Navbar(
+          variant: NavbarVariant.minimal,
+          activeTab: _activeTab,
+          onTabChange: (id) => setState(() => _activeTab = id),
+          
+          /**
+           * Visual customization.
+           */
+          height: 60.0,
+          iconSize: 22.0,
+
+          /**
+           * Theme customization.
+           */
+          theme: const NavbarTheme(
+            activeColor: Color(0xFFF43F5E),
+            inactiveColor: Color(0xFF94A3B8),
+          ),
+          tabs: [
+            NavbarTab(
+              id: 'home',
+              label: 'Home',
+              icon: (c, s) => Icon(Icons.home_outlined, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'search',
+              label: 'Search',
+              icon: (c, s) => Icon(Icons.search, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'profile',
+              label: 'Profile',
+              icon: (c, s) => Icon(Icons.person_outline, color: c, size: s),
+            ),
+          ],
+        ),
+      ),
+    );
+  }`,
+        usage: `// ... Same as basic usage with variant="minimal"`
+      },
+      {
+        name: 'IOS',
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/2bx3b0gfbrrod6xwd5cdq/SVID_20260510_175648_1.mp4?rlkey=31v8wz8hir01sgmj32ydiox7t&st=67pt0s3g&dl=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/xb5k2wbd5457f74qmbef2/SVID_20260510_221935_1.mp4?rlkey=l221u8t3nods46x2uekqppfk8&st=au5vdnsg&dl=1',
+        reactNativeUsage: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User, Plus } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="ios"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id)}
+
+        /**
+         * Visual fine-tuning
+         */
+        height={65}
+        iconSize={24}
+        
+        /**
+         * Theme customization
+         */
+        theme={{
+          background: 'rgba(255, 255, 255, 0.9)',
+          activeColor: '#007aff', // iOS Blue
+          inactiveColor: '#8e8e93',
+          indicatorColor: '#007aff', // iOS bottom indicator line
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#050505' }
+});`,
+        flutterUsage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _activeTab = 'home';
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        bottomNavigationBar: Navbar(
+          variant: NavbarVariant.ios,
+          activeTab: _activeTab,
+          onTabChange: (id) => setState(() => _activeTab = id),
+          
+          /**
+           * Visual customization.
+           */
+          height: 65.0,
+          iconSize: 24.0,
+
+          /**
+           * Theme customization.
+           */
+          theme: const NavbarTheme(
+            background: Color(0xE6FFFFFF),
+            activeColor: Color(0xFF007AFF),
+            inactiveColor: Color(0xFF8E8E93),
+            indicatorColor: Color(0xFF007AFF),
+          ),
+          tabs: [
+            NavbarTab(
+              id: 'home',
+              label: 'Home',
+              icon: (c, s) => Icon(Icons.home_outlined, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'search',
+              label: 'Search',
+              icon: (c, s) => Icon(Icons.search, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'profile',
+              label: 'Profile',
+              icon: (c, s) => Icon(Icons.person_outline, color: c, size: s),
+            ),
+          ],
+        ),
+      ),
+    );
+  }`,
+        usage: `// ... Same as basic usage with variant="ios"`
+      }
+    ],
+    flutter: {
+      previewGif: 'https://www.dropbox.com/scl/fi/yttjp5wexsyz5utnqg3g3/SVID_20260510_221611_2.mp4?rlkey=1ux0ay9ysxp8fkwghriyqkqny&st=wrpv81ew&dl=1',
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String _activeTab = 'home';
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        // The Gliph UI Navbar
+        bottomNavigationBar: Navbar(
+          /**
+           * visual style of the bar.
+           * Options: NavbarVariant.floating, NavbarVariant.classic, NavbarVariant.minimal, NavbarVariant.ios
+           */
+          variant: NavbarVariant.floating,
+
+          /**
+           * Active tab selection.
+           */
+          activeTab: _activeTab,
+
+          /**
+           * Tab change callback.
+           */
+          onTabChange: (id) => setState(() => _activeTab = id),
+
+          /**
+           * List of NavbarTab objects.
+           */
+          tabs: [
+            NavbarTab(
+              id: 'home',
+              label: 'Home',
+              icon: (c, s) => Icon(Icons.home_outlined, color: c, size: s),
+              activeIcon: (c, s) => Icon(Icons.home, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'search',
+              label: 'Search',
+              icon: (c, s) => Icon(Icons.search, color: c, size: s),
+            ),
+            NavbarTab(
+              id: 'profile',
+              label: 'Profile',
+              icon: (c, s) => Icon(Icons.person_outline, color: c, size: s),
+            ),
+          ],
+
+          /**
+           * Optional: Floating Action Button in the middle.
+           */
+          actionButton: ActionButtonObj(
+            icon: (c, s) => Icon(Icons.add, color: Colors.white, size: s),
+            onPress: () => print('Action Pressed'),
+            color: const Color(0xFF6366F1),
+          ),
+
+          /**
+           * Theme and Layout
+           */
+          activeScale: 1.3,
+          iconSize: 22,
+          height: 70,
+          bottom: 30,
+          theme: const NavbarTheme(
+            background: Color.fromRGBO(18, 18, 24, 0.85),
+            activeColor: Color(0xFF6366F1),
+            indicatorColor: Color.fromRGBO(99, 102, 241, 0.15),
           ),
         ),
       ),
@@ -441,9 +790,12 @@ class _MyAppState extends State<MyApp> {
         { name: 'onTabChange', type: 'Function(String)', default: 'required', desc: 'Callback when a tab is pressed.' },
         { name: 'actionButton', type: 'ActionButtonObj', default: 'null', desc: 'Optional center action button.' },
         { name: 'theme', type: 'NavbarTheme', default: 'default', desc: 'Theme colors and aesthetics.' },
+        { name: 'height', type: 'double', default: '70', desc: 'Total height of the navbar.' },
+        { name: 'bottom', type: 'double', default: '30', desc: 'Vertical offset from the bottom.' }
       ]
     }
-  },
+  }
+  ,
   scale: {
     title: 'Scale Picker',
     description: 'A horizontal ruler-style picker for height, weight, and other linear measurements.',
@@ -466,10 +818,25 @@ export default function App() {
         step={1}
         subdivisions={10}
         unit="cm"
+
+        /**
+         * Visual fine-tuning
+         */
+        height={140}        // Component height
+        tickWidth={10}      // Density of ticks
+        showLabels={true}    // Toggle number labels
+        fractionDigits={1}  // Decimal precision
+
+        /**
+         * Theme customization
+         */
         theme={{
-          activeColor: '#000000',
-          indicatorColor: '#000000',
-          textColor: '#000000'
+          activeColor: '#6366f1',
+          inactiveColor: 'rgba(99, 102, 241, 0.2)',
+          indicatorColor: '#6366f1',
+          textColor: '#ffffff',
+          labelColor: 'rgba(255, 255, 255, 0.4)',
+          fontFamily: 'System'
         }}
       />
     </View>
@@ -498,7 +865,68 @@ export default function App() {
     },
     flutter: {
       previewGif: 'https://www.dropbox.com/scl/fi/xoiawxojcd31ai29frr26/SVID_20260508_220213_1.gif?rlkey=rhgmopbi22o69yvhvtezxjk6e&st=t4y8zqva&dl=1',
-      usage: `import 'package:gliph_ui/gliph_ui.dart';\n\nScalePicker(\n  value: 88.0,\n  min: 40.0,\n  max: 200.0,\n  unit: 'cm',\n  theme: const ScalePickerTheme(\n    textColor: Colors.black,\n    indicatorColor: Colors.black,\n  ),\n  onChange: (val) => print(val),\n)`,
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.dark(),
+      home: const PickerShowcase(),
+    );
+  }
+}
+
+class PickerShowcase extends StatefulWidget {
+  const PickerShowcase({super.key});
+
+  @override
+  State<PickerShowcase> createState() => _PickerShowcaseState();
+}
+
+class _PickerShowcaseState extends State<PickerShowcase> {
+  double _value = 88.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: ScalePicker(
+          value: _value,
+          min: 40.0,
+          max: 200.0,
+          unit: 'cm',
+          
+          /**
+           * Visual customization.
+           */
+          step: 1.0,
+          subdivisions: 10,
+          height: 140.0,
+          tickWidth: 10.0,
+          fractionDigits: 1,
+
+          /**
+           * Theme customization.
+           */
+          theme: const ScalePickerTheme(
+            textColor: Colors.white,
+            activeColor: Colors.white,
+            indicatorColor: Color(0xFF6366F1),
+            labelColor: Colors.white24,
+          ),
+          onChange: (val) => setState(() => _value = val),
+        ),
+      ),
+    );
+  }
+}`,
       props: [
         { name: 'value', type: 'double', default: 'required', desc: 'Current controlled value.' },
         { name: 'onChange', type: 'ValueChanged<double>?', default: 'null', desc: 'Fires on scroll with snapped value.' },
@@ -538,25 +966,33 @@ export default function App() {
       <TimeScrollPicker
         value={time}
         onChange={setTime}
+
+        /**
+         * Configuration for time range and steps.
+         */
         limits={{
-          is12Hour: true,
-          minuteStep: 1,
-          hourMin: 0,
-          hourMax: 23
+          is12Hour: true,    // Toggle AM/PM
+          hourMin: 1,        // Min selectable hour
+          hourMax: 12,       // Max selectable hour
+          minuteStep: 5,     // Minute interval (0, 5, 10...)
         }}
+
+        /**
+         * Visual layout adjustment
+         */
+        layout={{
+          itemHeight: 70,    // Height of each row
+          visibleRows: 3,    // Number of items visible
+          fontSize: 40       // Label font size
+        }}
+
+        /**
+         * Theme overrides.
+         */
         theme={{
           activeTextColor: '#ffffff',
           inactiveTextColor: 'rgba(255,255,255,0.2)',
-          accentColor: '#ffffff',
-          separatorColor: '#ffffff'
-        }}
-        layout={{
-          itemHeight: 72,
-          visibleRows: 3,
-          fontSize: 44
-        }}
-        motion={{
-          decelerationRate: 0.992
+          separatorColor: '#6366f1', // Color of the ":" colon
         }}
       />
     </View>
@@ -586,7 +1022,73 @@ export default function App() {
       ]
     },
     flutter: {
-      usage: `import 'package:flutter/material.dart';\nimport 'package:gliph_ui/gliph_ui.dart';\n\nclass ExampleApp extends StatelessWidget {\n  @override\n  Widget build(BuildContext context) {\n    return TimeScrollPicker(\n      theme: const ScrollPickerTheme(\n        activeTextColor: Colors.white,\n        inactiveTextColor: Colors.white24,\n        accentColor: Colors.blueAccent,\n        separatorColor: Colors.blueAccent,\n      ),\n      layout: const ScrollPickerLayout(\n        itemHeight: 72,\n        visibleRows: 3,\n        fontSize: 44,\n      ),\n      motion: const ScrollPickerMotion(\n        decelerationRate: 0.992,\n      ),\n      limits: const TimeScrollPickerLimits(\n        is12Hour: true,\n        minuteStep: 1,\n        hourMin: 1,\n        hourMax: 12,\n      ),\n      onChange: (TimeValue val) {\n        print('Selected: \${val.hour}:\${val.minute} \${val.ampm}');\n      },\n    );\n  }\n}`,
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.dark(),
+      home: const PickerShowcase(),
+    );
+  }
+}
+
+class PickerShowcase extends StatefulWidget {
+  const PickerShowcase({super.key});
+
+  @override
+  State<PickerShowcase> createState() => _PickerShowcaseState();
+}
+
+class _PickerShowcaseState extends State<PickerShowcase> {
+  TimeValue _time = TimeValue(hour: 7, minute: 30, ampm: 'am');
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: TimeScrollPicker(
+          value: _time,
+
+          /**
+           * Configuration for time range and steps.
+           */
+          limits: const TimeScrollPickerLimits(
+            is12Hour: true,
+            minuteStep: 5,
+            hourMin: 1,
+            hourMax: 12,
+          ),
+
+          /**
+           * Visual layout adjustment.
+           */
+          layout: const ScrollPickerLayout(
+            itemHeight: 70.0,
+            fontSize: 40.0,
+          ),
+
+          /**
+           * Theme overrides.
+           */
+          theme: const ScrollPickerTheme(
+            activeTextColor: Colors.white,
+            inactiveTextColor: Colors.white24,
+            separatorColor: Color(0xFF6366F1),
+          ),
+          onChange: (val) => setState(() => _time = val),
+        ),
+      ),
+    );
+  }
+}`,
       props: [
         { name: 'value', type: 'TimeValue?', default: 'null', desc: 'Controlled selection { hour, minute, ampm }.' },
         { name: 'defaultValue', type: 'TimeValue?', default: '7:30', desc: 'Initial uncontrolled value.' },
@@ -626,15 +1128,34 @@ export default function App() {
       <WeightScrollPicker
         value={weight}
         onChange={setWeight}
+
+        /**
+         * Configuration for range and units.
+         */
         limits={{
-          wholeMin: 40,
-          wholeMax: 200,
-          units: ['kg', 'lbs'],
-          decimalValues: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+          wholeMin: 40,      // Minimum kg/lbs
+          wholeMax: 200,     // Maximum kg/lbs
+          units: ['kg', 'lbs'], // Available units
+          decimalValues: [0, 2, 5, 7], // Options for decimal column
         }}
+
+        /**
+         * Visual layout customization
+         */
+        layout={{
+          itemHeight: 65,
+          visibleRows: 3,
+          fontSize: 44,
+        }}
+
+        /**
+         * Theme customization.
+         */
         theme={{
           activeTextColor: '#ffffff',
-          inactiveTextColor: 'rgba(255,255,255,0.14)'
+          inactiveTextColor: 'rgba(255,255,255,0.15)',
+          separatorColor: '#10b981', // Color of the decimal point
+          accentColor: '#10b981',
         }}
       />
     </View>
@@ -662,7 +1183,75 @@ export default function App() {
       ]
     },
     flutter: {
-      usage: `import 'package:flutter/material.dart';\nimport 'package:gliph_ui/gliph_ui.dart';\n\nclass ExampleApp extends StatelessWidget {\n  @override\n  Widget build(BuildContext context) {\n    return WeightScrollPicker(\n      theme: const ScrollPickerTheme(\n        activeTextColor: Colors.white,\n        inactiveTextColor: Colors.white24,\n      ),\n      limits: const WeightScrollPickerLimits(\n        wholeMin: 40,\n        wholeMax: 150,\n        units: ['kg', 'lbs'],\n        decimalMin: 0,\n        decimalMax: 9,\n      ),\n      onChange: (WeightValue val) => print(val.whole),\n    );\n  }\n}`,
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.dark(),
+      home: const PickerShowcase(),
+    );
+  }
+}
+
+class PickerShowcase extends StatefulWidget {
+  const PickerShowcase({super.key});
+
+  @override
+  State<PickerShowcase> createState() => _PickerShowcaseState();
+}
+
+class _PickerShowcaseState extends State<PickerShowcase> {
+  WeightValue _weight = WeightValue(whole: 70, decimal: 5, unit: 'kg');
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: WeightScrollPicker(
+          value: _weight,
+
+          /**
+           * Configuration for range and units.
+           */
+          limits: const WeightScrollPickerLimits(
+            wholeMin: 40,
+            wholeMax: 200,
+            units: ['kg', 'lbs'],
+            decimalValues: [0, 2, 5, 7],
+          ),
+
+          /**
+           * Visual layout customization.
+           */
+          layout: const ScrollPickerLayout(
+            itemHeight: 65.0,
+            visibleRows: 3,
+            fontSize: 44.0,
+          ),
+
+          /**
+           * Theme customization.
+           */
+          theme: const ScrollPickerTheme(
+            activeTextColor: Colors.white,
+            inactiveTextColor: Colors.white12,
+            separatorColor: Color(0xFF10B981),
+            accentColor: Color(0xFF10B981),
+          ),
+          onChange: (val) => setState(() => _weight = val),
+        ),
+      ),
+    );
+  }
+}`,
       props: [
         { name: 'value', type: 'WeightValue?', default: 'null', desc: 'Controlled state { whole, decimal, unit }.' },
         { name: 'defaultValue', type: 'WeightValue?', default: '{whole:72, decimal:5, unit:"kg"}', desc: 'Initial uncontrolled value.' },
@@ -706,13 +1295,24 @@ export default function App() {
         ]}
         value={val}
         onChange={setVal}
+
+        /**
+         * Visual layout customization
+         */
+        width={120}         // Column width
+        layout={{
+          itemHeight: 70,
+          visibleRows: 3,
+          fontSize: 40
+        }}
+
+        /**
+         * Theme customization.
+         */
         theme={{
           activeTextColor: '#ffffff',
-          inactiveTextColor: 'rgba(255,255,255,0.14)'
-        }}
-        layout={{
-          itemHeight: 72,
-          visibleRows: 3
+          inactiveTextColor: 'rgba(255,255,255,0.14)',
+          accentColor: '#6366f1'
         }}
       />
     </View>
@@ -737,7 +1337,70 @@ export default function App() {
       ]
     },
     flutter: {
-      usage: `import 'package:gliph_ui/gliph_ui.dart';\n\nValueScrollPicker<String>(\n  items: [\n    ScrollPickerItem(label: 'A', value: 'a'),\n    ScrollPickerItem(label: 'B', value: 'b'),\n  ],\n  theme: const ScrollPickerTheme(\n    activeTextColor: Colors.white,\n    inactiveTextColor: Colors.white24,\n  ),\n  layout: const ScrollPickerLayout(\n    itemHeight: 72,\n    visibleRows: 3,\n  ),\n  onChange: (val) => print(val),\n)`,
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.dark(),
+      home: const PickerShowcase(),
+    );
+  }
+}
+
+class PickerShowcase extends StatefulWidget {
+  const PickerShowcase({super.key});
+
+  @override
+  State<PickerShowcase> createState() => _PickerShowcaseState();
+}
+
+class _PickerShowcaseState extends State<PickerShowcase> {
+  String _selection = 'pro';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: ValueScrollPicker<String>(
+          value: _selection,
+          items: [
+            ScrollPickerItem(label: 'Basic', value: 'basic'),
+            ScrollPickerItem(label: 'Pro', value: 'pro'),
+            ScrollPickerItem(label: 'Enterprise', value: 'enterprise'),
+          ],
+
+          /**
+           * Visual layout adjustment.
+           */
+          width: 120.0,
+          layout: const ScrollPickerLayout(
+            itemHeight: 70.0,
+            visibleRows: 3,
+            fontSize: 40.0,
+          ),
+
+          /**
+           * Theme customization.
+           */
+          theme: const ScrollPickerTheme(
+            activeTextColor: Colors.white,
+            inactiveTextColor: Colors.white24,
+            accentColor: Color(0xFF6366F1),
+          ),
+          onChange: (val) => setState(() => _selection = val),
+        ),
+      ),
+    );
+  }
+}`,
       props: [
         { name: 'items', type: 'List<ScrollPickerItem<T>>', default: 'required', desc: 'Items to display in the picker column.' },
         { name: 'value', type: 'T?', default: 'null', desc: 'Currently selected value (controlled).' },
@@ -772,13 +1435,31 @@ export default function App() {
       <DateScrollPicker
         value={date}
         onChange={setDate}
+
+        /**
+         * Optional: Selectable range constraints.
+         */
         limits={{
           yearMin: 1990,
           yearMax: 2030
         }}
+
+        /**
+         * Visual layout customization
+         */
+        layout={{
+          itemHeight: 72,
+          visibleRows: 3,
+          fontSize: 44
+        }}
+
+        /**
+         * Theme customization.
+         */
         theme={{
           activeTextColor: '#ffffff',
-          inactiveTextColor: 'rgba(255,255,255,0.14)'
+          inactiveTextColor: 'rgba(255,255,255,0.14)',
+          separatorColor: '#f43f5e' // Color of '/' or '-' separator
         }}
       />
     </View>
@@ -804,7 +1485,72 @@ export default function App() {
       ]
     },
     flutter: {
-      usage: `import 'package:gliph_ui/gliph_ui.dart';\n\nDateScrollPicker(\n  limits: const DateScrollPickerLimits(\n    yearMin: 1990,\n    yearMax: 2030,\n  ),\n  theme: const ScrollPickerTheme(\n    activeTextColor: Colors.white,\n    inactiveTextColor: Colors.white24,\n  ),\n  onChange: (val) => print(val.year),\n)`,
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.dark(),
+      home: const PickerShowcase(),
+    );
+  }
+}
+
+class PickerShowcase extends StatefulWidget {
+  const PickerShowcase({super.key});
+
+  @override
+  State<PickerShowcase> createState() => _PickerShowcaseState();
+}
+
+class _PickerShowcaseState extends State<PickerShowcase> {
+  DateValue _date = DateValue(year: 2025, month: 5, day: 9);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: DateScrollPicker(
+          value: _date,
+
+          /**
+           * Optional: Selectable range constraints.
+           */
+          limits: const DateScrollPickerLimits(
+            yearMin: 1990,
+            yearMax: 2030,
+          ),
+
+          /**
+           * Visual layout customization.
+           */
+          layout: const ScrollPickerLayout(
+            itemHeight: 72.0,
+            visibleRows: 3,
+            fontSize: 44.0,
+          ),
+
+          /**
+           * Theme customization.
+           */
+          theme: const ScrollPickerTheme(
+            activeTextColor: Colors.white,
+            inactiveTextColor: Colors.white24,
+            separatorColor: Color(0xFFF43F5E),
+          ),
+          onChange: (val) => setState(() => _date = val),
+        ),
+      ),
+    );
+  }
+}`,
       props: [
         { name: 'value', type: 'DateValue?', default: 'today', desc: 'Controlled selection { year, month, day }.' },
         { name: 'defaultValue', type: 'DateValue?', default: 'today', desc: 'Initial uncontrolled value.' },
@@ -833,23 +1579,40 @@ import { View } from 'react-native';
 import { CalendarPicker } from 'gliph-ui';
 
 export default function App() {
-  const [date, setDate] = useState({
-    year: 2025,
-    month: 5,
-    day: 9,
-  });
+  const [date, setDate] = useState({ year: 2025, month: 5, day: 9 });
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
       <CalendarPicker
         value={date}
         onChange={setDate}
+
+        /**
+         * Navigation and feature flags.
+         */
+        showTodayButton={true}
+        enableYearDropdown={true}
+        showOutsideDays={true}
+
+        /**
+         * Constraints
+         */
+        minDate={{ year: 2020, month: 1, day: 1 }}
+        maxDate={{ year: 2030, month: 12, day: 31 }}
+        yearRange={{ start: 2020, end: 2030 }}
+
+        /**
+         * Custom theme for the calendar interface.
+         */
         theme={{
-          accent: '#38BDF8',
-          surface: '#111827',
+          accent: '#38BDF8',       // Highlight color
+          surface: '#111827',      // Card background
+          surfaceSoft: '#1F2937',  // Dropdown background
+          text: '#F9FAFB',         // Primary text
+          mutedText: '#CBD5E1',    // Month title
+          faintText: '#64748B',    // Weekday labels
+          border: '#334155'        // Component borders
         }}
-        showTodayButton
-        enableYearDropdown
       />
     </View>
   );
@@ -881,27 +1644,74 @@ export default function App() {
     },
     flutter: {
       previewGif: 'https://www.dropbox.com/scl/fi/0fu21vlqhvze8xgy65p7i/SVID_20260509_104006_1.gif?rlkey=bis04b2arr84x3laeactp8ila&st=iip6zn5v&dl=1',
-      usage: `import 'package:gliph_ui/gliph_ui.dart';
+      usage: `import 'package:flutter/material.dart';
+import 'package:gliph_ui/gliph_ui.dart';
 
-CalendarPicker(
-  value: CalendarDate(year: 2025, month: 5, day: 9),
-  onChange: (date) => setState(() => _date = date),
-  width: 320,
-  height: 400,
-  showTodayButton: true,
-  showOutsideDays: true,
-  enableYearDropdown: true,
-  theme: const CalendarPickerTheme(
-    accent: Color(0xFF38BDF8),
-    onAccent: Color(0xFF082F49),
-    surface: Color(0xFF111827),
-    surfaceSoft: Color(0xFF1F2937),
-    text: Color(0xFFF9FAFB),
-    mutedText: Color(0xFFCBD5E1),
-    faintText: Color(0xFF64748B),
-    border: Color(0xFF334155),
-  ),
-)`,
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.dark(),
+      home: const PickerShowcase(),
+    );
+  }
+}
+
+class PickerShowcase extends StatefulWidget {
+  const PickerShowcase({super.key});
+
+  @override
+  State<PickerShowcase> createState() => _PickerShowcaseState();
+}
+
+class _PickerShowcaseState extends State<PickerShowcase> {
+  CalendarDate _date = CalendarDate(year: 2025, month: 5, day: 9);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: CalendarPicker(
+          value: _date,
+
+          /**
+           * Navigation and feature flags.
+           */
+          showTodayButton: true,
+          enableYearDropdown: true,
+          showOutsideDays: true,
+
+          /**
+           * Optional: Selectable range constraints.
+           */
+          minDate: CalendarDate(year: 2020, month: 1, day: 1),
+          maxDate: CalendarDate(year: 2030, month: 12, day: 31),
+          yearRange: CalendarYearRange(start: 2020, end: 2030),
+
+          /**
+           * Custom theme for the calendar interface.
+           */
+          theme: const CalendarPickerTheme(
+            accent: Color(0xFF38BDF8),       // Highlight color
+            onAccent: Color(0xFF082F49),     // Text on highlight
+            surface: Color(0xFF111827),      // Background card
+            surfaceSoft: Color(0xFF1F2937),  // Dropdown background
+            text: Color(0xFFF9FAFB),         // Primary text
+            mutedText: Color(0xFFCBD5E1),    // Month title
+            faintText: Color(0xFF64748B),    // Weekday labels
+            border: Color(0xFF334155),       // Component borders
+          ),
+          onChange: (date) => setState(() => _date = date),
+        ),
+      ),
+    );
+  }
+}`,
       props: [
         { name: 'value', type: 'CalendarDate?', default: 'today', desc: 'Controlled selection (year, month, day).' },
         { name: 'onChange', type: 'ValueChanged<CalendarDate>?', default: 'null', desc: 'Fires when a day is tapped.' },
@@ -1007,7 +1817,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                 className={`rounded-xl px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold transition-all border ${activeVariantIndex === idx
                   ? (isDark ? 'bg-white text-black border-white shadow-lg shadow-white/10' : 'bg-black text-white border-black shadow-lg shadow-black/10')
                   : (isDark ? 'border-white/10 text-white/50 hover:border-white/20 hover:text-white bg-white/[0.02]' : 'border-black/10 text-black/50 hover:border-black/20 hover:text-black bg-black/[0.02]')
-                }`}
+                  }`}
               >
                 {v.name}
               </button>
@@ -1037,37 +1847,47 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                           <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
                         </div>
 
-                        {variant.previewGif?.includes('.mp4') ? (
-                          <video
-                            src={variant.previewGif}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem]`}
-                          />
-                        ) : (
-                          <img
-                            src={variant.previewGif}
-                            alt={variant.name}
-                            className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem]`}
-                          />
-                        )}
+                        {(() => {
+                          const preview = platform === 'react-native'
+                            ? variant.reactNativePreview || variant.previewGif
+                            : variant.flutterPreview || variant.previewGif;
+
+                          if (!preview) return null;
+
+                          return preview.includes('.mp4') ? (
+                            <video
+                              src={preview}
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom' : 'object-cover'}`}
+                            />
+                          ) : (
+                            <img
+                              src={preview}
+                              alt={variant.name}
+                              className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom' : 'object-cover'}`}
+                            />
+                          );
+                        })()}
                       </div>
                     </div>
 
                     {/* Expo Playground */}
-                    <div className="flex flex-col gap-6 w-full max-w-4xl">
-                      <p className={`text-sm font-semibold uppercase tracking-wider text-center ${isDark ? 'text-white/40' : 'text-black/40'}`}>
-                        Live Playground
-                      </p>
-                      <div className={`overflow-hidden rounded-2xl border shadow-xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
-                        <iframe
-                          src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.2&name=${encodeURIComponent(variant.name)}&platform=android&theme=dark&code=${encodeURIComponent(variant.usage)}`}
-                          style={{ width: '100%', height: '600px', border: 0 }}
-                        />
+                    {platform === 'react-native' && (
+                      <div className="flex flex-col gap-6 w-full max-w-4xl">
+                        <p className={`text-sm font-semibold uppercase tracking-wider text-center ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+                          Live Playground
+                        </p>
+                        <div className={`overflow-hidden rounded-2xl border shadow-xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
+                          <iframe
+                            src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(variant.name)}&platform=android&theme=dark&code=${encodeURIComponent(variant.reactNativeUsage || variant.usage || '')}`}
+                            style={{ width: '100%', height: '600px', border: 0 }}
+                          />
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               );
@@ -1111,25 +1931,51 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
 
                   {platform === 'react-native' ? (
                     rnGif ? (
-                      <img
-                        key={`${category}-rn`}
-                        src={rnGif}
-                        alt="React Native Preview"
-                        className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
-                        onLoad={() => setRnLoading(false)}
-                      />
+                      rnGif.includes('.mp4') ? (
+                        <video
+                          key={`${category}-rn-video`}
+                          src={rnGif}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
+                          onCanPlayThrough={() => setRnLoading(false)}
+                        />
+                      ) : (
+                        <img
+                          key={`${category}-rn-img`}
+                          src={rnGif}
+                          alt="React Native Preview"
+                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
+                          onLoad={() => setRnLoading(false)}
+                        />
+                      )
                     ) : (
                       <div className="text-white/20 text-xs font-medium text-center px-8">RN Preview not available</div>
                     )
                   ) : (
                     flutterGif ? (
-                      <img
-                        key={`${category}-flutter`}
-                        src={flutterGif}
-                        alt="Flutter Preview"
-                        className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom scale-[0.9] origin-bottom' : 'object-cover'} rounded-[2.2rem] transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
-                        onLoad={() => setFlutterLoading(false)}
-                      />
+                      flutterGif.includes('.mp4') ? (
+                        <video
+                          key={`${category}-flutter-video`}
+                          src={flutterGif}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
+                          onCanPlayThrough={() => setFlutterLoading(false)}
+                        />
+                      ) : (
+                        <img
+                          key={`${category}-flutter-img`}
+                          src={flutterGif}
+                          alt="Flutter Preview"
+                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
+                          onLoad={() => setFlutterLoading(false)}
+                        />
+                      )
                     ) : (
                       <div className="text-white/20 text-xs font-medium text-center px-8 flex flex-col items-center gap-3">
                         <Smartphone size={32} className="opacity-20" />
@@ -1156,7 +2002,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                   </p>
                   <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                     <iframe
-                      src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.2&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(platformData.usage)}`}
+                      src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(data.reactNative?.usage || '')}`}
                       style={{ width: '100%', height: '650px', border: 0 }}
                       title="Gliph UI Expo Preview"
                     />
@@ -1180,10 +2026,14 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
               Import and implement the {data.title} in your React Native project.
             </p>
           </div>
-          <CodeBlock 
-            code={data.variants ? data.variants[activeVariantIndex].usage : platformData.usage} 
-            language={platform === 'react-native' ? 'tsx' : 'dart'} 
-            theme={theme} 
+          <CodeBlock
+            code={data.variants
+              ? (platform === 'react-native'
+                ? (data.variants[activeVariantIndex].reactNativeUsage || data.variants[activeVariantIndex].usage)
+                : (data.variants[activeVariantIndex].flutterUsage || data.variants[activeVariantIndex].usage))
+              : platformData.usage}
+            language={platform === 'react-native' ? 'tsx' : 'dart'}
+            theme={theme}
           />
         </div>
       </div>
