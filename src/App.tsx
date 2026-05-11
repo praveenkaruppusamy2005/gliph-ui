@@ -2445,6 +2445,18 @@ function App() {
   }, []);
 
   useEffect(() => {
+    let title = "Gliph UI — Premium Mobile Components";
+    if (currentPath.startsWith("/flutter")) {
+      title = currentPath.includes("components")
+        ? "Flutter Components — Gliph UI"
+        : "Flutter UI Development — Gliph UI";
+    } else if (currentPath === "/components") {
+      title = "React Native Components — Gliph UI";
+    }
+    document.title = title;
+  }, [currentPath]);
+
+  useEffect(() => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
