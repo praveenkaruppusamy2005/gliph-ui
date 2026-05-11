@@ -140,7 +140,7 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
           </button>
 
           <a
-            className={`hidden lg:flex rounded-xl px-3 py-2 text-sm font-semibold transition cursor-pointer ${isDark ? 'text-white/70 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black'}`}
+            className={`hidden md:flex rounded-xl px-3 py-2 text-sm font-semibold transition cursor-pointer ${isDark ? 'text-white/70 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black'}`}
             onClick={(e) => { e.preventDefault(); navigate(isRN ? '/flutter' : '/'); }}
             href={isRN ? "/flutter" : "/"}
           >
@@ -158,12 +158,11 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
       </header>
 
       {/* Mobile Only Platform Switcher */}
-      <div className="sm:hidden mb-6">
+      <div className="md:hidden mb-8 flex justify-center">
         <button
           onClick={() => navigate(isRN ? '/flutter' : '/')}
-          className={`w-full py-3 px-4 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all ${isDark ? 'border-white/10 bg-white/5 text-white/70 active:bg-white/10' : 'border-black/10 bg-black/5 text-black/70 active:bg-black/10'}`}
+          className={`text-xs font-bold transition-all ${isDark ? 'text-white/50 active:text-white' : 'text-black/50 active:text-black'}`}
         >
-          {isRN ? <Smartphone size={14} className="text-[#38bdf8]" /> : <Code2 size={14} className="text-[#61dafb]" />}
           {isRN ? "Are you a Flutter developer?" : "Switch to React Native"}
         </button>
       </div>
