@@ -1,8 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Scale, ListFilter, ChevronLeft, Terminal, Code2, PlaySquare, Calendar, Smartphone, Copy, Check, Settings, Layout, Zap, Sun, Moon, Ruler } from 'lucide-react';
+import { Clock, Scale, ListFilter, ChevronLeft, Terminal, Code2, PlaySquare, Calendar, Smartphone, Copy, Check, Settings, Layout, Zap, Sun, Moon, Ruler, ArrowRight, Sparkles } from 'lucide-react';
+import darkHero from './assets/dark.png';
+import whiteHero from './assets/white.jpg';
+import darkLogo from './assets/dark-logo.png';
+import whiteLogo from './assets/white-logo.png';
 
 type Platform = 'react-native' | 'flutter';
 type Theme = 'light' | 'dark';
+
+const syntaxKeywords = new Set([
+  'import', 'from', 'export', 'default', 'function', 'const', 'let', 'var', 'return',
+  'class', 'extends', 'interface', 'type', 'if', 'else', 'new', 'true', 'false',
+  'null', 'undefined', 'void', 'async', 'await', 'final', 'required', 'super',
+  'enum', 'public', 'private', 'protected', 'static', 'this'
+]);
+
+function highlightLine(line: string, isDark: boolean) {
+  const colors = {
+    text: isDark ? '#d8d8d8' : '#1f2937',
+    comment: isDark ? '#7c7c7c' : '#8a8a8a',
+    string: isDark ? '#f5d67b' : '#9f5f00',
+    keyword: isDark ? '#8ab4ff' : '#1d4ed8',
+    number: isDark ? '#b5e48c' : '#047857',
+    tag: isDark ? '#ffb4a2' : '#b42318',
+    prop: isDark ? '#d8b4fe' : '#7e22ce',
+    component: isDark ? '#93e7fb' : '#0369a1',
+  };
+  const pattern = /(\/\/.*|\/\*.*?\*\/|(['"`])(?:\\.|(?!\2).)*\2|\b\d+(?:\.\d+)?\b|<\/?[A-Za-z][\w.]*|\b[A-Za-z_]\w*(?=\s*=)|\b[A-Z][A-Za-z0-9_]*\b|\b[A-Za-z_]\w*\b)/g;
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+
+  for (const match of line.matchAll(pattern)) {
+    const token = match[0];
+    const index = match.index ?? 0;
+    if (index > lastIndex) nodes.push(line.slice(lastIndex, index));
+
+    let color = colors.text;
+    if (token.startsWith('//') || token.startsWith('/*')) color = colors.comment;
+    else if (/^['"`]/.test(token)) color = colors.string;
+    else if (/^\d/.test(token)) color = colors.number;
+    else if (token.startsWith('<')) color = colors.tag;
+    else if (syntaxKeywords.has(token)) color = colors.keyword;
+    else if (/^[A-Z]/.test(token)) color = colors.component;
+    else if (line.slice(index + token.length).match(/^\s*=/)) color = colors.prop;
+
+    nodes.push(
+      <span key={`${index}-${token}`} style={{ color }}>
+        {token}
+      </span>
+    );
+    lastIndex = index + token.length;
+  }
+
+  if (lastIndex < line.length) nodes.push(line.slice(lastIndex));
+  return nodes;
+}
 
 function CodeBlock({ code, language, theme }: { code: string, language: string, theme: Theme }) {
   const [copied, setCopied] = useState(false);
@@ -16,10 +68,10 @@ function CodeBlock({ code, language, theme }: { code: string, language: string, 
   const isDark = theme === 'dark';
 
   return (
-    <div className={`relative group rounded-2xl border ${isDark ? 'border-white/10 bg-[#0d0d0d]' : 'border-black/10 bg-zinc-50'} p-6 shadow-2xl transition hover:border-blue-500/30`}>
+    <div className={`relative group overflow-hidden border-y ${isDark ? 'border-white/10 bg-[#070707]' : 'border-black/10 bg-[#fbfbfb]'} p-6 transition`}>
       <button
         onClick={copyToClipboard}
-        className={`absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10 hover:text-white' : 'border-black/10 bg-black/5 text-black/50 hover:bg-black/10 hover:text-black'} opacity-0 group-hover:opacity-100`}
+        className={`absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10 hover:text-white' : 'border-black/10 bg-black/5 text-black/50 hover:bg-black/10 hover:text-black'} opacity-100 sm:opacity-0 sm:group-hover:opacity-100`}
         title="Copy code"
       >
         {copied ? <Check size={18} className="text-[#4ade80]" /> : <Copy size={18} />}
@@ -27,8 +79,17 @@ function CodeBlock({ code, language, theme }: { code: string, language: string, 
       <div className={`absolute right-16 top-6 z-10 text-[10px] font-bold uppercase tracking-widest ${isDark ? 'text-white/20' : 'text-black/20'}`}>
         {language}
       </div>
-      <pre className={`overflow-x-auto text-[14px] leading-relaxed whitespace-pre-wrap selection:bg-[#38bdf8]/30 ${isDark ? 'text-[#c9d1d9]' : 'text-zinc-800'}`} style={{ fontFamily: '"Fira Code", "JetBrains Mono", monospace' }}>
-        <code>{code}</code>
+      <pre className="overflow-x-auto whitespace-pre-wrap text-[13.5px] leading-7 selection:bg-white/20" style={{ fontFamily: '"Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace' }}>
+        <code>
+          {code.split('\n').map((line, index) => (
+            <React.Fragment key={index}>
+              <span className={isDark ? 'text-white/25' : 'text-black/25'}>{String(index + 1).padStart(2, '0')}</span>
+              <span className="select-none px-3 text-white/10">|</span>
+              {highlightLine(line, isDark)}
+              {index < code.split('\n').length - 1 ? '\n' : null}
+            </React.Fragment>
+          ))}
+        </code>
       </pre>
     </div>
   );
@@ -39,45 +100,47 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
   const basePath = isRN ? '' : '/flutter';
   const componentsPath = isRN ? '/components' : '/flutter/components';
   const isDark = theme === 'dark';
+  const logoAsset = isDark ? darkLogo : whiteLogo;
 
   return (
     <>
-      <header className="flex h-24 items-center justify-between">
+      <header className="sticky top-4 z-40 mt-4 flex h-20 items-center justify-between px-1 sm:px-0">
         <a
-          className={`flex items-center gap-3 text-2xl font-bold cursor-pointer ${isDark ? 'text-white' : 'text-black'}`}
+          className={`flex items-center gap-3 text-xl font-bold cursor-pointer sm:text-2xl ${isDark ? 'text-white' : 'text-black'}`}
           onClick={(e) => { e.preventDefault(); navigate(basePath || '/'); }}
           href={basePath || '/'}
         >
-          Gliph UI
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${isDark ? 'bg-white/75 text-black' : 'bg-black/75 text-white'}`}>
-            Beta
-          </span>
+          <img
+            src={logoAsset}
+            alt="Gliph UI"
+            className="h-40 w-40 object-contain object-left sm:h-40 sm:w-40"
+          />
         </a>
 
-        <nav className={`hidden items-center gap-10 text-sm font-semibold md:flex ${isDark ? 'text-white/85' : 'text-black/70'}`}>
+        <nav className={`hidden items-center gap-2 text-sm font-semibold md:flex ${isDark ? 'text-white/80' : 'text-black/70'}`}>
           <a
-            className="transition hover:text-blue-500 cursor-pointer"
+            className={`rounded-full px-4 py-2 transition cursor-pointer ${isDark ? 'hover:text-white' : 'hover:text-black'}`}
             onClick={(e) => { e.preventDefault(); navigate(componentsPath); }}
             href={componentsPath}
           >
             Components
           </a>
-          <a className="transition hover:text-blue-500" href="/pricing">
+          <a className={`rounded-full px-4 py-2 transition ${isDark ? 'hover:text-white' : 'hover:text-black'}`} href="/pricing">
             Pricing
           </a>
         </nav>
 
-        <div className="flex items-center gap-3 sm:gap-6">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={toggleTheme}
-            className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/15' : 'border-black/10 bg-black/5 text-black hover:bg-black/10'}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all hover:-translate-y-0.5 ${isDark ? 'text-white hover:bg-white/10' : 'text-black hover:bg-black/5'}`}
             title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
 
           <a
-            className={`hidden sm:flex text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
+            className={`hidden lg:flex rounded-xl px-3 py-2 text-sm font-semibold transition cursor-pointer ${isDark ? 'text-white/70 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black'}`}
             onClick={(e) => { e.preventDefault(); navigate(isRN ? '/flutter' : '/'); }}
             href={isRN ? "/flutter" : "/"}
           >
@@ -85,7 +148,7 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
           </a>
 
           <a
-            className={`rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold shadow-xl transition duration-200 hover:-translate-y-0.5 cursor-pointer ${isDark ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-black/5'}`}
+            className={`rounded-xl px-4 py-2.5 text-xs font-bold shadow-xl transition duration-200 hover:-translate-y-0.5 sm:px-5 sm:py-3 sm:text-sm cursor-pointer ${isDark ? 'bg-white text-black shadow-white/10 hover:bg-zinc-200' : 'bg-black text-white shadow-black/10 hover:bg-zinc-800'}`}
             onClick={(e) => { e.preventDefault(); navigate(componentsPath); }}
             href={componentsPath}
           >
@@ -111,17 +174,23 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
 function HomePage({ platform, navigate, theme }: { platform: Platform, navigate: (path: string) => void, theme: Theme }) {
   const isRN = platform === 'react-native';
   const isDark = theme === 'dark';
+  const heroAsset = isDark ? darkHero : whiteHero;
 
   return (
-    <section className="flex flex-col min-h-[calc(100vh-6rem)] justify-center py-8 lg:py-0">
-      <div className="max-w-3xl">
-        <h1 className={`text-5xl font-bold leading-[1.08] sm:text-6xl lg:text-7xl ${isDark ? 'text-white' : 'text-black'}`}>
+    <section className="grid min-h-[calc(100vh-6rem)] items-center gap-12 py-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,0.8fr)] lg:py-10">
+      <div className="max-w-4xl">
+        <div className={`mb-7 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] shadow-2xl ${isDark ? 'border-white/15 bg-white/[0.07] text-white shadow-black/40' : 'border-black/15 bg-white text-black shadow-slate-200/80'}`}>
+          <Sparkles size={14} />
+          Mobile UI components
+        </div>
+
+        <h1 className={`text-5xl font-bold leading-[1.02] sm:text-6xl lg:text-7xl xl:text-8xl ${isDark ? 'text-white' : 'text-slate-950'}`}>
           Supercharge your
-          <span className={`block ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>{isRN ? 'React Native' : 'Flutter'}</span>
+          <span className={isDark ? 'block text-zinc-300' : 'block text-zinc-700'}>{isRN ? 'React Native' : 'Flutter'}</span>
           development
         </h1>
 
-        <p className={`mt-8 max-w-2xl text-lg font-medium leading-8 ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+        <p className={`mt-8 max-w-2xl text-lg font-medium leading-8 sm:text-xl ${isDark ? 'text-white/[0.64]' : 'text-slate-600'}`}>
           Ready-to-use {isRN ? 'React Native' : 'Flutter'} components crafted for clean mobile
           interfaces. Copy, customize, and ship polished screens faster.
         </p>
@@ -129,11 +198,16 @@ function HomePage({ platform, navigate, theme }: { platform: Platform, navigate:
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
           <button
             onClick={() => navigate(isRN ? '/components' : '/flutter/components')}
-            className={`rounded-xl px-6 py-3.5 text-center text-base font-bold shadow-2xl transition duration-200 hover:-translate-y-0.5 ${isDark ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-black/5'}`}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-bold shadow-2xl transition duration-200 hover:-translate-y-0.5 ${isDark ? 'bg-white text-black shadow-white/10 hover:bg-zinc-200' : 'bg-black text-white shadow-black/10 hover:bg-zinc-800'}`}
           >
             Browse {isRN ? 'RN' : 'Flutter'} Components
+            <ArrowRight size={18} />
           </button>
         </div>
+      </div>
+
+      <div className="relative mx-auto flex w-full max-w-[520px] items-center justify-center">
+        <img src={heroAsset} alt="Developer illustration" className="h-auto max-h-[620px] w-full object-contain" />
       </div>
     </section>
   );
@@ -152,6 +226,7 @@ interface PickerProp {
 interface PlatformData {
   previewGif?: string;
   usage: string;
+  usageJs?: string;
   props: PickerProp[];
 }
 
@@ -161,6 +236,7 @@ interface Variant {
   flutterPreview?: string;
   previewGif?: string;
   reactNativeUsage?: string;
+  reactNativeUsageJs?: string;
   flutterUsage?: string;
   usage: string; // fallback
 }
@@ -191,15 +267,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Navbar
-        /**
-         * Design variant of the navbar.
-         * Options: 'floating', 'classic', 'minimal', 'ios'
-         */
         variant="floating"
-
-        /**
-         * List of tabs to display.
-         */
         tabs={[
           { 
             id: 'home', 
@@ -210,42 +278,54 @@ export default function App() {
           { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
           { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
         ]}
-
-        /**
-         * The active tab ID. Should be managed via state.
-         */
         activeTab={activeTab}
-
-        /**
-         * Callback fired when a tab is pressed.
-         */
         onTabChange={(id) => setActiveTab(id)}
-
-        /**
-         * Optional: Floating action button in the center.
-         */
         actionButton={{
           icon: (c, s) => <Plus color="#fff" size={s} />,
           onPress: () => console.log('Action Pressed'),
           color: '#6366f1'
         }}
-
-        /**
-         * Visual fine-tuning
-         */
-        activeScale={1.3}  // Scale of active tab (Default: 1.25)
-        iconSize={22}      // Size of icons (Default: 24)
-        height={70}        // Navbar height (Default: 70)
-        bottom={30}        // Offset from bottom (Floating variant)
-
-        /**
-         * Theme customization
-         */
+        activeScale={1.3}
+        iconSize={22}
+        height={70}
+        bottom={30}
         theme={{
           background: 'rgba(18, 18, 24, 0.85)',
           activeColor: '#6366f1',
           indicatorColor: 'rgba(99, 102, 241, 0.15)',
           borderColor: 'rgba(255, 255, 255, 0.1)'
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#050505' }
+});`,
+      usageJs: `import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Navbar } from 'gliph-ui';
+import { Home, Search, User, Plus } from 'lucide-react-native';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+
+  return (
+    <View style={styles.container}>
+      <Navbar
+        variant="floating"
+        tabs={[
+          { id: 'home', label: 'Home', icon: (c, s) => <Home color={c} size={s} /> },
+          { id: 'search', label: 'Search', icon: (c, s) => <Search color={c} size={s} /> },
+          { id: 'profile', label: 'Profile', icon: (c, s) => <User color={c} size={s} /> }
+        ]}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id)}
+        actionButton={{
+          icon: (c, s) => <Plus color="#fff" size={s} />,
+          onPress: () => console.log('Action Pressed'),
+          color: '#6366f1'
         }}
       />
     </View>
@@ -417,7 +497,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050505' }
 });`,
         flutterUsage: `import 'package:flutter/material.dart';
-import 'package:gliph_ui/gliph_ui.dart';
+import 'package:gliph_ui/gliph_ui.gov';
 
 void main() => runApp(const MyApp());
 
@@ -794,8 +874,7 @@ class _MyAppState extends State<MyApp> {
         { name: 'bottom', type: 'double', default: '30', desc: 'Vertical offset from the bottom.' }
       ]
     }
-  }
-  ,
+  },
   scale: {
     title: 'Scale Picker',
     description: 'A horizontal ruler-style picker for height, weight, and other linear measurements.',
@@ -959,40 +1038,40 @@ import { View } from 'react-native';
 import { TimeScrollPicker } from 'gliph-ui';
 
 export default function App() {
-  const [time, setTime] = useState({ hour: 7, minute: 30, ampm: 'am' });
+  const [time, setTime] = useState({ hour: 10, minute: 30 });
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
       <TimeScrollPicker
         value={time}
         onChange={setTime}
-
-        /**
-         * Configuration for time range and steps.
-         */
         limits={{
-          is12Hour: true,    // Toggle AM/PM
-          hourMin: 1,        // Min selectable hour
-          hourMax: 12,       // Max selectable hour
-          minuteStep: 5,     // Minute interval (0, 5, 10...)
+          is12Hour: true,
+          minuteStep: 5
         }}
-
-        /**
-         * Visual layout adjustment
-         */
-        layout={{
-          itemHeight: 70,    // Height of each row
-          visibleRows: 3,    // Number of items visible
-          fontSize: 40       // Label font size
-        }}
-
-        /**
-         * Theme overrides.
-         */
         theme={{
           activeTextColor: '#ffffff',
-          inactiveTextColor: 'rgba(255,255,255,0.2)',
-          separatorColor: '#6366f1', // Color of the ":" colon
+          inactiveTextColor: 'rgba(255,255,255,0.14)'
+        }}
+      />
+    </View>
+  );
+}`,
+      usageJs: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { TimeScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [time, setTime] = useState({ hour: 10, minute: 30 });
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <TimeScrollPicker
+        value={time}
+        onChange={setTime}
+        limits={{
+          is12Hour: true,
+          minuteStep: 5
         }}
       />
     </View>
@@ -1121,41 +1200,40 @@ import { View } from 'react-native';
 import { WeightScrollPicker } from 'gliph-ui';
 
 export default function App() {
-  const [weight, setWeight] = useState({ whole: 70, decimal: 5, unit: 'kg' });
+  const [weight, setWeight] = useState(72.5);
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
       <WeightScrollPicker
         value={weight}
         onChange={setWeight}
-
-        /**
-         * Configuration for range and units.
-         */
         limits={{
-          wholeMin: 40,      // Minimum kg/lbs
-          wholeMax: 200,     // Maximum kg/lbs
-          units: ['kg', 'lbs'], // Available units
-          decimalValues: [0, 2, 5, 7], // Options for decimal column
+          min: 30,
+          max: 150
         }}
-
-        /**
-         * Visual layout customization
-         */
-        layout={{
-          itemHeight: 65,
-          visibleRows: 3,
-          fontSize: 44,
-        }}
-
-        /**
-         * Theme customization.
-         */
         theme={{
           activeTextColor: '#ffffff',
-          inactiveTextColor: 'rgba(255,255,255,0.15)',
-          separatorColor: '#10b981', // Color of the decimal point
-          accentColor: '#10b981',
+          inactiveTextColor: 'rgba(255,255,255,0.14)'
+        }}
+      />
+    </View>
+  );
+}`,
+      usageJs: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { WeightScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [weight, setWeight] = useState(72.5);
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <WeightScrollPicker
+        value={weight}
+        onChange={setWeight}
+        limits={{
+          min: 30,
+          max: 150
         }}
       />
     </View>
@@ -1250,8 +1328,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
         ),
       ),
     );
-  }
-}`,
+  }`,
       props: [
         { name: 'value', type: 'WeightValue?', default: 'null', desc: 'Controlled state { whole, decimal, unit }.' },
         { name: 'defaultValue', type: 'WeightValue?', default: '{whole:72, decimal:5, unit:"kg"}', desc: 'Initial uncontrolled value.' },
@@ -1295,25 +1372,31 @@ export default function App() {
         ]}
         value={val}
         onChange={setVal}
-
-        /**
-         * Visual layout customization
-         */
-        width={120}         // Column width
-        layout={{
-          itemHeight: 70,
-          visibleRows: 3,
-          fontSize: 40
-        }}
-
-        /**
-         * Theme customization.
-         */
         theme={{
           activeTextColor: '#ffffff',
-          inactiveTextColor: 'rgba(255,255,255,0.14)',
-          accentColor: '#6366f1'
+          inactiveTextColor: 'rgba(255,255,255,0.14)'
         }}
+      />
+    </View>
+  );
+}`,
+      usageJs: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { ValueScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [val, setVal] = useState('medium');
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <ValueScrollPicker
+        items={[
+          { label: 'Low', value: 'low' },
+          { label: 'Medium', value: 'medium' },
+          { label: 'High', value: 'high' }
+        ]}
+        value={val}
+        onChange={setVal}
       />
     </View>
   );
@@ -1435,31 +1518,33 @@ export default function App() {
       <DateScrollPicker
         value={date}
         onChange={setDate}
-
-        /**
-         * Optional: Selectable range constraints.
-         */
         limits={{
           yearMin: 1990,
           yearMax: 2030
         }}
-
-        /**
-         * Visual layout customization
-         */
-        layout={{
-          itemHeight: 72,
-          visibleRows: 3,
-          fontSize: 44
-        }}
-
-        /**
-         * Theme customization.
-         */
         theme={{
           activeTextColor: '#ffffff',
-          inactiveTextColor: 'rgba(255,255,255,0.14)',
-          separatorColor: '#f43f5e' // Color of '/' or '-' separator
+          inactiveTextColor: 'rgba(255,255,255,0.14)'
+        }}
+      />
+    </View>
+  );
+}`,
+      usageJs: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { DateScrollPicker } from 'gliph-ui';
+
+export default function App() {
+  const [date, setDate] = useState({ year: 2025, month: 5, day: 9 });
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <DateScrollPicker
+        value={date}
+        onChange={setDate}
+        limits={{
+          yearMin: 1990,
+          yearMax: 2030
         }}
       />
     </View>
@@ -1569,6 +1654,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
       ]
     }
   },
+
   calendar: {
     title: 'Calendar Picker',
     description: 'A full-featured monthly calendar with animated day selection, year dropdown, and min/max date constraints.',
@@ -1586,33 +1672,31 @@ export default function App() {
       <CalendarPicker
         value={date}
         onChange={setDate}
-
-        /**
-         * Navigation and feature flags.
-         */
         showTodayButton={true}
         enableYearDropdown={true}
-        showOutsideDays={true}
-
-        /**
-         * Constraints
-         */
-        minDate={{ year: 2020, month: 1, day: 1 }}
-        maxDate={{ year: 2030, month: 12, day: 31 }}
-        yearRange={{ start: 2020, end: 2030 }}
-
-        /**
-         * Custom theme for the calendar interface.
-         */
         theme={{
-          accent: '#38BDF8',       // Highlight color
-          surface: '#111827',      // Card background
-          surfaceSoft: '#1F2937',  // Dropdown background
-          text: '#F9FAFB',         // Primary text
-          mutedText: '#CBD5E1',    // Month title
-          faintText: '#64748B',    // Weekday labels
-          border: '#334155'        // Component borders
+          accent: '#38BDF8',
+          surface: '#111827',
+          text: '#F9FAFB'
         }}
+      />
+    </View>
+  );
+}`,
+      usageJs: `import React, { useState } from 'react';
+import { View } from 'react-native';
+import { CalendarPicker } from 'gliph-ui';
+
+export default function App() {
+  const [date, setDate] = useState({ year: 2025, month: 5, day: 9 });
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}>
+      <CalendarPicker
+        value={date}
+        onChange={setDate}
+        showTodayButton={true}
+        enableYearDropdown={true}
       />
     </View>
   );
@@ -1678,35 +1762,41 @@ class _PickerShowcaseState extends State<PickerShowcase> {
       body: Center(
         child: CalendarPicker(
           value: _date,
+          onChange: (date) => setState(() => _date = date),
 
           /**
-           * Navigation and feature flags.
+           * Range and Navigation
+           */
+          minDate: CalendarDate(year: 2020, month: 1, day: 1),
+          maxDate: CalendarDate(year: 2030, month: 12, day: 31),
+          yearRange: CalendarYearRange(start: 2000, end: 2050),
+          
+          /**
+           * Feature Toggles
            */
           showTodayButton: true,
           enableYearDropdown: true,
           showOutsideDays: true,
 
           /**
-           * Optional: Selectable range constraints.
+           * Layout
            */
-          minDate: CalendarDate(year: 2020, month: 1, day: 1),
-          maxDate: CalendarDate(year: 2030, month: 12, day: 31),
-          yearRange: CalendarYearRange(start: 2020, end: 2030),
+          maxWidth: 390.0,
 
           /**
-           * Custom theme for the calendar interface.
+           * Theme customization
            */
           theme: const CalendarPickerTheme(
-            accent: Color(0xFF38BDF8),       // Highlight color
-            onAccent: Color(0xFF082F49),     // Text on highlight
-            surface: Color(0xFF111827),      // Background card
-            surfaceSoft: Color(0xFF1F2937),  // Dropdown background
-            text: Color(0xFFF9FAFB),         // Primary text
-            mutedText: Color(0xFFCBD5E1),    // Month title
-            faintText: Color(0xFF64748B),    // Weekday labels
-            border: Color(0xFF334155),       // Component borders
+            accent: Color(0xFF38BDF8),
+            onAccent: Color(0xFF082F49),
+            surface: Color(0xFF111827),
+            surfaceSoft: Color(0xFF1F2937),
+            text: Color(0xFFF9FAFB),
+            mutedText: Color(0xFFCBD5E1),
+            faintText: Color(0xFF64748B),
+            disabledText: Color(0xFF475569),
+            border: Color(0xFF334155),
           ),
-          onChange: (date) => setState(() => _date = date),
         ),
       ),
     );
@@ -1764,6 +1854,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
   const [rnLoading, setRnLoading] = useState(true);
   const [flutterLoading, setFlutterLoading] = useState(true);
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
+  const [rnLanguage, setRnLanguage] = useState<'tsx' | 'jsx'>('tsx');
 
   const rnGif = data.reactNative?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
   const flutterGif = data.flutter?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
@@ -1779,33 +1870,55 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
     return () => clearTimeout(timer);
   }, [category]);
 
+  const getCode = () => {
+    if (platform === 'flutter') {
+      return data.variants
+        ? (data.variants[activeVariantIndex].flutterUsage || data.variants[activeVariantIndex].usage)
+        : platformData.usage;
+    }
+
+    // React Native
+    if (data.variants) {
+      const v = data.variants[activeVariantIndex];
+      return (rnLanguage === 'jsx'
+        ? (v.reactNativeUsageJs || v.reactNativeUsage || v.usage)
+        : (v.reactNativeUsage || v.usage));
+    } else {
+      return (rnLanguage === 'jsx'
+        ? (platformData.usageJs || platformData.usage)
+        : platformData.usage);
+    }
+  };
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <button
         onClick={onBack}
-        className={`group flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all mb-8 ${isDark ? 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white' : 'border-black/10 bg-black/5 text-black/70 hover:bg-black/10 hover:text-black'}`}
+        className={`group mb-8 flex w-fit items-center gap-2 text-sm font-semibold transition-all ${isDark ? 'text-white/60 hover:text-white' : 'text-black/60 hover:text-black'}`}
       >
         <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
         Back to components
       </button>
 
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
-        <h2 className={`text-4xl font-bold leading-tight sm:text-5xl tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
-          {data.title}
-        </h2>
+      <div className={`border-b pb-8 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
+          <h2 className={`text-4xl font-bold leading-tight sm:text-5xl tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
+            {data.title}
+          </h2>
 
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${isDark ? 'border-white/10 bg-white/5' : 'border-black/10 bg-black/5'}`}>
-          {platform === 'react-native' ? (
-            <><Code2 size={16} className="text-[#61dafb]" /> <span className={`text-sm font-medium tracking-tight ${isDark ? 'text-white/80' : 'text-black/70'}`}>React Native API</span></>
-          ) : (
-            <><Smartphone size={16} className="text-[#38bdf8]" /> <span className={`text-sm font-medium tracking-tight ${isDark ? 'text-white/80' : 'text-black/70'}`}>Flutter API</span></>
-          )}
+          <div className={`flex items-center gap-2 text-sm font-semibold ${isDark ? 'text-white/70' : 'text-black/60'}`}>
+            {platform === 'react-native' ? (
+              <><Code2 size={16} /> <span className="tracking-tight">React Native API</span></>
+            ) : (
+              <><Smartphone size={16} /> <span className="tracking-tight">Flutter API</span></>
+            )}
+          </div>
         </div>
-      </div>
 
-      <p className={`mt-5 text-lg leading-8 max-w-2xl ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-        {data.description}
-      </p>
+        <p className={`mt-5 text-lg leading-8 max-w-2xl ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+          {data.description}
+        </p>
+      </div>
 
       {data.variants ? (
         <div className="mt-16">
@@ -1882,7 +1995,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                         </p>
                         <div className={`overflow-hidden rounded-2xl border shadow-xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                           <iframe
-                            src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(variant.name)}&platform=android&theme=dark&code=${encodeURIComponent(variant.reactNativeUsage || variant.usage || '')}`}
+                            src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(variant.name)}&platform=android&theme=dark&code=${encodeURIComponent(rnLanguage === 'jsx' ? (variant.reactNativeUsageJs || variant.reactNativeUsage || variant.usage || '') : (variant.reactNativeUsage || variant.usage || ''))}`}
                             style={{ width: '100%', height: '600px', border: 0 }}
                           />
                         </div>
@@ -1939,21 +2052,19 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                           loop
                           muted
                           playsInline
-                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
+                          className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom' : 'object-cover'}`}
                           onCanPlayThrough={() => setRnLoading(false)}
                         />
                       ) : (
                         <img
                           key={`${category}-rn-img`}
                           src={rnGif}
-                          alt="React Native Preview"
-                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${rnLoading ? 'opacity-0' : 'opacity-100'}`}
+                          alt={data.title}
+                          className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom' : 'object-cover'}`}
                           onLoad={() => setRnLoading(false)}
                         />
                       )
-                    ) : (
-                      <div className="text-white/20 text-xs font-medium text-center px-8">RN Preview not available</div>
-                    )
+                    ) : null
                   ) : (
                     flutterGif ? (
                       flutterGif.includes('.mp4') ? (
@@ -1964,24 +2075,19 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                           loop
                           muted
                           playsInline
-                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
+                          className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom' : 'object-cover'}`}
                           onCanPlayThrough={() => setFlutterLoading(false)}
                         />
                       ) : (
                         <img
                           key={`${category}-flutter-img`}
                           src={flutterGif}
-                          alt="Flutter Preview"
-                          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${flutterLoading ? 'opacity-0' : 'opacity-100'}`}
+                          alt={data.title}
+                          className={`absolute inset-0 h-full w-full ${category === 'navbar' ? 'object-contain object-bottom' : 'object-cover'}`}
                           onLoad={() => setFlutterLoading(false)}
                         />
                       )
-                    ) : (
-                      <div className="text-white/20 text-xs font-medium text-center px-8 flex flex-col items-center gap-3">
-                        <Smartphone size={32} className="opacity-20" />
-                        Flutter Preview Coming Soon
-                      </div>
-                    )
+                    ) : null
                   )}
                 </div>
               </div>
@@ -2002,7 +2108,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                   </p>
                   <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                     <iframe
-                      src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(data.reactNative?.usage || '')}`}
+                      src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(rnLanguage === 'jsx' ? (platformData.usageJs || platformData.usage || '') : (platformData.usage || ''))}`}
                       style={{ width: '100%', height: '650px', border: 0 }}
                       title="Gliph UI Expo Preview"
                     />
@@ -2017,22 +2123,37 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
       {/* Unified Usage Code Section */}
       <div key={`${category}-${activeVariantIndex}-usage`} className={`mt-24 border-t pt-20 animate-in fade-in slide-in-from-bottom-4 duration-700 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
         <div className="flex flex-col gap-10 max-w-4xl mx-auto">
-          <div className="flex flex-col items-center gap-3">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isDark ? 'bg-white/5 text-[#4ade80]' : 'bg-black/5 text-[#22c55e]'}`}>
-              <Terminal size={24} />
+          <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-3">
+              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isDark ? 'bg-white/5 text-[#4ade80]' : 'bg-black/5 text-[#22c55e]'}`}>
+                <Terminal size={24} />
+              </div>
+              <h3 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Usage Code</h3>
+              <p className={`text-sm font-medium ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+                Import and implement the {data.title} in your project.
+              </p>
             </div>
-            <h3 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Usage Code</h3>
-            <p className={`text-sm font-medium ${isDark ? 'text-white/40' : 'text-black/40'}`}>
-              Import and implement the {data.title} in your React Native project.
-            </p>
+
+            {platform === 'react-native' && (
+              <div className={`flex gap-1 p-1 rounded-xl border ${isDark ? 'border-white/10 bg-white/5' : 'border-black/10 bg-black/5'}`}>
+                <button
+                  onClick={() => setRnLanguage('tsx')}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${rnLanguage === 'tsx' ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (isDark ? 'text-white/40 hover:text-white/60' : 'text-black/40 hover:text-black/60')}`}
+                >
+                  TypeScript
+                </button>
+                <button
+                  onClick={() => setRnLanguage('jsx')}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${rnLanguage === 'jsx' ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg') : (isDark ? 'text-white/40 hover:text-white/60' : 'text-black/40 hover:text-black/60')}`}
+                >
+                  JavaScript (JSX)
+                </button>
+              </div>
+            )}
           </div>
           <CodeBlock
-            code={data.variants
-              ? (platform === 'react-native'
-                ? (data.variants[activeVariantIndex].reactNativeUsage || data.variants[activeVariantIndex].usage)
-                : (data.variants[activeVariantIndex].flutterUsage || data.variants[activeVariantIndex].usage))
-              : platformData.usage}
-            language={platform === 'react-native' ? 'tsx' : 'dart'}
+            code={getCode()}
+            language={platform === 'react-native' ? rnLanguage : 'dart'}
             theme={theme}
           />
         </div>
@@ -2041,30 +2162,41 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
 
       {/* Installation */}
       <div className={`mt-20 border-t pt-16 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-        <div className="mb-6 flex items-center gap-3">
-          <Terminal className="text-[#4ade80]" size={28} />
-          <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Installation</h3>
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className={`mb-3 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.18em] ${isDark ? 'text-white/35' : 'text-black/35'}`}>
+              <Terminal size={18} />
+              Setup
+            </div>
+            <h3 className={`text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>Installation</h3>
+          </div>
+          <p className={`max-w-md text-sm leading-6 ${isDark ? 'text-white/50' : 'text-black/50'}`}>
+            Install the package and any required peer dependency before adding components to your app.
+          </p>
         </div>
 
         {platform === 'react-native' && (
-          <div className={`mb-6 p-4 rounded-xl border ${isDark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-500/20 bg-amber-500/5'}`}>
-            <p className={`text-sm font-semibold flex items-center gap-2 ${isDark ? 'text-amber-500' : 'text-amber-600'}`}>
-              <Zap size={16} /> Prerequisite: react-native-svg
+          <div className={`mb-8 border-l-2 pl-5 ${isDark ? 'border-white/20' : 'border-black/20'}`}>
+            <p className={`text-sm font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-black'}`}>
+              <Zap size={16} /> Prerequisite
             </p>
-            <p className={`mt-1 text-sm ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-              Most Gliph UI components require <code className="font-mono text-xs">react-native-svg</code> to render icons. Ensure it is installed in your project.
+            <p className={`mt-2 text-sm leading-6 ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+              Most Gliph UI components require <code className="font-mono text-xs">react-native-svg</code> to render icons.
             </p>
-            <div className="mt-3">
+            <div className="mt-5">
               <CodeBlock code="npm install react-native-svg" language="bash" theme={theme} />
             </div>
           </div>
         )}
 
-        <CodeBlock
-          code={platform === 'react-native' ? 'npm install gliph-ui' : 'flutter pub add gliph_ui'}
-          language={platform === 'react-native' ? 'npm' : 'shell'}
-          theme={theme}
-        />
+        <div>
+          <p className={`mb-3 text-sm font-bold uppercase tracking-[0.18em] ${isDark ? 'text-white/35' : 'text-black/35'}`}>Package</p>
+          <CodeBlock
+            code={platform === 'react-native' ? 'npm install gliph-ui' : 'flutter pub add gliph_ui'}
+            language={platform === 'react-native' ? 'npm' : 'shell'}
+            theme={theme}
+          />
+        </div>
       </div>
 
 
@@ -2175,13 +2307,13 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
   return (
     <section className="grid flex-1 py-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
       <aside className={`lg:min-h-[calc(100vh-8.5rem)] lg:border-r ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-        <nav className="flex flex-col items-start pb-10 mr-8 gap-1">
+        <nav className="sticky top-28 flex flex-col items-start gap-1 pb-4 lg:mr-8">
           {/* Home link */}
           <button
             onClick={() => navigate(platform === 'react-native' ? '/' : '/flutter')}
-            className={`w-full text-left px-3 py-2 text-sm font-semibold rounded-lg transition-all mb-2 ${isDark ? 'text-white/50 hover:text-white hover:bg-white/5' : 'text-black/50 hover:text-black hover:bg-black/5'}`}
+            className={`w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all mb-2 ${isDark ? 'text-white/[0.55] hover:text-white hover:bg-white/10' : 'text-black/[0.55] hover:text-black hover:bg-black/[0.05]'}`}
           >
-            ← Home
+            Back home
           </button>
 
           {/* Navigation group */}
@@ -2192,9 +2324,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#818cf8]' : 'text-[#6366f1]') : ''}>{comp.icon}</span>
@@ -2210,9 +2342,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#fb923c]' : 'text-[#ea580c]') : ''}>{comp.icon}</span>
@@ -2228,9 +2360,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#38bdf8]' : 'text-[#0ea5e9]') : ''}>{comp.icon}</span>
@@ -2246,9 +2378,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#4ade80]' : 'text-[#16a34a]') : ''}>{comp.icon}</span>
@@ -2260,9 +2392,12 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
 
       <div className="w-full max-w-5xl pt-10 pb-32">
         {activeCategory === null ? (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col items-start justify-center min-h-[60vh]">
-            <h2 className={`text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>Components</h2>
-            <p className={`text-lg max-w-lg ${isDark ? 'text-white/50' : 'text-black/50'}`}>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex min-h-[60vh] flex-col items-start justify-center">
+            <div className={`mb-5 flex h-14 w-14 items-center justify-center ${isDark ? 'text-white' : 'text-black'}`}>
+              <Layout size={28} />
+            </div>
+            <h2 className={`text-4xl font-bold mb-4 sm:text-5xl ${isDark ? 'text-white' : 'text-slate-950'}`}>Components</h2>
+            <p className={`text-lg max-w-lg leading-8 ${isDark ? 'text-white/[0.58]' : 'text-slate-600'}`}>
               Select a component from the sidebar to view its documentation, usage examples, and props.
             </p>
           </div>
@@ -2271,6 +2406,29 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
         )}
       </div>
     </section>
+  );
+}
+
+function Footer({ theme }: { theme: Theme }) {
+  const isDark = theme === 'dark';
+
+  return (
+    <footer className={`mt-auto border-t py-8 text-sm ${isDark ? 'border-white/10 text-white/45' : 'border-black/10 text-black/45'}`}>
+      <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+        <p>
+          Created by{' '}
+          <a
+            href="https://github.com/praveenkaruppusamy2005"
+            target="_blank"
+            rel="noreferrer"
+            className={`inline-flex items-center gap-1.5 font-bold transition ${isDark ? 'text-white/75 hover:text-white' : 'text-black/75 hover:text-black'}`}
+          >
+            Praveen
+          </a>
+        </p>
+        <p className={isDark ? 'text-white/30' : 'text-black/30'}>Gliph UI</p>
+      </div>
+    </footer>
   );
 }
 
@@ -2321,15 +2479,16 @@ function App() {
     <main className={`relative min-h-screen overflow-hidden transition-colors duration-300 ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
       <div className="pointer-events-none absolute inset-0">
         {isDark ? (
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_8%,_rgba(255,255,255,0.07),_transparent_28%),linear-gradient(180deg,_#050505_0%,_#000000_48%,_#030303_100%)]" />
+          <div className="absolute inset-0 bg-black" />
         ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_8%,_rgba(0,0,0,0.03),_transparent_28%),linear-gradient(180deg,_#ffffff_0%,_#fcfcfc_48%,_#f9f9f9_100%)]" />
+          <div className="absolute inset-0 bg-white" />
         )}
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1520px] flex-col px-5 sm:px-8 lg:px-20">
         <Header platform={platform} navigate={navigate} theme={theme} toggleTheme={toggleTheme} />
         {page}
+        <Footer theme={theme} />
       </div>
     </main>
   );
