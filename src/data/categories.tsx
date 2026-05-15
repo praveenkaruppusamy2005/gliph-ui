@@ -1606,30 +1606,57 @@ import Slider from '@react-native-community/slider';
 import { ArrowLeft, Headphones, Smartphone, Pause, Play, Repeat, Repeat1, Shuffle, SkipBack, SkipForward } from 'lucide-react-native';
 import GliphPlayer, { usePlaybackState, useProgress, State, Event, useTrackPlayerEvents, RepeatMode } from 'react-native-gliph-player';
 
-// ... Full implementation provided in the example
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// ... (Rest of the MusicPlayer component implementation)
+// Including the MarqueeText and main MusicPlayer function...
 \`\`\`
 
 ## Step 3: Main App Setup (App.tsx)
 
 \`\`\`tsx
 import React, { useEffect } from 'react';
-import GliphPlayer, { Capability, AppKilledPlaybackBehavior } from 'react-native-gliph-player';
+import { StatusBar, StyleSheet, View, PermissionsAndroid, Platform } from 'react-native';
+import GliphPlayer, { Capability, AppKilledPlaybackBehavior, usePlaybackState } from 'react-native-gliph-player';
 import { MusicPlayer } from './components/music-player';
 
-export default function App() {
+const tracks = [
+  {
+    id: 'leo-badass',
+    url: 'https://...',
+    title: 'Badass (Leo)',
+    artist: 'Anirudh Ravichander',
+    album: 'Leo',
+    artwork: 'https://...'
+  }
+];
+
+function App() {
+  const [isPlayerReady, setIsPlayerReady] = React.useState(false);
+
   useEffect(() => {
     const setup = async () => {
-      await GliphPlayer.setupPlayer({
-        android: { appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification }
-      });
-      await GliphPlayer.add(tracks);
-      await GliphPlayer.play();
+      try {
+        await GliphPlayer.setupPlayer({
+          android: { appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification }
+        });
+        await GliphPlayer.add(tracks);
+        await GliphPlayer.play();
+        setIsPlayerReady(true);
+      } catch (e) { console.log(e); }
     };
     setup();
   }, []);
 
-  return <MusicPlayer tracks={tracks} />;
+  return (
+    <View style={{ flex: 1 }}>
+      <StatusBar barStyle="light-content" transparent />
+      {isPlayerReady && <MusicPlayer tracks={tracks} />}
+    </View>
+  );
 }
+
+export default App;
 \`\`\``,
       props: [
         { name: 'tracks', type: 'MusicPlayerTrack[]', default: 'required', desc: 'Array of track objects with id, url, title, artist, album, and artwork.' },

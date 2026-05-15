@@ -110,7 +110,7 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
                       <p className={`mb-6 text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-black/40'}`}>
                         Visual Preview
                       </p>
-                      <div className={`relative ${category === 'music-player' ? 'w-[600px] aspect-[3/5]' : 'w-[280px] aspect-[9/19]'} rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl overflow-hidden ${isDark ? 'border-[#1a1a1a]' : 'border-zinc-800'}`}>
+                      <div className={`relative ${category === 'music-player' ? 'w-[420px] aspect-[3/5]' : 'w-[280px] aspect-[9/19]'} rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl overflow-hidden ${isDark ? 'border-[#1a1a1a]' : 'border-zinc-800'}`}>
                         <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
                           <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
                         </div>
@@ -179,7 +179,7 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
                   {platform === 'react-native' ? 'React Native' : 'Flutter'} Demonstration
                 </p>
 
-                <div className={`relative ${category === 'music-player' ? 'w-[640px] aspect-[3/5]' : (category === 'navbar' ? 'w-[240px]' : 'w-[300px]')} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
+                <div className={`relative ${category === 'music-player' ? 'w-[440px] aspect-[3/5]' : (category === 'navbar' ? 'w-[240px]' : 'w-[300px]')} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
                   {/* Notch */}
                   <div className="absolute top-0 inset-x-0 flex justify-center z-30 pt-3">
                     <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
