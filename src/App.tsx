@@ -1,60 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Scale, ListFilter, ChevronLeft, Terminal, Code2, PlaySquare, Calendar, Smartphone, Copy, Check, Settings, Layout, Zap, Sun, Moon, Ruler, ArrowRight, Sparkles } from 'lucide-react';
-import darkHero from './assets/dark.png';
-import whiteHero from './assets/white.jpg';
-import darkLogo from './assets/dark-logo.png';
-import whiteLogo from './assets/white-logo.png';
+import { Clock, Scale, ListFilter, ChevronLeft, Terminal, Code2, PlaySquare, Play, Calendar, Smartphone, Copy, Check, Settings, Layout, Zap, Sun, Moon, Ruler, Sparkles, Headphones, Radio, Volume2, Disc3 } from 'lucide-react';
 
 type Platform = 'react-native' | 'flutter';
 type Theme = 'light' | 'dark';
-
-const syntaxKeywords = new Set([
-  'import', 'from', 'export', 'default', 'function', 'const', 'let', 'var', 'return',
-  'class', 'extends', 'interface', 'type', 'if', 'else', 'new', 'true', 'false',
-  'null', 'undefined', 'void', 'async', 'await', 'final', 'required', 'super',
-  'enum', 'public', 'private', 'protected', 'static', 'this'
-]);
-
-function highlightLine(line: string, isDark: boolean) {
-  const colors = {
-    text: isDark ? '#d8d8d8' : '#1f2937',
-    comment: isDark ? '#7c7c7c' : '#8a8a8a',
-    string: isDark ? '#f5d67b' : '#9f5f00',
-    keyword: isDark ? '#8ab4ff' : '#1d4ed8',
-    number: isDark ? '#b5e48c' : '#047857',
-    tag: isDark ? '#ffb4a2' : '#b42318',
-    prop: isDark ? '#d8b4fe' : '#7e22ce',
-    component: isDark ? '#93e7fb' : '#0369a1',
-  };
-  const pattern = /(\/\/.*|\/\*.*?\*\/|(['"`])(?:\\.|(?!\2).)*\2|\b\d+(?:\.\d+)?\b|<\/?[A-Za-z][\w.]*|\b[A-Za-z_]\w*(?=\s*=)|\b[A-Z][A-Za-z0-9_]*\b|\b[A-Za-z_]\w*\b)/g;
-  const nodes: React.ReactNode[] = [];
-  let lastIndex = 0;
-
-  for (const match of line.matchAll(pattern)) {
-    const token = match[0];
-    const index = match.index ?? 0;
-    if (index > lastIndex) nodes.push(line.slice(lastIndex, index));
-
-    let color = colors.text;
-    if (token.startsWith('//') || token.startsWith('/*')) color = colors.comment;
-    else if (/^['"`]/.test(token)) color = colors.string;
-    else if (/^\d/.test(token)) color = colors.number;
-    else if (token.startsWith('<')) color = colors.tag;
-    else if (syntaxKeywords.has(token)) color = colors.keyword;
-    else if (/^[A-Z]/.test(token)) color = colors.component;
-    else if (line.slice(index + token.length).match(/^\s*=/)) color = colors.prop;
-
-    nodes.push(
-      <span key={`${index}-${token}`} style={{ color }}>
-        {token}
-      </span>
-    );
-    lastIndex = index + token.length;
-  }
-
-  if (lastIndex < line.length) nodes.push(line.slice(lastIndex));
-  return nodes;
-}
 
 function CodeBlock({ code, language, theme }: { code: string, language: string, theme: Theme }) {
   const [copied, setCopied] = useState(false);
@@ -68,10 +16,10 @@ function CodeBlock({ code, language, theme }: { code: string, language: string, 
   const isDark = theme === 'dark';
 
   return (
-    <div className={`relative group overflow-hidden border-y ${isDark ? 'border-white/10 bg-[#070707]' : 'border-black/10 bg-[#fbfbfb]'} p-6 transition`}>
+    <div className={`relative group rounded-2xl border ${isDark ? 'border-white/10 bg-[#0d0d0d]' : 'border-black/10 bg-zinc-50'} p-6 shadow-2xl transition hover:border-blue-500/30`}>
       <button
         onClick={copyToClipboard}
-        className={`absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10 hover:text-white' : 'border-black/10 bg-black/5 text-black/50 hover:bg-black/10 hover:text-black'} opacity-100 sm:opacity-0 sm:group-hover:opacity-100`}
+        className={`absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10 hover:text-white' : 'border-black/10 bg-black/5 text-black/50 hover:bg-black/10 hover:text-black'} opacity-0 group-hover:opacity-100`}
         title="Copy code"
       >
         {copied ? <Check size={18} className="text-[#4ade80]" /> : <Copy size={18} />}
@@ -79,17 +27,8 @@ function CodeBlock({ code, language, theme }: { code: string, language: string, 
       <div className={`absolute right-16 top-6 z-10 text-[10px] font-bold uppercase tracking-widest ${isDark ? 'text-white/20' : 'text-black/20'}`}>
         {language}
       </div>
-      <pre className="overflow-x-auto whitespace-pre-wrap text-[13.5px] leading-7 selection:bg-white/20" style={{ fontFamily: '"Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace' }}>
-        <code>
-          {code.split('\n').map((line, index) => (
-            <React.Fragment key={index}>
-              <span className={isDark ? 'text-white/25' : 'text-black/25'}>{String(index + 1).padStart(2, '0')}</span>
-              <span className="select-none px-3 text-white/10">|</span>
-              {highlightLine(line, isDark)}
-              {index < code.split('\n').length - 1 ? '\n' : null}
-            </React.Fragment>
-          ))}
-        </code>
+      <pre className={`overflow-x-auto text-[14px] leading-relaxed whitespace-pre-wrap selection:bg-[#38bdf8]/30 ${isDark ? 'text-[#c9d1d9]' : 'text-zinc-800'}`} style={{ fontFamily: '"Fira Code", "JetBrains Mono", monospace' }}>
+        <code>{code}</code>
       </pre>
     </div>
   );
@@ -100,47 +39,54 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
   const basePath = isRN ? '' : '/flutter';
   const componentsPath = isRN ? '/components' : '/flutter/components';
   const isDark = theme === 'dark';
-  const logoAsset = isDark ? darkLogo : whiteLogo;
 
   return (
     <>
-      <header className="sticky top-4 z-40 mt-4 flex h-20 items-center justify-between px-1 sm:px-0">
+      <header className="flex h-24 items-center justify-between">
         <a
-          className={`flex items-center gap-3 text-xl font-bold cursor-pointer sm:text-2xl ${isDark ? 'text-white' : 'text-black'}`}
+          className={`flex items-center gap-3 text-2xl font-bold cursor-pointer ${isDark ? 'text-white' : 'text-black'}`}
           onClick={(e) => { e.preventDefault(); navigate(basePath || '/'); }}
           href={basePath || '/'}
         >
-          <img
-            src={logoAsset}
-            alt="Gliph UI"
-            className="h-40 w-40 object-contain object-left sm:h-40 sm:w-40"
-          />
+          Gliph UI
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${isDark ? 'bg-white/75 text-black' : 'bg-black/75 text-white'}`}>
+            Beta
+          </span>
         </a>
 
-        <nav className={`hidden items-center gap-2 text-sm font-semibold md:flex ${isDark ? 'text-white/80' : 'text-black/70'}`}>
+        <nav className={`hidden items-center gap-10 text-sm font-semibold md:flex ${isDark ? 'text-white/85' : 'text-black/70'}`}>
           <a
-            className={`rounded-full px-4 py-2 transition cursor-pointer ${isDark ? 'hover:text-white' : 'hover:text-black'}`}
+            className="transition hover:text-blue-500 cursor-pointer"
             onClick={(e) => { e.preventDefault(); navigate(componentsPath); }}
             href={componentsPath}
           >
             Components
           </a>
-          <a className={`rounded-full px-4 py-2 transition ${isDark ? 'hover:text-white' : 'hover:text-black'}`} href="/pricing">
+          {isRN && (
+            <a
+              className="transition hover:text-blue-500 cursor-pointer"
+              onClick={(e) => { e.preventDefault(); navigate('/musicplayer'); }}
+              href="/musicplayer"
+            >
+              Music Player
+            </a>
+          )}
+          <a className="transition hover:text-blue-500" href="/pricing">
             Pricing
           </a>
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-3 sm:gap-6">
           <button
             onClick={toggleTheme}
-            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all hover:-translate-y-0.5 ${isDark ? 'text-white hover:bg-white/10' : 'text-black hover:bg-black/5'}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-all ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/15' : 'border-black/10 bg-black/5 text-black hover:bg-black/10'}`}
             title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
 
           <a
-            className={`hidden md:flex rounded-xl px-3 py-2 text-sm font-semibold transition cursor-pointer ${isDark ? 'text-white/70 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black'}`}
+            className={`hidden sm:flex text-sm font-semibold transition hover:text-blue-500 cursor-pointer ${isDark ? 'text-white/70' : 'text-black/60'}`}
             onClick={(e) => { e.preventDefault(); navigate(isRN ? '/flutter' : '/'); }}
             href={isRN ? "/flutter" : "/"}
           >
@@ -148,7 +94,7 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
           </a>
 
           <a
-            className={`rounded-xl px-4 py-2.5 text-xs font-bold shadow-xl transition duration-200 hover:-translate-y-0.5 sm:px-5 sm:py-3 sm:text-sm cursor-pointer ${isDark ? 'bg-white text-black shadow-white/10 hover:bg-zinc-200' : 'bg-black text-white shadow-black/10 hover:bg-zinc-800'}`}
+            className={`rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold shadow-xl transition duration-200 hover:-translate-y-0.5 cursor-pointer ${isDark ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-black/5'}`}
             onClick={(e) => { e.preventDefault(); navigate(componentsPath); }}
             href={componentsPath}
           >
@@ -158,11 +104,12 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
       </header>
 
       {/* Mobile Only Platform Switcher */}
-      <div className="md:hidden mb-8 flex justify-center">
+      <div className="sm:hidden mb-6">
         <button
           onClick={() => navigate(isRN ? '/flutter' : '/')}
-          className={`text-xs font-bold transition-all ${isDark ? 'text-white/50 active:text-white' : 'text-black/50 active:text-black'}`}
+          className={`w-full py-3 px-4 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all ${isDark ? 'border-white/10 bg-white/5 text-white/70 active:bg-white/10' : 'border-black/10 bg-black/5 text-black/70 active:bg-black/10'}`}
         >
+          {isRN ? <Smartphone size={14} className="text-[#38bdf8]" /> : <Code2 size={14} className="text-[#61dafb]" />}
           {isRN ? "Are you a Flutter developer?" : "Switch to React Native"}
         </button>
       </div>
@@ -173,23 +120,17 @@ function Header({ platform, navigate, theme, toggleTheme }: { platform: Platform
 function HomePage({ platform, navigate, theme }: { platform: Platform, navigate: (path: string) => void, theme: Theme }) {
   const isRN = platform === 'react-native';
   const isDark = theme === 'dark';
-  const heroAsset = isDark ? darkHero : whiteHero;
 
   return (
-    <section className="grid min-h-[calc(100vh-6rem)] items-center gap-12 py-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,0.8fr)] lg:py-10">
-      <div className="max-w-4xl">
-        <div className={`mb-7 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] shadow-2xl ${isDark ? 'border-white/15 bg-white/[0.07] text-white shadow-black/40' : 'border-black/15 bg-white text-black shadow-slate-200/80'}`}>
-          <Sparkles size={14} />
-          Mobile UI components
-        </div>
-
-        <h1 className={`text-5xl font-bold leading-[1.02] sm:text-6xl lg:text-7xl xl:text-8xl ${isDark ? 'text-white' : 'text-slate-950'}`}>
+    <section className="flex flex-col min-h-[calc(100vh-6rem)] justify-center py-8 lg:py-0">
+      <div className="max-w-3xl">
+        <h1 className={`text-5xl font-bold leading-[1.08] sm:text-6xl lg:text-7xl ${isDark ? 'text-white' : 'text-black'}`}>
           Supercharge your
-          <span className={isDark ? 'block text-zinc-300' : 'block text-zinc-700'}>{isRN ? 'React Native' : 'Flutter'}</span>
+          <span className={`block ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>{isRN ? 'React Native' : 'Flutter'}</span>
           development
         </h1>
 
-        <p className={`mt-8 max-w-2xl text-lg font-medium leading-8 sm:text-xl ${isDark ? 'text-white/[0.64]' : 'text-slate-600'}`}>
+        <p className={`mt-8 max-w-2xl text-lg font-medium leading-8 ${isDark ? 'text-white/60' : 'text-black/60'}`}>
           Ready-to-use {isRN ? 'React Native' : 'Flutter'} components crafted for clean mobile
           interfaces. Copy, customize, and ship polished screens faster.
         </p>
@@ -197,23 +138,18 @@ function HomePage({ platform, navigate, theme }: { platform: Platform, navigate:
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
           <button
             onClick={() => navigate(isRN ? '/components' : '/flutter/components')}
-            className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-bold shadow-2xl transition duration-200 hover:-translate-y-0.5 ${isDark ? 'bg-white text-black shadow-white/10 hover:bg-zinc-200' : 'bg-black text-white shadow-black/10 hover:bg-zinc-800'}`}
+            className={`rounded-xl px-6 py-3.5 text-center text-base font-bold shadow-2xl transition duration-200 hover:-translate-y-0.5 ${isDark ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-black/5'}`}
           >
             Browse {isRN ? 'RN' : 'Flutter'} Components
-            <ArrowRight size={18} />
           </button>
         </div>
-      </div>
-
-      <div className="relative mx-auto flex w-full max-w-[520px] items-center justify-center">
-        <img src={heroAsset} alt="Developer illustration" className="h-auto max-h-[620px] w-full object-contain" />
       </div>
     </section>
   );
 }
 
 
-type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar' | 'navbar';
+type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar' | 'navbar' | 'music-player';
 
 interface PickerProp {
   name: string;
@@ -1825,6 +1761,202 @@ class _PickerShowcaseState extends State<PickerShowcase> {
         { name: 'theme.pressed', type: 'Color', default: 'Color(0xFF263244)', desc: 'Background tint shown on press.' },
       ]
     }
+  },
+  'music-player': {
+    title: 'React Native Gliph Player',
+    description: 'A cinematic React Native audio player with background playback, lock-screen controls, mini-player mode, glass UI, animated transitions, and production-ready customization.',
+    reactNative: {
+      previewGif: 'https://www.dropbox.com/scl/fi/placeholder-music-player.gif?rlkey=placeholder&st=placeholder&dl=1',
+      usage: `import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Platform, StatusBar } from 'react-native';
+import TrackPlayer, { 
+  Capability, 
+  AppKilledPlaybackBehavior 
+} from 'react-native-track-player';
+import { GliphPlayer } from 'react-native-gliph-player';
+
+const tracks = [
+  {
+    id: 'leo-badass',
+    url: 'https://dl.dropboxusercontent.com/scl/fi/odjabq0j82svow4znyn4b/Badass-Leo-320-Kbps.mp3?rlkey=4yidwu60qtowjst8t6q2txs0u&st=drn5lwb9&dl=1',
+    title: 'Badass (Leo)',
+    artist: 'Anirudh Ravichander',
+    album: 'Leo',
+    artwork: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg',
+  }
+];
+
+export default function App() {
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
+
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        /**
+         * Initialize the native audio engine.
+         * Configuration for ultra-fast buffering.
+         */
+        await TrackPlayer.setupPlayer({
+          waitForBuffer: false,
+          minBuffer: 15 * 1000,
+          maxBuffer: 60 * 1000,
+          playBuffer: 1500,
+        });
+
+        await TrackPlayer.updateOptions({
+          android: {
+            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+            alwaysPauseOnInterruption: true,
+          },
+          capabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+            Capability.SeekTo,
+          ],
+          compactCapabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+          ],
+        });
+
+        await TrackPlayer.add(tracks);
+        await TrackPlayer.play();
+        setIsPlayerReady(true);
+      } catch (e) {
+        console.log('[TrackPlayer] Setup Error:', e);
+      }
+    };
+
+    setup();
+  }, []);
+
+  if (!isPlayerReady) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <StatusBar barStyle="light-content" translucent />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <GliphPlayer 
+        tracks={tracks} 
+        initialTrackId="leo-badass"
+        uiConfig={{
+          accentColor: '#1DB954',
+          titleFontSize: 28,
+          artistFontSize: 20,
+          artworkPadding: 50,
+          showMiniPlayer: true,
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#080812' }
+});`,
+      usageJs: `import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Platform, StatusBar } from 'react-native';
+import TrackPlayer, { 
+  Capability, 
+  AppKilledPlaybackBehavior 
+} from 'react-native-track-player';
+import { GliphPlayer } from 'react-native-gliph-player';
+
+const tracks = [
+  {
+    id: 'leo-badass',
+    url: 'https://dl.dropboxusercontent.com/scl/fi/odjabq0j82svow4znyn4b/Badass-Leo-320-Kbps.mp3?rlkey=4yidwu60qtowjst8t6q2txs0u&st=drn5lwb9&dl=1',
+    title: 'Badass (Leo)',
+    artist: 'Anirudh Ravichander',
+    album: 'Leo',
+    artwork: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg',
+  }
+];
+
+export default function App() {
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
+
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        await TrackPlayer.setupPlayer({
+          waitForBuffer: false,
+          playBuffer: 1500,
+        });
+
+        await TrackPlayer.updateOptions({
+          android: {
+            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+          },
+          capabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+            Capability.SeekTo,
+          ],
+        });
+
+        await TrackPlayer.add(tracks);
+        await TrackPlayer.play();
+        setIsPlayerReady(true);
+      } catch (e) {
+        console.log('[TrackPlayer] Error:', e);
+      }
+    };
+
+    setup();
+  }, []);
+
+  if (!isPlayerReady) return <View style={styles.container} />;
+
+  return (
+    <View style={styles.container}>
+      <GliphPlayer 
+        tracks={tracks} 
+        uiConfig={{
+          accentColor: '#1DB954',
+          titleFontSize: 28,
+          artistFontSize: 20,
+          artworkPadding: 50,
+          showMiniPlayer: true,
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#080812' }
+});`,
+      props: [
+        { name: 'tracks', type: 'MusicPlayerTrack[]', default: 'required', desc: 'Array of track objects with id, url, title, artist, album, and artwork.' },
+        { name: 'initialTrackId', type: 'string', default: 'tracks[0].id', desc: 'ID of the track to start with.' },
+        { name: 'uiConfig.accentColor', type: 'string', default: '#1DB954', desc: 'Theme color for sliders, active icons, and device status.' },
+        { name: 'uiConfig.titleColor', type: 'string', default: '#ffffff', desc: 'Text color for the song title.' },
+        { name: 'uiConfig.artistColor', type: 'string', default: '#e5e5e5', desc: 'Text color for the artist name.' },
+        { name: 'uiConfig.timeColor', type: 'string', default: '#b3b3b3', desc: 'Text color for the progress timers.' },
+        { name: 'uiConfig.fontFamily', type: 'string', default: 'System Default', desc: 'The font family applied to all text elements.' },
+        { name: 'uiConfig.artworkPadding', type: 'number', default: '48', desc: 'Controls the size of the artwork (higher value = smaller image).' },
+        { name: 'uiConfig.titleFontSize', type: 'number', default: '32', desc: 'Font size for the song title.' },
+        { name: 'uiConfig.artistFontSize', type: 'number', default: '20', desc: 'Font size for the artist name.' },
+        { name: 'uiConfig.marqueeSpeed', type: 'number', default: '30', desc: 'Scrolling speed of the title and artist text.' },
+        { name: 'uiConfig.showMiniPlayer', type: 'boolean', default: 'true', desc: 'Enable or disable the floating mini-player bar.' },
+        { name: 'onBack', type: '() => void', default: 'undefined', desc: 'Callback triggered when the back arrow is pressed.' },
+        { name: 'onTrackChange', type: '(track: MusicPlayerTrack) => void', default: 'undefined', desc: 'Callback triggered when the track changes.' }
+      ]
+    },
+    flutter: {
+      usage: `// Music Player is coming soon to Flutter. Stay tuned!`,
+      props: []
+    }
   }
 };
 
@@ -1846,6 +1978,151 @@ const COMMON_PROPS = {
   ]
 };
 
+const PLAYER_DOC_LINKS = [
+  {
+    title: 'React Native Gliph Player',
+    desc: 'Install the player, connect react-native-track-player, and render the full-screen music experience.',
+    icon: <Headphones size={18} />
+  },
+  {
+    title: 'Floating Mini Player',
+    desc: 'Use the compact floating player for music apps, audio previews, podcasts, radio, and queue playback.',
+    icon: <Radio size={18} />
+  },
+  {
+    title: 'Background Audio Controls',
+    desc: 'Configure lock-screen actions, headset events, Bluetooth output detection, and Android notifications.',
+    icon: <Volume2 size={18} />
+  },
+  {
+    title: 'Themes and Artwork',
+    desc: 'Customize accent colors, artwork sizing, typography, marquee text, and mini-player visibility.',
+    icon: <Disc3 size={18} />
+  }
+];
+
+function MusicPlayerHeroPhone({ isDark }: { isDark: boolean }) {
+  return (
+    <div className={`relative mx-auto w-[290px] aspect-[9/19] rounded-[3rem] border-[12px] overflow-hidden shadow-2xl ${isDark ? 'border-[#18181b] bg-[#070711] shadow-emerald-500/10' : 'border-zinc-900 bg-[#070711] shadow-black/25'}`}>
+      <div className="absolute top-0 inset-x-0 z-30 flex justify-center pt-3">
+        <div className="h-6 w-24 rounded-full bg-black/70" />
+      </div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_10%,rgba(34,197,94,0.45),transparent_30%),radial-gradient(circle_at_76%_34%,rgba(56,189,248,0.28),transparent_32%),linear-gradient(180deg,#07101a_0%,#050506_62%,#09090b_100%)]" />
+      <div className="relative z-10 flex h-full flex-col px-6 pb-7 pt-16 text-white">
+        <div className="flex items-center justify-between text-white/70">
+          <ChevronLeft size={22} />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Now Playing</span>
+          <Volume2 size={20} />
+        </div>
+        <div className="mt-10 aspect-square rounded-[2rem] border border-white/10 bg-[linear-gradient(145deg,#16a34a,#0f172a_56%,#38bdf8)] p-4 shadow-2xl shadow-emerald-500/20">
+          <div className="flex h-full items-center justify-center rounded-[1.35rem] border border-white/10 bg-black/30">
+            <Disc3 size={82} className="text-white/85" />
+          </div>
+        </div>
+        <div className="mt-9 text-center">
+          <h2 className="text-2xl font-extrabold tracking-normal">Gliph Player</h2>
+          <p className="mt-2 text-sm font-medium text-white/55">Background audio UI kit</p>
+        </div>
+        <div className="mt-8">
+          <div className="h-1.5 overflow-hidden rounded-full bg-white/15">
+            <div className="h-full w-[58%] rounded-full bg-[#22c55e]" />
+          </div>
+          <div className="mt-2 flex justify-between text-[11px] font-semibold text-white/45">
+            <span>1:42</span>
+            <span>3:08</span>
+          </div>
+        </div>
+        <div className="mt-auto flex items-center justify-center gap-8">
+          <button className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/80">
+            <ChevronLeft size={21} />
+          </button>
+          <button className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-black shadow-xl">
+            <Play size={28} fill="currentColor" />
+          </button>
+          <button className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white/80">
+            <ChevronLeft size={21} className="rotate-180" />
+          </button>
+        </div>
+        <div className="mt-6 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-[#22c55e]" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-bold">Mini player enabled</p>
+              <p className="truncate text-[11px] text-white/50">Lock-screen ready</p>
+            </div>
+            <PlaySquare size={18} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MusicPlayerDocsPage({ navigate, theme }: { navigate: (path: string) => void, theme: Theme }) {
+  const isDark = theme === 'dark';
+
+  return (
+    <section className="pb-28">
+      <div className="grid min-h-[calc(100vh-6rem)] items-center gap-14 py-10 lg:grid-cols-[minmax(0,1fr)_420px]">
+        <div>
+          <div className={`mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-widest ${isDark ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300' : 'border-emerald-600/20 bg-emerald-600/10 text-emerald-700'}`}>
+            <Sparkles size={14} /> React Native Audio
+          </div>
+          <h1 className={`max-w-4xl text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl ${isDark ? 'text-white' : 'text-black'}`}>
+            react-native-gliph-player documentation
+          </h1>
+          <p className={`mt-7 max-w-2xl text-lg font-medium leading-8 ${isDark ? 'text-white/62' : 'text-black/62'}`}>
+            Build a premium audio player for React Native with a polished full-screen experience, floating mini player, background playback, lock-screen controls, queue support, and deep theme control.
+          </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={() => document.getElementById('player-docs')?.scrollIntoView({ behavior: 'smooth' })}
+              className={`rounded-xl px-6 py-3.5 text-sm font-bold shadow-2xl transition duration-200 hover:-translate-y-0.5 ${isDark ? 'bg-white text-black hover:bg-zinc-200 shadow-white/5' : 'bg-black text-white hover:bg-zinc-800 shadow-black/5'}`}
+            >
+              Read Documentation
+            </button>
+            <button
+              onClick={() => navigate('/components')}
+              className={`rounded-xl border px-6 py-3.5 text-sm font-bold transition ${isDark ? 'border-white/10 bg-white/5 text-white/75 hover:bg-white/10 hover:text-white' : 'border-black/10 bg-black/5 text-black/70 hover:bg-black/10 hover:text-black'}`}
+            >
+              Browse Components
+            </button>
+          </div>
+        </div>
+        <MusicPlayerHeroPhone isDark={isDark} />
+      </div>
+
+      <div className={`border-y py-8 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+        <p className={`mb-4 text-sm font-bold uppercase tracking-widest ${isDark ? 'text-white/35' : 'text-black/35'}`}>
+          Documentation shortcuts
+        </p>
+        <div className="divide-y divide-white/10">
+          {PLAYER_DOC_LINKS.map((item) => (
+            <button
+              key={item.title}
+              onClick={() => document.getElementById('player-docs')?.scrollIntoView({ behavior: 'smooth' })}
+              className={`group flex w-full items-center gap-4 py-5 text-left transition ${isDark ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.03]'}`}
+            >
+              <span className={`flex h-10 w-10 items-center justify-center rounded-full border ${isDark ? 'border-white/10 bg-white/5 text-[#93c5fd]' : 'border-black/10 bg-black/5 text-[#2563eb]'}`}>
+                {item.icon}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className={`block text-xl font-bold ${isDark ? 'text-[#93c5fd]' : 'text-[#2563eb]'}`}>{item.title}</span>
+                <span className={`mt-1 block text-base leading-6 ${isDark ? 'text-white/65' : 'text-black/65'}`}>{item.desc}</span>
+              </span>
+              <ChevronLeft size={22} className={`rotate-180 transition group-hover:translate-x-1 ${isDark ? 'text-white/35' : 'text-black/35'}`} />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div id="player-docs" className="pt-14">
+        <CategoryDetails category="music-player" platform="react-native" onBack={() => navigate('/')} theme={theme} />
+      </div>
+    </section>
+  );
+}
+
 function CategoryDetails({ category, platform, onBack, theme }: { category: Category, platform: Platform, onBack: () => void, theme: Theme }) {
   const data = CATEGORY_CONTENT[category];
   const platformData = platform === 'react-native' ? data.reactNative : data.flutter;
@@ -1854,6 +2131,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
   const [flutterLoading, setFlutterLoading] = useState(true);
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
   const [rnLanguage, setRnLanguage] = useState<'tsx' | 'jsx'>('tsx');
+  const [musicPlayerTab, setMusicPlayerTab] = useState<'full' | 'mini'>('full');
 
   const rnGif = data.reactNative?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
   const flutterGif = data.flutter?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
@@ -1893,31 +2171,29 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <button
         onClick={onBack}
-        className={`group mb-8 flex w-fit items-center gap-2 text-sm font-semibold transition-all ${isDark ? 'text-white/60 hover:text-white' : 'text-black/60 hover:text-black'}`}
+        className={`group flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all mb-8 ${isDark ? 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white' : 'border-black/10 bg-black/5 text-black/70 hover:bg-black/10 hover:text-black'}`}
       >
         <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
         Back to components
       </button>
 
-      <div className={`border-b pb-8 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
-          <h2 className={`text-4xl font-bold leading-tight sm:text-5xl tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
-            {data.title}
-          </h2>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
+        <h2 className={`text-4xl font-bold leading-tight sm:text-5xl tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
+          {data.title}
+        </h2>
 
-          <div className={`flex items-center gap-2 text-sm font-semibold ${isDark ? 'text-white/70' : 'text-black/60'}`}>
-            {platform === 'react-native' ? (
-              <><Code2 size={16} /> <span className="tracking-tight">React Native API</span></>
-            ) : (
-              <><Smartphone size={16} /> <span className="tracking-tight">Flutter API</span></>
-            )}
-          </div>
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${isDark ? 'border-white/10 bg-white/5' : 'border-black/10 bg-black/5'}`}>
+          {platform === 'react-native' ? (
+            <><Code2 size={16} className="text-[#61dafb]" /> <span className={`text-sm font-medium tracking-tight ${isDark ? 'text-white/80' : 'text-black/70'}`}>React Native API</span></>
+          ) : (
+            <><Smartphone size={16} className="text-[#38bdf8]" /> <span className={`text-sm font-medium tracking-tight ${isDark ? 'text-white/80' : 'text-black/70'}`}>Flutter API</span></>
+          )}
         </div>
-
-        <p className={`mt-5 text-lg leading-8 max-w-2xl ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-          {data.description}
-        </p>
       </div>
+
+      <p className={`mt-5 text-lg leading-8 max-w-2xl ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+        {data.description}
+      </p>
 
       {data.variants ? (
         <div className="mt-16">
@@ -1994,7 +2270,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                         </p>
                         <div className={`overflow-hidden rounded-2xl border shadow-xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                           <iframe
-                            src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(variant.name)}&platform=android&theme=dark&code=${encodeURIComponent(rnLanguage === 'jsx' ? (variant.reactNativeUsageJs || variant.reactNativeUsage || variant.usage || '') : (variant.reactNativeUsage || variant.usage || ''))}`}
+                            src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.6,react-native-svg,lucide-react-native&name=${encodeURIComponent(variant.name)}&platform=android&theme=dark&code=${encodeURIComponent(rnLanguage === 'jsx' ? (variant.reactNativeUsageJs || variant.reactNativeUsage || variant.usage || '') : (variant.reactNativeUsage || variant.usage || ''))}`}
                             style={{ width: '100%', height: '600px', border: 0 }}
                           />
                         </div>
@@ -2025,9 +2301,29 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
 
                 <div className={`relative ${category === 'navbar' ? 'w-[240px]' : 'w-[300px]'} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
                   {/* Notch */}
-                  <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
+                  <div className="absolute top-0 inset-x-0 flex justify-center z-30 pt-3">
                     <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
                   </div>
+
+                  {/* Music Player Tab Switcher Overlay */}
+                  {category === 'music-player' && (
+                    <div className="absolute top-12 inset-x-0 z-30 px-6">
+                      <div className="flex p-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
+                        <button
+                          onClick={() => setMusicPlayerTab('full')}
+                          className={`flex-1 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${musicPlayerTab === 'full' ? 'bg-white text-black shadow-lg' : 'text-white/60'}`}
+                        >
+                          Full
+                        </button>
+                        <button
+                          onClick={() => setMusicPlayerTab('mini')}
+                          className={`flex-1 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${musicPlayerTab === 'mini' ? 'bg-white text-black shadow-lg' : 'text-white/60'}`}
+                        >
+                          Mini
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Loading overlay */}
                   {(platform === 'react-native' ? rnLoading : flutterLoading) && (
@@ -2107,7 +2403,7 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
                   </p>
                   <div className={`overflow-hidden rounded-2xl border shadow-2xl ${isDark ? 'border-white/10 bg-[#0a0a0a]' : 'border-black/10 bg-white'}`}>
                     <iframe
-                      src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.5,react-native-svg,lucide-react-native&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(rnLanguage === 'jsx' ? (platformData.usageJs || platformData.usage || '') : (platformData.usage || ''))}`}
+                      src={`https://snack.expo.dev/embedded?dependencies=gliph-ui@1.2.6,react-native-svg,lucide-react-native&name=${encodeURIComponent(data.title)}&platform=android&theme=dark&code=${encodeURIComponent(rnLanguage === 'jsx' ? (platformData.usageJs || platformData.usage || '') : (platformData.usage || ''))}`}
                       style={{ width: '100%', height: '650px', border: 0 }}
                       title="Gliph UI Expo Preview"
                     />
@@ -2161,41 +2457,137 @@ function CategoryDetails({ category, platform, onBack, theme }: { category: Cate
 
       {/* Installation */}
       <div className={`mt-20 border-t pt-16 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className={`mb-3 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.18em] ${isDark ? 'text-white/35' : 'text-black/35'}`}>
-              <Terminal size={18} />
-              Setup
-            </div>
-            <h3 className={`text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>Installation</h3>
-          </div>
-          <p className={`max-w-md text-sm leading-6 ${isDark ? 'text-white/50' : 'text-black/50'}`}>
-            Install the package and any required peer dependency before adding components to your app.
-          </p>
+        <div className="mb-6 flex items-center gap-3">
+          <Terminal className="text-[#4ade80]" size={28} />
+          <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Installation</h3>
         </div>
 
         {platform === 'react-native' && (
-          <div className={`mb-8 border-l-2 pl-5 ${isDark ? 'border-white/20' : 'border-black/20'}`}>
-            <p className={`text-sm font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-black'}`}>
-              <Zap size={16} /> Prerequisite
-            </p>
-            <p className={`mt-2 text-sm leading-6 ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-              Most Gliph UI components require <code className="font-mono text-xs">react-native-svg</code> to render icons.
-            </p>
-            <div className="mt-5">
-              <CodeBlock code="npm install react-native-svg" language="bash" theme={theme} />
-            </div>
+          <div className="space-y-6">
+            {category !== 'music-player' && (
+              <div className={`p-6 rounded-2xl border transition-all ${isDark ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-500/15 bg-amber-500/5'}`}>
+                <p className={`text-sm font-bold flex items-center gap-3 ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>
+                  <Zap size={18} /> Essential Prerequisite
+                </p>
+                <p className={`mt-2 text-sm leading-relaxed ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+                  Most Gliph UI components use <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-amber-500/10">react-native-svg</code> for high-performance iconography.
+                </p>
+                <div className="mt-4">
+                  <CodeBlock code="npm install react-native-svg" language="bash" theme={theme} />
+                </div>
+              </div>
+            )}
+
+            {category === 'music-player' && (
+              <div className="space-y-6">
+                <div className={`p-8 rounded-3xl border-2 transition-all shadow-2xl ${isDark ? 'border-[#38bdf8]/30 bg-[#38bdf8]/5 shadow-[#38bdf8]/5' : 'border-[#38bdf8]/20 bg-[#38bdf8]/5 shadow-[#38bdf8]/10'}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <p className={`text-base font-black flex items-center gap-3 uppercase tracking-tighter ${isDark ? 'text-[#38bdf8]' : 'text-[#0ea5e9]'}`}>
+                      <Sparkles size={22} className="animate-pulse" /> Automated Magic Setup
+                    </p>
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isDark ? 'bg-[#38bdf8]/20 text-[#38bdf8]' : 'bg-[#38bdf8]/10 text-[#0ea5e9]'}`}>Best Experience</span>
+                  </div>
+                  <p className={`text-sm leading-relaxed mb-6 ${isDark ? 'text-white/70' : 'text-black/70'}`}>
+                    Create a file named <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[#38bdf8]/10">gliph-setup.js</code> in your project root, paste the code below, and run <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[#38bdf8]/10">node gliph-setup.js</code>.
+                  </p>
+
+                  <div className="mb-6">
+                    <CodeBlock
+                      code={`const fs = require('fs');\nconst path = require('path');\nconst { execSync } = require('child_process');\n\nconsole.log('Gliph Player setup...');\n\n// 1. Install Dependencies\nexecSync('npm install react-native-gliph-player react-native-track-player react-native-fs lucide-react-native @react-native-community/slider', { stdio: 'inherit' });\n\n// 2. Create service.js\nconst serviceCode = \`import TrackPlayer, { Event } from 'react-native-track-player';\\n\\nmodule.exports = async function() {\\n    TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play());\\n    TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause());\\n    TrackPlayer.addEventListener(Event.RemoteStop, () => TrackPlayer.destroy());\\n    TrackPlayer.addEventListener(Event.RemoteNext, () => TrackPlayer.skipToNext());\\n    TrackPlayer.addEventListener(Event.RemotePrevious, () => TrackPlayer.skipToPrevious());\\n};\`;\nfs.writeFileSync('service.js', serviceCode);\n\n// 3. Android Configuration (Automatic Path Detection)\nconst manifestPath = './android/app/src/main/AndroidManifest.xml';\nif (fs.existsSync(manifestPath)) {\n  const manifest = fs.readFileSync(manifestPath, 'utf8');\n  const pkg = manifest.match(/package="([^"]+)"/)[1];\n  const targetDir = \`./android/app/src/main/java/\${pkg.replace(/\\./g, '/')}\`;\n  fs.mkdirSync(targetDir, { recursive: true });\n  fs.writeFileSync(path.join(targetDir, 'DeviceInfoModule.kt'), \`package \${pkg}\\n\\nimport android.content.Context\\nimport android.media.AudioDeviceInfo\\nimport android.media.AudioManager\\nimport com.facebook.react.bridge.ReactApplicationContext\\nimport com.facebook.react.bridge.ReactContextBaseJavaModule\\nimport com.facebook.react.bridge.ReactMethod\\nimport com.facebook.react.bridge.Promise\\n\\nclass DeviceInfoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {\\n    override fun getName(): String = "DeviceInfo"\\n\\n    @ReactMethod\\n    fun getDeviceType(promise: Promise) {\\n        val audioManager = reactApplicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager\\n        val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)\\n        for (device in devices) {\\n            if (device.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {\\n                promise.resolve("bluetooth"); return\\n            }\\n            if (device.type == AudioDeviceInfo.TYPE_WIRED_HEADSET || device.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES) {\\n                promise.resolve("headset"); return\\n            }\\n        }\\n        promise.resolve("speaker")\\n    }\\n}\`);\n  console.log('Android module configured');\n}\n\nconsole.log('Setup finished. Register the service in index.js and rebuild.');`}
+                      language="javascript"
+                      theme={theme}
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-4">
+                    {['Auto-Install', 'Service Generation', 'Android Pathing', 'HW Config'].map((feat) => (
+                      <div key={feat} className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+                        <Check size={12} className="text-emerald-500" /> {feat}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-2xl border transition-all ${isDark ? 'border-blue-500/20 bg-blue-500/5' : 'border-blue-500/15 bg-blue-500/5'}`}>
+                  <p className={`text-sm font-bold flex items-center gap-3 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                    <Smartphone size={18} /> Manual Native Audio Setup
+                  </p>
+                  <p className={`mt-2 text-sm leading-relaxed ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+                    The Music Player requires native capabilities for playback and background controls.
+                  </p>
+                  <div className="mt-4">
+                    <CodeBlock code="npm install react-native-gliph-player react-native-track-player react-native-fs" language="bash" theme={theme} />
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-2xl border transition-all ${isDark ? 'border-pink-500/20 bg-pink-500/5' : 'border-pink-500/15 bg-pink-500/5'}`}>
+                  <p className={`text-sm font-bold flex items-center gap-3 ${isDark ? 'text-pink-400' : 'text-pink-600'}`}>
+                    <Terminal size={18} /> 1. Background Service Registration
+                  </p>
+                  <p className={`mt-2 text-sm leading-relaxed ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+                    Register the playback service in your <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-pink-500/10">index.js</code>:
+                  </p>
+                  <div className="mt-4">
+                    <CodeBlock
+                      code={`import TrackPlayer from 'react-native-track-player';\n\nTrackPlayer.registerPlaybackService(() => require('./service'));`}
+                      language="javascript"
+                      theme={theme}
+                    />
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-2xl border transition-all ${isDark ? 'border-purple-500/20 bg-purple-500/5' : 'border-purple-500/15 bg-purple-500/5'}`}>
+                  <p className={`text-sm font-bold flex items-center gap-3 ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>
+                    <Terminal size={18} /> 2. Create service.js
+                  </p>
+                  <p className={`mt-2 text-sm leading-relaxed ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+                    Create a file named <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-purple-500/10">service.js</code> in your project root:
+                  </p>
+                  <div className="mt-4">
+                    <CodeBlock
+                      code={`import TrackPlayer, { Event } from 'react-native-track-player';
+
+module.exports = async function() {
+    TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play());
+    TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause());
+    TrackPlayer.addEventListener(Event.RemoteStop, () => TrackPlayer.destroy());
+    TrackPlayer.addEventListener(Event.RemoteNext, () => TrackPlayer.skipToNext());
+    TrackPlayer.addEventListener(Event.RemotePrevious, () => TrackPlayer.skipToPrevious());
+};`}
+                      language="javascript"
+                      theme={theme}
+                    />
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-2xl border transition-all ${isDark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-500/15 bg-emerald-500/5'}`}>
+                  <p className={`text-sm font-bold flex items-center gap-3 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                    <Zap size={18} /> 3. Android Hardware Logic
+                  </p>
+                  <p className={`mt-2 text-sm leading-relaxed ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+                    To enable Bluetooth and headset detection on Android, place the <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-emerald-500/10">DeviceInfoModule.kt</code> in your native source folder:
+                  </p>
+                  <div className={`mt-3 p-3 rounded-xl font-mono text-xs ${isDark ? 'bg-black/40 text-emerald-400/80' : 'bg-emerald-50 text-emerald-700/80'}`}>
+                    android/app/src/main/java/com/yourpackage/DeviceInfoModule.kt
+                  </div>
+                  <p className={`mt-3 text-sm leading-relaxed ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+                    <span className="font-bold text-emerald-500">Note:</span> Ensure the <code className="font-mono text-xs italic">package</code> name at the top of the file matches your app's actual package name (found in your AndroidManifest.xml).
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        <div>
-          <p className={`mb-3 text-sm font-bold uppercase tracking-[0.18em] ${isDark ? 'text-white/35' : 'text-black/35'}`}>Package</p>
-          <CodeBlock
-            code={platform === 'react-native' ? 'npm install gliph-ui' : 'flutter pub add gliph_ui'}
-            language={platform === 'react-native' ? 'npm' : 'shell'}
-            theme={theme}
-          />
-        </div>
+        <CodeBlock
+          code={platform === 'react-native'
+            ? (category === 'music-player'
+              ? 'npm install react-native-gliph-player react-native-track-player react-native-fs lucide-react-native @react-native-community/slider'
+              : 'npm install gliph-ui')
+            : 'flutter pub add gliph_ui'}
+          language={platform === 'react-native' ? 'npm' : 'shell'}
+          theme={theme}
+        />
       </div>
 
 
@@ -2296,23 +2688,25 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
     { id: 'weight', title: 'Weight Picker', icon: <Scale size={16} />, group: 'Scroll' },
     { id: 'value', title: 'Value Picker', icon: <ListFilter size={16} />, group: 'Scroll' },
     { id: 'calendar', title: 'Calendar Picker', icon: <Calendar size={16} />, group: 'Calendar' },
+    { id: 'music-player', title: 'Music Player', icon: <PlaySquare size={16} />, group: 'Media' },
   ];
 
   const navigationComponents = allComponents.filter(c => c.group === 'Navigation');
   const scaleComponents = allComponents.filter(c => c.group === 'Scale');
   const scrollComponents = allComponents.filter(c => c.group === 'Scroll');
   const calendarComponents = allComponents.filter(c => c.group === 'Calendar');
+  const mediaComponents = allComponents.filter(c => c.group === 'Media');
 
   return (
     <section className="grid flex-1 py-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
       <aside className={`lg:min-h-[calc(100vh-8.5rem)] lg:border-r ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-        <nav className="sticky top-28 flex flex-col items-start gap-1 pb-4 lg:mr-8">
+        <nav className="flex flex-col items-start pb-10 mr-8 gap-1">
           {/* Home link */}
           <button
             onClick={() => navigate(platform === 'react-native' ? '/' : '/flutter')}
-            className={`w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all mb-2 ${isDark ? 'text-white/[0.55] hover:text-white hover:bg-white/10' : 'text-black/[0.55] hover:text-black hover:bg-black/[0.05]'}`}
+            className={`w-full text-left px-3 py-2 text-sm font-semibold rounded-lg transition-all mb-2 ${isDark ? 'text-white/50 hover:text-white hover:bg-white/5' : 'text-black/50 hover:text-black hover:bg-black/5'}`}
           >
-            Back home
+            ← Home
           </button>
 
           {/* Navigation group */}
@@ -2323,9 +2717,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#818cf8]' : 'text-[#6366f1]') : ''}>{comp.icon}</span>
@@ -2341,9 +2735,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#fb923c]' : 'text-[#ea580c]') : ''}>{comp.icon}</span>
@@ -2359,9 +2753,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#38bdf8]' : 'text-[#0ea5e9]') : ''}>{comp.icon}</span>
@@ -2377,12 +2771,30 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
             <button
               key={comp.id}
               onClick={() => setActiveCategory(comp.id)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeCategory === comp.id
-                ? (isDark ? 'text-white font-semibold' : 'text-black font-semibold')
-                : (isDark ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-black/60 hover:bg-black/[0.05] hover:text-black')
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
                 }`}
             >
               <span className={activeCategory === comp.id ? (isDark ? 'text-[#4ade80]' : 'text-[#16a34a]') : ''}>{comp.icon}</span>
+              {comp.title}
+            </button>
+          ))}
+
+          {/* Media group */}
+          <p className={`w-full px-3 pt-6 pb-1 text-[11px] font-bold uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/30'}`}>
+            Media
+          </p>
+          {mediaComponents.map((comp) => (
+            <button
+              key={comp.id}
+              onClick={() => setActiveCategory(comp.id)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === comp.id
+                ? (isDark ? 'bg-white/10 text-white font-semibold' : 'bg-black/8 text-black font-semibold')
+                : (isDark ? 'text-white/60 hover:bg-white/5 hover:text-white' : 'text-black/60 hover:bg-black/5 hover:text-black')
+                }`}
+            >
+              <span className={activeCategory === comp.id ? (isDark ? 'text-[#f472b6]' : 'text-[#db2777]') : ''}>{comp.icon}</span>
               {comp.title}
             </button>
           ))}
@@ -2391,12 +2803,9 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
 
       <div className="w-full max-w-5xl pt-10 pb-32">
         {activeCategory === null ? (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex min-h-[60vh] flex-col items-start justify-center">
-            <div className={`mb-5 flex h-14 w-14 items-center justify-center ${isDark ? 'text-white' : 'text-black'}`}>
-              <Layout size={28} />
-            </div>
-            <h2 className={`text-4xl font-bold mb-4 sm:text-5xl ${isDark ? 'text-white' : 'text-slate-950'}`}>Components</h2>
-            <p className={`text-lg max-w-lg leading-8 ${isDark ? 'text-white/[0.58]' : 'text-slate-600'}`}>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col items-start justify-center min-h-[60vh]">
+            <h2 className={`text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>Components</h2>
+            <p className={`text-lg max-w-lg ${isDark ? 'text-white/50' : 'text-black/50'}`}>
               Select a component from the sidebar to view its documentation, usage examples, and props.
             </p>
           </div>
@@ -2405,29 +2814,6 @@ function ComponentsPage({ platform, navigate, theme }: { platform: Platform, nav
         )}
       </div>
     </section>
-  );
-}
-
-function Footer({ theme }: { theme: Theme }) {
-  const isDark = theme === 'dark';
-
-  return (
-    <footer className={`mt-auto border-t py-8 text-sm ${isDark ? 'border-white/10 text-white/45' : 'border-black/10 text-black/45'}`}>
-      <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-        <p>
-          Created by{' '}
-          <a
-            href="https://github.com/praveenkaruppusamy2005"
-            target="_blank"
-            rel="noreferrer"
-            className={`inline-flex items-center gap-1.5 font-bold transition ${isDark ? 'text-white/75 hover:text-white' : 'text-black/75 hover:text-black'}`}
-          >
-            Praveen
-          </a>
-        </p>
-        <p className={isDark ? 'text-white/30' : 'text-black/30'}>Gliph UI</p>
-      </div>
-    </footer>
   );
 }
 
@@ -2445,20 +2831,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let title = "Gliph UI — Premium Mobile Components";
-    if (currentPath.startsWith("/flutter")) {
-      title = currentPath.includes("components")
-        ? "Flutter Components — Gliph UI"
-        : "Flutter UI Development — Gliph UI";
-    } else if (currentPath === "/components") {
-      title = "React Native Components — Gliph UI";
-    }
-    document.title = title;
-  }, [currentPath]);
-
-  useEffect(() => {
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    const description = document.querySelector('meta[name="description"]');
+    if (currentPath === '/musicplayer' || currentPath === '/react-native-gliph-player') {
+      document.title = 'react-native-gliph-player Documentation | Gliph UI Music Player';
+      description?.setAttribute('content', 'Documentation for react-native-gliph-player: install the React Native music player, configure background playback, mini player mode, lock-screen controls, and UI themes.');
+    } else {
+      document.title = 'Gliph UI | High-Fidelity React Native & Flutter Component Library';
+      description?.setAttribute('content', 'A premium suite of highly-customizable UI components for React Native and Flutter. High-fidelity pickers, navbars, and interactive elements for your next mobile app.');
+    }
+  }, [currentPath]);
 
   const navigate = (path: string) => {
     window.history.pushState({}, '', path);
@@ -2480,6 +2865,8 @@ function App() {
     }
   } else if (currentPath === "/components") {
     page = <ComponentsPage platform="react-native" navigate={navigate} theme={theme} />;
+  } else if (currentPath === "/musicplayer" || currentPath === "/react-native-gliph-player") {
+    page = <MusicPlayerDocsPage navigate={navigate} theme={theme} />;
   } else {
     page = <HomePage platform="react-native" navigate={navigate} theme={theme} />;
   }
@@ -2490,16 +2877,15 @@ function App() {
     <main className={`relative min-h-screen overflow-hidden transition-colors duration-300 ${isDark ? 'bg-black text-white' : 'bg-white text-black'}`}>
       <div className="pointer-events-none absolute inset-0">
         {isDark ? (
-          <div className="absolute inset-0 bg-black" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_8%,_rgba(255,255,255,0.07),_transparent_28%),linear-gradient(180deg,_#050505_0%,_#000000_48%,_#030303_100%)]" />
         ) : (
-          <div className="absolute inset-0 bg-white" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_8%,_rgba(0,0,0,0.03),_transparent_28%),linear-gradient(180deg,_#ffffff_0%,_#fcfcfc_48%,_#f9f9f9_100%)]" />
         )}
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[1520px] flex-col px-5 sm:px-8 lg:px-20">
         <Header platform={platform} navigate={navigate} theme={theme} toggleTheme={toggleTheme} />
         {page}
-        <Footer theme={theme} />
       </div>
     </main>
   );
