@@ -4,11 +4,11 @@ import type { Theme } from '../types';
 import { PLAYER_DOC_LINKS } from '../data/categories';
 import { CategoryDetails } from '../components/CategoryDetails';
 
-function MusicPlayerHeroPhone({ isDark }: { isDark: boolean }) {
+function MusicPlayerHeroTablet({ isDark }: { isDark: boolean }) {
   return (
-    <div className={`relative mx-auto w-[290px] aspect-[9/19] rounded-[3rem] border-[12px] overflow-hidden shadow-2xl ${isDark ? 'border-[#18181b] bg-[#070711] shadow-emerald-500/10' : 'border-zinc-900 bg-[#070711] shadow-black/25'}`}>
-      <div className="absolute top-0 inset-x-0 z-30 flex justify-center pt-3">
-        <div className="h-6 w-24 rounded-full bg-black/70" />
+    <div className={`relative mx-auto w-[480px] aspect-[4/3] rounded-[2rem] border-[12px] overflow-hidden shadow-2xl ${isDark ? 'border-[#18181b] bg-[#070711] shadow-emerald-500/10' : 'border-zinc-900 bg-[#070711] shadow-black/25'}`}>
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30">
+        <div className="h-1.5 w-12 rounded-full bg-white/10" />
       </div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_10%,rgba(34,197,94,0.45),transparent_30%),radial-gradient(circle_at_76%_34%,rgba(56,189,248,0.28),transparent_32%),linear-gradient(180deg,#07101a_0%,#050506_62%,#09090b_100%)]" />
       <div className="relative z-10 flex h-full flex-col px-6 pb-7 pt-16 text-white">
@@ -93,7 +93,7 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
             </button>
           </div>
         </div>
-        <MusicPlayerHeroPhone isDark={isDark} />
+        <MusicPlayerHeroTablet isDark={isDark} />
       </div>
 
       <div className={`border-y py-8 ${isDark ? 'border-white/10' : 'border-black/10'}`}>

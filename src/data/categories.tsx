@@ -1585,175 +1585,89 @@ class _PickerShowcaseState extends State<PickerShowcase> {
     description: 'A cinematic React Native audio player with background playback, lock-screen controls, mini-player mode, glass UI, animated transitions, and production-ready customization.',
     reactNative: {
       previewGif: 'https://www.dropbox.com/scl/fi/placeholder-music-player.gif?rlkey=placeholder&st=placeholder&dl=1',
-      usage: `import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Platform, StatusBar } from 'react-native';
-import TrackPlayer, { 
-  Capability, 
-  AppKilledPlaybackBehavior 
-} from 'react-native-track-player';
+      usage: `# React Native Gliph Player
+
+A high-performance audio engine for React Native built on top of JSI and TurboModules.
+
+## Step 1: Install Dependencies
+
+First, you need to install the core player and its native dependencies:
+
+\`\`\`sh
+npm install react-native-gliph-player react-native-track-player lucide-react-native
+\`\`\`
+
+## Step 2: Configure Native Audio Engine
+
+Initialize the player service in your \`index.js\` or \`App.tsx\` to handle background events:
+
+\`\`\`tsx
+import TrackPlayer from 'react-native-track-player';
+
+// This service must be registered to handle playback events in the background
+TrackPlayer.registerPlaybackService(() => require('./service'));
+\`\`\`
+
+## Step 3: Implement the Player UI
+
+Use the \`GliphPlayer\` component to render the cinematic interface:
+
+\`\`\`tsx
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
 import { GliphPlayer } from 'react-native-gliph-player';
 
-const tracks = [
-  {
-    id: 'leo-badass',
-    url: 'https://dl.dropboxusercontent.com/scl/fi/odjabq0j82svow4znyn4b/Badass-Leo-320-Kbps.mp3?rlkey=4yidwu60qtowjst8t6q2txs0u&st=drn5lwb9&dl=1',
-    title: 'Badass (Leo)',
-    artist: 'Anirudh Ravichander',
-    album: 'Leo',
-    artwork: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg',
-  }
-];
-
 export default function App() {
-  const [isPlayerReady, setIsPlayerReady] = useState(false);
-
-  useEffect(() => {
-    const setup = async () => {
-      try {
-        /**
-         * Initialize the native audio engine.
-         * Configuration for ultra-fast buffering.
-         */
-        await TrackPlayer.setupPlayer({
-          waitForBuffer: false,
-          minBuffer: 15 * 1000,
-          maxBuffer: 60 * 1000,
-          playBuffer: 1500,
-        });
-
-        await TrackPlayer.updateOptions({
-          android: {
-            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-            alwaysPauseOnInterruption: true,
-          },
-          capabilities: [
-            Capability.Play,
-            Capability.Pause,
-            Capability.SkipToNext,
-            Capability.SkipToPrevious,
-            Capability.SeekTo,
-          ],
-          compactCapabilities: [
-            Capability.Play,
-            Capability.Pause,
-            Capability.SkipToNext,
-          ],
-        });
-
-        await TrackPlayer.add(tracks);
-        await TrackPlayer.play();
-        setIsPlayerReady(true);
-      } catch (e) {
-        console.log('[TrackPlayer] Setup Error:', e);
-      }
-    };
-
-    setup();
-  }, []);
-
-  if (!isPlayerReady) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center' }]}>
-        <StatusBar barStyle="light-content" translucent />
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: '#080812' }}>
       <GliphPlayer 
-        tracks={tracks} 
-        initialTrackId="leo-badass"
+        tracks={MY_TRACKS} 
         uiConfig={{
           accentColor: '#1DB954',
-          titleFontSize: 28,
-          artistFontSize: 20,
-          artworkPadding: 50,
           showMiniPlayer: true,
         }}
       />
     </View>
   );
 }
+\`\`\`
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#080812' }
-});`,
-      usageJs: `import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Platform, StatusBar } from 'react-native';
-import TrackPlayer, { 
-  Capability, 
-  AppKilledPlaybackBehavior 
-} from 'react-native-track-player';
+## Troubleshooting
+
+If you encounter native build errors, ensure you are using the New Architecture and have correctly linked the JSI modules.`,
+      usageJs: `# React Native Gliph Player (JS)
+
+## Step 1: Install Dependencies
+
+\`\`\`sh
+npm install react-native-gliph-player react-native-track-player lucide-react-native
+\`\`\`
+
+## Step 2: Configure Service
+
+\`\`\`javascript
+import TrackPlayer from 'react-native-track-player';
+TrackPlayer.registerPlaybackService(() => require('./service'));
+\`\`\`
+
+## Step 3: UI Implementation
+
+\`\`\`javascript
+import React from 'react';
+import { View } from 'react-native';
 import { GliphPlayer } from 'react-native-gliph-player';
 
-const tracks = [
-  {
-    id: 'leo-badass',
-    url: 'https://dl.dropboxusercontent.com/scl/fi/odjabq0j82svow4znyn4b/Badass-Leo-320-Kbps.mp3?rlkey=4yidwu60qtowjst8t6q2txs0u&st=drn5lwb9&dl=1',
-    title: 'Badass (Leo)',
-    artist: 'Anirudh Ravichander',
-    album: 'Leo',
-    artwork: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg',
-  }
-];
-
 export default function App() {
-  const [isPlayerReady, setIsPlayerReady] = useState(false);
-
-  useEffect(() => {
-    const setup = async () => {
-      try {
-        await TrackPlayer.setupPlayer({
-          waitForBuffer: false,
-          playBuffer: 1500,
-        });
-
-        await TrackPlayer.updateOptions({
-          android: {
-            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-          },
-          capabilities: [
-            Capability.Play,
-            Capability.Pause,
-            Capability.SkipToNext,
-            Capability.SkipToPrevious,
-            Capability.SeekTo,
-          ],
-        });
-
-        await TrackPlayer.add(tracks);
-        await TrackPlayer.play();
-        setIsPlayerReady(true);
-      } catch (e) {
-        console.log('[TrackPlayer] Error:', e);
-      }
-    };
-
-    setup();
-  }, []);
-
-  if (!isPlayerReady) return <View style={styles.container} />;
-
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: '#080812' }}>
       <GliphPlayer 
-        tracks={tracks} 
-        uiConfig={{
-          accentColor: '#1DB954',
-          titleFontSize: 28,
-          artistFontSize: 20,
-          artworkPadding: 50,
-          showMiniPlayer: true,
-        }}
+        tracks={MY_TRACKS} 
+        uiConfig={{ accentColor: '#1DB954' }}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#080812' }
-});`,
+\`\`\``,
       props: [
         { name: 'tracks', type: 'MusicPlayerTrack[]', default: 'required', desc: 'Array of track objects with id, url, title, artist, album, and artwork.' },
         { name: 'initialTrackId', type: 'string', default: 'tracks[0].id', desc: 'ID of the track to start with.' },
