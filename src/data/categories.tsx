@@ -1597,7 +1597,7 @@ A high-performance audio engine for React Native built on top of JSI and TurboMo
 npm install react-native-gliph-player react-native-track-player lucide-react-native @react-native-community/slider
 \`\`\`
 
-## Step 2: Component Implementation (music-player.tsx)
+## Step 2: Create Music Player Component (\`components/music-player.tsx\`)
 
 \`\`\`tsx
 import React, { useMemo, useState, useEffect, useRef } from 'react';
@@ -1608,55 +1608,121 @@ import GliphPlayer, { usePlaybackState, useProgress, State, Event, useTrackPlaye
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// ... (Rest of the MusicPlayer component implementation)
-// Including the MarqueeText and main MusicPlayer function...
-\`\`\`
-
-## Step 3: Main App Setup (App.tsx)
-
-\`\`\`tsx
-import React, { useEffect } from 'react';
-import { StatusBar, StyleSheet, View, PermissionsAndroid, Platform } from 'react-native';
-import GliphPlayer, { Capability, AppKilledPlaybackBehavior, usePlaybackState } from 'react-native-gliph-player';
-import { MusicPlayer } from './components/music-player';
-
-const tracks = [
-  {
-    id: 'leo-badass',
-    url: 'https://...',
-    title: 'Badass (Leo)',
-    artist: 'Anirudh Ravichander',
-    album: 'Leo',
-    artwork: 'https://...'
-  }
-];
-
-function App() {
-  const [isPlayerReady, setIsPlayerReady] = React.useState(false);
+// Marquee Animation for long titles
+function MarqueeText({ text, style, speed = 35, delay = 2000 }) {
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [textWidth, setTextWidth] = useState(0);
+  const gap = 40;
 
   useEffect(() => {
-    const setup = async () => {
-      try {
-        await GliphPlayer.setupPlayer({
-          android: { appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification }
-        });
-        await GliphPlayer.add(tracks);
-        await GliphPlayer.play();
-        setIsPlayerReady(true);
-      } catch (e) { console.log(e); }
+    let isMounted = true;
+    const startAnimation = () => {
+      if (!isMounted || textWidth <= containerWidth || containerWidth <= 0) return;
+      animatedValue.setValue(0);
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.timing(animatedValue, {
+          toValue: -(textWidth + gap),
+          duration: (textWidth + gap) * speed,
+          easing: (t) => t,
+          useNativeDriver: true,
+        })
+      ]).start(() => isMounted && startAnimation());
     };
-    setup();
-  }, []);
+    if (textWidth > containerWidth) startAnimation();
+    return () => { isMounted = false; animatedValue.stopAnimation(); };
+  }, [textWidth, containerWidth, text]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar barStyle="light-content" transparent />
-      {isPlayerReady && <MusicPlayer tracks={tracks} />}
+    <View style={{ overflow: 'hidden' }} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
+      <Animated.View style={{ flexDirection: 'row', transform: [{ translateX: animatedValue }] }}>
+        <Text onLayout={e => setTextWidth(e.nativeEvent.layout.width)} numberOfLines={1} style={style}>{text}</Text>
+        {textWidth > containerWidth && <Text numberOfLines={1} style={[style, { marginLeft: gap }]}>{text}</Text>}
+      </Animated.View>
     </View>
   );
 }
 
-export default App;
+export function MusicPlayer({ tracks, uiConfig = {} }) {
+  const playbackState = usePlaybackState();
+  const progress = useProgress(250);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const isPlaying = playbackState.state === State.Playing;
+  const activeTrack = tracks[activeIndex] ?? tracks[0];
+
+  const togglePlayback = async () => {
+    const state = await GliphPlayer.getPlaybackState();
+    state.state === State.Playing ? await GliphPlayer.pause() : await GliphPlayer.play();
+  };
+
+  return (
+    <View style={styles.root}>
+      <View style={styles.background}>
+        <Image source={{ uri: activeTrack.artwork }} blurRadius={45} style={StyleSheet.absoluteFill} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
+      </View>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.artworkContainer}>
+          <Image source={{ uri: activeTrack.artwork }} style={styles.artwork} />
+        </View>
+        <View style={styles.songInfo}>
+          <MarqueeText text={activeTrack.title} style={styles.title} />
+          <Text style={styles.artist}>{activeTrack.artist}</Text>
+        </View>
+        <Slider 
+          value={progress.position} 
+          maximumValue={progress.duration} 
+          minimumTrackTintColor={uiConfig.accentColor || '#1DB954'}
+          onSlidingComplete={val => GliphPlayer.seekTo(val)}
+        />
+        <View style={styles.controls}>
+          <TouchableOpacity onPress={() => GliphPlayer.skipToPrevious()}><SkipBack size={32} fill="#fff" /></TouchableOpacity>
+          <TouchableOpacity onPress={togglePlayback} style={styles.playBtn}>
+            {isPlaying ? <Pause size={32} fill="#000" /> : <Play size={32} fill="#000" />}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => GliphPlayer.skipToNext()}><SkipForward size={32} fill="#fff" /></TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: '#121212' },
+  artworkContainer: { padding: 40, alignItems: 'center' },
+  artwork: { width: '100%', aspectRatio: 1, borderRadius: 12 },
+  songInfo: { paddingHorizontal: 20, marginBottom: 40 },
+  title: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+  artist: { color: '#b3b3b3', fontSize: 18, marginTop: 4 },
+  controls: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' },
+  playBtn: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }
+});
+\`\`\`
+
+## Step 3: Initialize in \`App.tsx\`
+
+\`\`\`tsx
+import React, { useEffect } from 'react';
+import GliphPlayer, { Capability, AppKilledPlaybackBehavior } from 'react-native-gliph-player';
+import { MusicPlayer } from './components/music-player';
+
+const tracks = [{ id: '1', url: '...', title: 'Song 1', artist: 'Artist', artwork: '...' }];
+
+export default function App() {
+  useEffect(() => {
+    const setup = async () => {
+      await GliphPlayer.setupPlayer({
+        android: { appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification }
+      });
+      await GliphPlayer.add(tracks);
+      await GliphPlayer.play();
+    };
+    setup();
+  }, []);
+
+  return <MusicPlayer tracks={tracks} uiConfig={{ accentColor: '#1DB954' }} />;
+}
 \`\`\``,
       props: [
         { name: 'tracks', type: 'MusicPlayerTrack[]', default: 'required', desc: 'Array of track objects with id, url, title, artist, album, and artwork.' },
