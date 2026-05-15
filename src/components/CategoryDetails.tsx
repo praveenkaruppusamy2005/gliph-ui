@@ -12,7 +12,6 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
   const [flutterLoading, setFlutterLoading] = useState(true);
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
   const [rnLanguage, setRnLanguage] = useState<'tsx' | 'jsx'>('tsx');
-  const [musicPlayerTab, setMusicPlayerTab] = useState<'full' | 'mini'>('full');
 
   const rnGif = data.reactNative?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
   const flutterGif = data.flutter?.previewGif || (category !== 'calendar' && category !== 'scale' ? data.previewGif : undefined);
@@ -111,7 +110,7 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
                       <p className={`mb-6 text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-black/40'}`}>
                         Visual Preview
                       </p>
-                      <div className={`relative ${category === 'music-player' ? 'w-[480px] aspect-[4/3]' : 'w-[280px] aspect-[9/19]'} rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl overflow-hidden ${isDark ? 'border-[#1a1a1a]' : 'border-zinc-800'}`}>
+                      <div className={`relative ${category === 'music-player' ? 'w-[320px] aspect-[3/4]' : 'w-[280px] aspect-[9/19]'} rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl overflow-hidden ${isDark ? 'border-[#1a1a1a]' : 'border-zinc-800'}`}>
                         <div className="absolute top-0 inset-x-0 flex justify-center z-20 pt-3">
                           <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
                         </div>
@@ -180,31 +179,12 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
                   {platform === 'react-native' ? 'React Native' : 'Flutter'} Demonstration
                 </p>
 
-                <div className={`relative ${category === 'music-player' ? 'w-[520px] aspect-[4/3]' : (category === 'navbar' ? 'w-[240px]' : 'w-[300px]')} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
+                <div className={`relative ${category === 'music-player' ? 'w-[340px] aspect-[3/4]' : (category === 'navbar' ? 'w-[240px]' : 'w-[300px]')} aspect-[9/19] rounded-[3rem] border-[12px] ${category === 'navbar' ? 'bg-white' : 'bg-black'} shadow-2xl flex items-center justify-center overflow-hidden ${isDark ? 'border-[#1a1a1a] shadow-white/5' : 'border-zinc-800 shadow-black/20'}`}>
                   {/* Notch */}
                   <div className="absolute top-0 inset-x-0 flex justify-center z-30 pt-3">
                     <div className="h-6 w-24 rounded-full bg-[#1a1a1a]"></div>
                   </div>
 
-                  {/* Music Player Tab Switcher Overlay */}
-                  {category === 'music-player' && (
-                    <div className="absolute top-12 inset-x-0 z-30 px-6">
-                      <div className="flex p-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-                        <button
-                          onClick={() => setMusicPlayerTab('full')}
-                          className={`flex-1 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${musicPlayerTab === 'full' ? 'bg-white text-black shadow-lg' : 'text-white/60'}`}
-                        >
-                          Full
-                        </button>
-                        <button
-                          onClick={() => setMusicPlayerTab('mini')}
-                          className={`flex-1 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${musicPlayerTab === 'mini' ? 'bg-white text-black shadow-lg' : 'text-white/60'}`}
-                        >
-                          Mini
-                        </button>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Loading overlay */}
                   {(platform === 'react-native' ? rnLoading : flutterLoading) && (
