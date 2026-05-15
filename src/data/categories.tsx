@@ -1585,13 +1585,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
     description: 'A cinematic React Native audio player with background playback, lock-screen controls, mini-player mode, glass UI, animated transitions, and production-ready customization.',
     reactNative: {
       previewGif: 'https://www.dropbox.com/scl/fi/placeholder-music-player.gif?rlkey=placeholder&st=placeholder&dl=1',
-      usage: `# React Native Gliph Player
-
-A high-performance audio engine for React Native built on top of JSI and TurboModules.
-
-[Learn more about the core engine features here](/musicplayer)
-
-## Step 1: Install Dependencies
+      usage: `## Step 1: Install Dependencies
 
 \`\`\`sh
 npm install react-native-gliph-player react-native-track-player lucide-react-native @react-native-community/slider
