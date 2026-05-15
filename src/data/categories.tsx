@@ -1586,7 +1586,6 @@ class _PickerShowcaseState extends State<PickerShowcase> {
     reactNative: {
       previewGif: 'https://www.dropbox.com/scl/fi/placeholder-music-player.gif?rlkey=placeholder&st=placeholder&dl=1',
       usage: `## Step 1: Install Dependencies
-
 \`\`\`sh
 npm install react-native-gliph-player react-native-track-player lucide-react-native @react-native-community/slider
 \`\`\`
