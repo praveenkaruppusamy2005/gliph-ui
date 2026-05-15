@@ -6,7 +6,7 @@ import { CategoryDetails } from '../components/CategoryDetails';
 
 function MusicPlayerHeroTablet({ isDark }: { isDark: boolean }) {
   return (
-    <div className={`relative mx-auto w-[320px] aspect-[3/4] rounded-[2rem] border-[12px] overflow-hidden shadow-2xl ${isDark ? 'border-[#18181b] bg-[#070711] shadow-emerald-500/10' : 'border-zinc-900 bg-[#070711] shadow-black/25'}`}>
+    <div className={`relative mx-auto w-[600px] aspect-[3/5] rounded-[2.5rem] border-[14px] overflow-hidden shadow-2xl ${isDark ? 'border-[#18181b] bg-[#070711] shadow-emerald-500/10' : 'border-zinc-900 bg-[#070711] shadow-black/25'}`}>
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30">
         <div className="h-1.5 w-12 rounded-full bg-white/10" />
       </div>

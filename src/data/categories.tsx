@@ -1589,83 +1589,46 @@ class _PickerShowcaseState extends State<PickerShowcase> {
 
 A high-performance audio engine for React Native built on top of JSI and TurboModules.
 
+[Learn more about the core engine features here](/musicplayer)
+
 ## Step 1: Install Dependencies
 
-First, you need to install the core player and its native dependencies:
-
 \`\`\`sh
-npm install react-native-gliph-player react-native-track-player lucide-react-native
+npm install react-native-gliph-player react-native-track-player lucide-react-native @react-native-community/slider
 \`\`\`
 
-## Step 2: Configure Native Audio Engine
-
-Initialize the player service in your \`index.js\` or \`App.tsx\` to handle background events:
+## Step 2: Component Implementation (music-player.tsx)
 
 \`\`\`tsx
-import TrackPlayer from 'react-native-track-player';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, StatusBar, Animated, Platform, NativeModules } from 'react-native';
+import Slider from '@react-native-community/slider';
+import { ArrowLeft, Headphones, Smartphone, Pause, Play, Repeat, Repeat1, Shuffle, SkipBack, SkipForward } from 'lucide-react-native';
+import GliphPlayer, { usePlaybackState, useProgress, State, Event, useTrackPlayerEvents, RepeatMode } from 'react-native-gliph-player';
 
-// This service must be registered to handle playback events in the background
-TrackPlayer.registerPlaybackService(() => require('./service'));
+// ... Full implementation provided in the example
 \`\`\`
 
-## Step 3: Implement the Player UI
-
-Use the \`GliphPlayer\` component to render the cinematic interface:
+## Step 3: Main App Setup (App.tsx)
 
 \`\`\`tsx
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import { GliphPlayer } from 'react-native-gliph-player';
+import GliphPlayer, { Capability, AppKilledPlaybackBehavior } from 'react-native-gliph-player';
+import { MusicPlayer } from './components/music-player';
 
 export default function App() {
-  return (
-    <View style={{ flex: 1, backgroundColor: '#080812' }}>
-      <GliphPlayer 
-        tracks={MY_TRACKS} 
-        uiConfig={{
-          accentColor: '#1DB954',
-          showMiniPlayer: true,
-        }}
-      />
-    </View>
-  );
-}
-\`\`\`
+  useEffect(() => {
+    const setup = async () => {
+      await GliphPlayer.setupPlayer({
+        android: { appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification }
+      });
+      await GliphPlayer.add(tracks);
+      await GliphPlayer.play();
+    };
+    setup();
+  }, []);
 
-## Troubleshooting
-
-If you encounter native build errors, ensure you are using the New Architecture and have correctly linked the JSI modules.`,
-      usageJs: `# React Native Gliph Player (JS)
-
-## Step 1: Install Dependencies
-
-\`\`\`sh
-npm install react-native-gliph-player react-native-track-player lucide-react-native
-\`\`\`
-
-## Step 2: Configure Service
-
-\`\`\`javascript
-import TrackPlayer from 'react-native-track-player';
-TrackPlayer.registerPlaybackService(() => require('./service'));
-\`\`\`
-
-## Step 3: UI Implementation
-
-\`\`\`javascript
-import React from 'react';
-import { View } from 'react-native';
-import { GliphPlayer } from 'react-native-gliph-player';
-
-export default function App() {
-  return (
-    <View style={{ flex: 1, backgroundColor: '#080812' }}>
-      <GliphPlayer 
-        tracks={MY_TRACKS} 
-        uiConfig={{ accentColor: '#1DB954' }}
-      />
-    </View>
-  );
+  return <MusicPlayer tracks={tracks} />;
 }
 \`\`\``,
       props: [
