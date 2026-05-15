@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Volume2, Disc3, Sparkles, Play, PlaySquare } from 'lucide-react';
 import type { Theme } from '../types';

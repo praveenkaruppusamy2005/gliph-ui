@@ -1,14 +1,12 @@
-import React from 'react';
 import { Sun, Moon, Smartphone, Code2 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import type { Platform, Theme } from '../types';
+import type { Theme } from '../types';
 
 export function Header({ theme, toggleTheme }: { theme: Theme, toggleTheme: () => void }) {
   const location = useLocation();
   const currentPath = location.pathname;
   const isRN = !currentPath.startsWith('/flutter');
-  const platform: Platform = isRN ? 'react-native' : 'flutter';
-  
+
   const basePath = isRN ? '' : '/flutter';
   const componentsPath = isRN ? '/components' : '/flutter/components';
   const isDark = theme === 'dark';

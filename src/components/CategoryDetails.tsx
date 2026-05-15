@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, Code2, Smartphone, PlaySquare } from 'lucide-react';
 import type { Category, Platform, Theme } from '../types';
 import { CATEGORY_CONTENT } from '../data/categories';

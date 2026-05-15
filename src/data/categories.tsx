@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Category, CategoryData } from '../types';
 import { Headphones, Radio, Volume2, Disc3 } from 'lucide-react';
 

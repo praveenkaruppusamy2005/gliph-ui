@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Clock, Scale, ListFilter, Calendar, Headphones } from 'lucide-react';
 import type { Platform, Theme, Category } from '../types';
-import { CATEGORY_IDS } from '../data/categories';
 import { CategoryDetails } from '../components/CategoryDetails';
 
 const SIDEBAR_COMPONENTS = [
