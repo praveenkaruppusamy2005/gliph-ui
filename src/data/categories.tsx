@@ -1585,24 +1585,83 @@ class _PickerShowcaseState extends State<PickerShowcase> {
     description: 'A cinematic React Native audio player with background playback, lock-screen controls, mini-player mode, glass UI, animated transitions, and production-ready customization.',
     reactNative: {
       previewGif: 'https://www.dropbox.com/scl/fi/placeholder-music-player.gif?rlkey=placeholder&st=placeholder&dl=1',
-      usage: `## Step 1: Install Dependencies
-\`\`\`sh
-npm install react-native-gliph-player react-native-track-player lucide-react-native @react-native-community/slider
-\`\`\`
-
-## Step 2: Create Music Player Component (\`components/music-player.tsx\`)
-
-\`\`\`tsx
+      usage: `// ==========================================
+// components/music-player.tsx
+// ==========================================
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, StatusBar, Animated, Platform, NativeModules } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  StatusBar,
+  Animated,
+  Platform,
+  NativeModules,
+} from 'react-native';
 import Slider from '@react-native-community/slider';
-import { ArrowLeft, Headphones, Smartphone, Pause, Play, Repeat, Repeat1, Shuffle, SkipBack, SkipForward } from 'lucide-react-native';
-import GliphPlayer, { usePlaybackState, useProgress, State, Event, useTrackPlayerEvents, RepeatMode } from 'react-native-gliph-player';
+import {
+  ArrowLeft,
+  ListMusic,
+  Headphones,
+  Smartphone,
+  MoreHorizontal,
+  Pause,
+  Play,
+  Repeat,
+  Repeat1,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  Volume2,
+} from 'lucide-react-native';
+import GliphPlayer, {
+  usePlaybackState,
+  useProgress,
+  State,
+  Event,
+  useTrackPlayerEvents,
+  RepeatMode,
+} from 'react-native-gliph-player';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Marquee Animation for long titles
-function MarqueeText({ text, style, speed = 35, delay = 2000 }) {
+export type MusicPlayerTrack = {
+  id: string;
+  url: string;
+  title: string;
+  artist: string;
+  album: string;
+  artwork: string;
+};
+
+export type MusicPlayerUIConfig = {
+  accentColor?: string;
+  titleColor?: string;
+  artistColor?: string;
+  timeColor?: string;
+  fontFamily?: string;
+  artworkPadding?: number;
+  titleFontSize?: number;
+  artistFontSize?: number;
+  marqueeSpeed?: number;
+  showMiniPlayer?: boolean;
+};
+
+export type MusicPlayerProps = {
+  tracks: MusicPlayerTrack[];
+  initialTrackId?: string;
+  onBack?: () => void;
+  onTrackChange?: (track: MusicPlayerTrack) => void;
+  uiConfig?: MusicPlayerUIConfig;
+};
+
+const repeatModes = ['off', 'one', 'all'] as const;
+
+function MarqueeText({ text, style, speed = 35, delay = 2000 }: { text: string; style: any, speed?: number, delay?: number }) {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [textWidth, setTextWidth] = useState(0);
@@ -1610,71 +1669,355 @@ function MarqueeText({ text, style, speed = 35, delay = 2000 }) {
 
   useEffect(() => {
     let isMounted = true;
+
     const startAnimation = () => {
       if (!isMounted || textWidth <= containerWidth || containerWidth <= 0) return;
+
       animatedValue.setValue(0);
+      const duration = (textWidth + gap) * speed;
+
       Animated.sequence([
         Animated.delay(delay),
         Animated.timing(animatedValue, {
           toValue: -(textWidth + gap),
-          duration: (textWidth + gap) * speed,
+          duration: duration,
           easing: (t) => t,
           useNativeDriver: true,
         })
-      ]).start(() => isMounted && startAnimation());
+      ]).start(({ finished }) => {
+        if (isMounted) {
+          startAnimation();
+        }
+      });
     };
-    if (textWidth > containerWidth) startAnimation();
-    return () => { isMounted = false; animatedValue.stopAnimation(); };
-  }, [textWidth, containerWidth, text]);
+
+    if (textWidth > containerWidth && containerWidth > 0) {
+      startAnimation();
+    } else {
+      animatedValue.setValue(0);
+    }
+
+    return () => {
+      isMounted = false;
+      animatedValue.stopAnimation();
+    };
+  }, [textWidth, containerWidth, text, speed, delay]);
 
   return (
-    <View style={{ overflow: 'hidden' }} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
-      <Animated.View style={{ flexDirection: 'row', transform: [{ translateX: animatedValue }] }}>
-        <Text onLayout={e => setTextWidth(e.nativeEvent.layout.width)} numberOfLines={1} style={style}>{text}</Text>
-        {textWidth > containerWidth && <Text numberOfLines={1} style={[style, { marginLeft: gap }]}>{text}</Text>}
+    <View
+      style={{ overflow: 'hidden', width: '100%' }}
+      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+    >
+      <View style={{ position: 'absolute', opacity: 0, flexDirection: 'row', width: 10000 }}>
+        <Text
+          onLayout={(e) => setTextWidth(e.nativeEvent.layout.width)}
+          style={[style, { alignSelf: 'flex-start' }]}
+          numberOfLines={1}
+        >
+          {text}
+        </Text>
+      </View>
+
+      <Animated.View
+        style={{
+          flexDirection: 'row',
+          transform: [{ translateX: animatedValue }],
+          width: textWidth > containerWidth ? 5000 : '100%',
+        }}
+      >
+        <Text numberOfLines={1} style={style}>
+          {text}
+        </Text>
+        {textWidth > containerWidth && (
+          <Text numberOfLines={1} style={[style, { marginLeft: gap }]}>
+            {text}
+          </Text>
+        )}
       </Animated.View>
     </View>
   );
 }
 
-export function MusicPlayer({ tracks, uiConfig = {} }) {
+export function MusicPlayer({
+  tracks,
+  initialTrackId,
+  onBack,
+  onTrackChange,
+  uiConfig = {},
+}: MusicPlayerProps) {
+  const {
+    accentColor = '#1DB954',
+    titleColor = '#ffffff',
+    artistColor = '#e5e5e5',
+    timeColor = '#b3b3b3',
+    fontFamily = Platform.OS === 'ios' ? 'System' : 'normal',
+    artworkPadding = 48,
+    titleFontSize = 32,
+    artistFontSize = 20,
+    marqueeSpeed = 30,
+    showMiniPlayer = true,
+  } = uiConfig;
+
   const playbackState = usePlaybackState();
   const progress = useProgress(250);
+
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<(typeof repeatModes)[number]>('all');
+  const [isSliding, setIsSliding] = useState(false);
+  const [slidingValue, setSlidingValue] = useState(0);
+
   const isPlaying = playbackState.state === State.Playing;
   const activeTrack = tracks[activeIndex] ?? tracks[0];
 
+  useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async (event) => {
+    if (event.type === Event.PlaybackActiveTrackChanged && event.track) {
+      const index = tracks.findIndex(t => t.id === event.track?.id);
+      if (index !== -1) {
+        setActiveIndex(index);
+      }
+    }
+  });
+
+  useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
+    if (repeatMode === 'off') {
+      await GliphPlayer.skip(0);
+      await GliphPlayer.play();
+    }
+  });
+
+  const [isMinimized, setIsMinimized] = useState(false);
+
   const togglePlayback = async () => {
-    const state = await GliphPlayer.getPlaybackState();
-    state.state === State.Playing ? await GliphPlayer.pause() : await GliphPlayer.play();
+    try {
+      const state = await GliphPlayer.getPlaybackState();
+      const currentPlaying = state.state === State.Playing;
+
+      if (currentPlaying) {
+        await GliphPlayer.pause();
+      } else {
+        await GliphPlayer.play();
+      }
+    } catch (error) {
+      console.error('Toggle Playback Error:', error);
+      if (isPlaying) {
+        await GliphPlayer.pause();
+      } else {
+        await GliphPlayer.play();
+      }
+    }
   };
+
+  const skipTrack = async (direction: 1 | -1) => {
+    try {
+      if (direction === 1) {
+        await GliphPlayer.skipToNext();
+      } else {
+        await GliphPlayer.skipToPrevious();
+      }
+    } catch (e) {
+      await GliphPlayer.skip(0);
+      await GliphPlayer.play();
+    }
+  };
+
+  const cycleRepeatMode = async () => {
+    const current = repeatModes.indexOf(repeatMode);
+    const nextMode = repeatModes[(current + 1) % repeatModes.length];
+    setRepeatMode(nextMode);
+
+    if (nextMode === 'off') {
+      await GliphPlayer.setRepeatMode(RepeatMode.Off);
+    } else if (nextMode === 'one') {
+      await GliphPlayer.setRepeatMode(RepeatMode.Track);
+    } else if (nextMode === 'all') {
+      await GliphPlayer.setRepeatMode(RepeatMode.Queue);
+    }
+  };
+
+  const toggleShuffle = async () => {
+    const newShuffle = !isShuffle;
+    setIsShuffle(newShuffle);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return \`\${mins}:\${secs.toString().padStart(2, '0')}\`;
+  };
+
+  const handleSlidingComplete = async (value: number) => {
+    await GliphPlayer.seekTo(value);
+    await GliphPlayer.play();
+    setTimeout(() => {
+      setIsSliding(false);
+    }, 500);
+  };
+
+  const [activeOutputName, setActiveOutputName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const updateOutput = async () => {
+      try {
+        if (NativeModules.DeviceInfoModule) {
+          const name = await NativeModules.DeviceInfoModule.getActiveAudioDeviceName();
+          setActiveOutputName(name);
+        }
+      } catch (e) {}
+    };
+
+    updateOutput();
+    const interval = setInterval(updateOutput, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const deviceName = useMemo(() => {
+    if (activeOutputName) return activeOutputName;
+
+    if (Platform.OS === 'android') {
+      const brand = (Platform as any).constants?.Brand || (Platform as any).constants?.Manufacturer || '';
+      const model = (Platform as any).constants?.Model || '';
+      return \`\${brand} \${model}\`.trim() || "Praveen's Device";
+    }
+    return "Praveen's iPhone";
+  }, [activeOutputName]);
+
+  if (!activeTrack) return null;
+
+  if (isMinimized && showMiniPlayer) {
+    return (
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => setIsMinimized(false)}
+        style={styles.miniPlayer}
+      >
+        <Image source={{ uri: activeTrack.artwork }} style={styles.miniArtwork} />
+        <View style={styles.miniInfo}>
+          <Text numberOfLines={1} style={[styles.miniTitle, { color: titleColor, fontFamily }]}>{activeTrack.title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {activeOutputName ? (
+              <Headphones color={accentColor} size={12} style={{ marginRight: 4 }} />
+            ) : (
+              <Smartphone color={accentColor} size={12} style={{ marginRight: 4 }} />
+            )}
+            <Text numberOfLines={1} style={[styles.miniArtist, { color: artistColor, fontFamily }]}>{activeTrack.artist}</Text>
+          </View>
+        </View>
+        <TouchableOpacity onPress={togglePlayback} style={styles.miniPlayBtn}>
+          {isPlaying ? <Pause color="#ffffff" size={24} fill="#ffffff" /> : <Play color="#ffffff" size={24} fill="#ffffff" />}
+        </TouchableOpacity>
+
+        <View style={styles.miniSliderContainer}>
+          <View
+            style={[
+              styles.miniSliderFill,
+              {
+                width: \`\${(progress.position / (progress.duration || 1)) * 100}%\`,
+                backgroundColor: accentColor
+              }
+            ]}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <View style={styles.root}>
       <View style={styles.background}>
-        <Image source={{ uri: activeTrack.artwork }} blurRadius={45} style={StyleSheet.absoluteFill} />
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
+        <Image source={{ uri: activeTrack.artwork }} blurRadius={45} style={styles.bgImage} />
+        <View style={styles.bgOverlay} />
       </View>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.artworkContainer}>
-          <Image source={{ uri: activeTrack.artwork }} style={styles.artwork} />
-        </View>
-        <View style={styles.songInfo}>
-          <MarqueeText text={activeTrack.title} style={styles.title} />
-          <Text style={styles.artist}>{activeTrack.artist}</Text>
-        </View>
-        <Slider 
-          value={progress.position} 
-          maximumValue={progress.duration} 
-          minimumTrackTintColor={uiConfig.accentColor || '#1DB954'}
-          onSlidingComplete={val => GliphPlayer.seekTo(val)}
-        />
-        <View style={styles.controls}>
-          <TouchableOpacity onPress={() => GliphPlayer.skipToPrevious()}><SkipBack size={32} fill="#fff" /></TouchableOpacity>
-          <TouchableOpacity onPress={togglePlayback} style={styles.playBtn}>
-            {isPlaying ? <Pause size={32} fill="#000" /> : <Play size={32} fill="#000" />}
+
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => setIsMinimized(true)}>
+            <ArrowLeft color="#ffffff" size={24} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => GliphPlayer.skipToNext()}><SkipForward size={32} fill="#fff" /></TouchableOpacity>
+          <View style={{ flex: 1 }} />
+        </View>
+
+        <View style={[styles.heroArtworkContainer, { paddingHorizontal: artworkPadding }]}>
+          <View style={styles.artworkShadow}>
+            <Image source={{ uri: activeTrack.artwork }} style={styles.artwork} />
+          </View>
+        </View>
+
+        <View style={styles.songInfoRow}>
+          <View style={styles.songTextContainer}>
+            <MarqueeText
+              text={activeTrack.title}
+              style={[styles.songTitle, { color: titleColor, fontSize: titleFontSize, fontFamily }]}
+              speed={marqueeSpeed}
+              delay={2000}
+            />
+            <MarqueeText
+              text={activeTrack.artist}
+              style={[styles.songArtist, { color: artistColor, fontSize: artistFontSize, fontFamily }]}
+              speed={marqueeSpeed + 10}
+              delay={3000}
+            />
+          </View>
+        </View>
+
+        <View style={styles.progressSection}>
+          <Slider
+            style={styles.slider}
+            value={isSliding ? slidingValue : progress.position}
+            minimumValue={0}
+            maximumValue={progress.duration || 1}
+            thumbTintColor="#ffffff"
+            minimumTrackTintColor={accentColor}
+            maximumTrackTintColor="rgba(255,255,255,0.3)"
+            onSlidingStart={() => setIsSliding(true)}
+            onValueChange={(val) => setSlidingValue(val)}
+            onSlidingComplete={handleSlidingComplete}
+          />
+          <View style={styles.timeLabels}>
+            <Text style={[styles.timeText, { color: timeColor, fontFamily }]}>
+              {formatTime(isSliding ? slidingValue : progress.position)}
+            </Text>
+            <Text style={[styles.timeText, { color: timeColor, fontFamily }]}>{formatTime(progress.duration)}</Text>
+          </View>
+        </View>
+
+        <View style={styles.controlCenter}>
+          <TouchableOpacity onPress={toggleShuffle}>
+            <Shuffle color={isShuffle ? accentColor : '#ffffff'} size={24} />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => skipTrack(-1)}>
+            <SkipBack color="#ffffff" size={32} fill="#ffffff" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={togglePlayback} style={styles.playButton}>
+            {isPlaying ? (
+              <Pause color="#000000" size={32} fill="#000000" />
+            ) : (
+              <Play color="#000000" size={32} fill="#000000" style={{ marginLeft: 4 }} />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => skipTrack(1)}>
+            <SkipForward color="#ffffff" size={32} fill="#ffffff" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={cycleRepeatMode}>
+            {repeatMode === 'one' ? (
+              <Repeat1 color={accentColor} size={24} />
+            ) : (
+              <Repeat color={repeatMode === 'all' ? accentColor : '#ffffff'} size={24} />
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.deviceStatus}>
+          {activeOutputName ? (
+            <Headphones color={accentColor} size={16} style={{ marginRight: 8 }} />
+          ) : (
+            <Smartphone color={accentColor} size={16} style={{ marginRight: 8 }} />
+          )}
+          <Text style={[styles.deviceName, { color: accentColor }]}>{deviceName}</Text>
         </View>
       </ScrollView>
     </View>
@@ -1683,40 +2026,173 @@ export function MusicPlayer({ tracks, uiConfig = {} }) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#121212' },
-  artworkContainer: { padding: 40, alignItems: 'center' },
-  artwork: { width: '100%', aspectRatio: 1, borderRadius: 12 },
-  songInfo: { paddingHorizontal: 20, marginBottom: 40 },
-  title: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
-  artist: { color: '#b3b3b3', fontSize: 18, marginTop: 4 },
-  controls: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' },
-  playBtn: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }
+  background: { ...StyleSheet.absoluteFill },
+  bgImage: { ...StyleSheet.absoluteFill, opacity: 0.45 },
+  bgOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.1)' },
+  scroll: { paddingBottom: 40 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 60 },
+  heroArtworkContainer: { alignItems: 'center', marginTop: 40, paddingHorizontal: 48 },
+  artworkShadow: { width: '100%', aspectRatio: 1, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 20 }, shadowOpacity: 0.5, shadowRadius: 30, elevation: 25 },
+  artwork: { width: '100%', height: '100%', borderRadius: 8 },
+  songInfoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 28, marginTop: 48 },
+  songTextContainer: { flex: 1 },
+  songTitle: { color: '#ffffff', fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
+  songArtist: { color: '#e5e5e5', fontSize: 20, marginTop: 8, fontWeight: '700', letterSpacing: -0.2 },
+  progressSection: { paddingHorizontal: 16, marginTop: 24 },
+  slider: { width: '100%', height: 40 },
+  timeLabels: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, marginTop: -4 },
+  timeText: { color: '#b3b3b3', fontSize: 11, fontWeight: '500' },
+  controlCenter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 32, marginTop: 20 },
+  playButton: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#ffffff', justifyContent: 'center', alignItems: 'center' },
+  miniPlayer: { position: 'absolute', bottom: 20, left: 10, right: 10, height: 64, backgroundColor: 'rgba(40, 40, 40, 0.95)', borderRadius: 8, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 },
+  miniArtwork: { width: 48, height: 48, borderRadius: 4 },
+  miniInfo: { flex: 1, marginLeft: 12 },
+  miniTitle: { color: '#ffffff', fontSize: 14, fontWeight: 'bold' },
+  miniArtist: { color: '#b3b3b3', fontSize: 12 },
+  miniPlayBtn: { padding: 8 },
+  miniSliderContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, backgroundColor: 'rgba(255,255,255,0.1)', borderBottomLeftRadius: 8, borderBottomRightRadius: 8, overflow: 'hidden' },
+  miniSliderFill: { height: '100%', backgroundColor: '#ffffff' },
+  deviceStatus: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingHorizontal: 28, marginTop: 32, marginBottom: 20 },
+  deviceName: { color: '#1DB954', fontSize: 12, fontWeight: '600', letterSpacing: 0.5 },
 });
-\`\`\`
 
-## Step 3: Initialize in \`App.tsx\`
 
-\`\`\`tsx
-import React, { useEffect } from 'react';
-import GliphPlayer, { Capability, AppKilledPlaybackBehavior } from 'react-native-gliph-player';
-import { MusicPlayer } from './components/music-player';
+// ==========================================
+// App.tsx
+// ==========================================
+// Note: Assuming MusicPlayer is exported from './components/music-player'
+import { StatusBar, LogBox, PermissionsAndroid, Modal } from 'react-native';
 
-const tracks = [{ id: '1', url: '...', title: 'Song 1', artist: 'Artist', artwork: '...' }];
+const tracks = [
+  {
+    id: 'leo-badass',
+    url: 'https://dl.dropboxusercontent.com/scl/fi/odjabq0j82svow4znyn4b/Badass-Leo-320-Kbps.mp3?rlkey=4yidwu60qtowjst8t6q2txs0u&st=drn5lwb9&dl=1',
+    title: 'Badass (Leo) - Leo Das is a Badass',
+    artist: 'Anirudh Ravichander, Vishnu Edavan, Lokesh Kanagaraj',
+    album: 'Leo',
+    artwork: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg',
+  },
+  {
+    id: 'aura-10-10',
+    url: 'https://dl.dropboxusercontent.com/scl/fi/wr1aakslyq6nzzllcfmg0/Aura-10-10.mp3?rlkey=jmz4jcdl1mhzk8zbabjiu0j5m&st=xd8c3k50&dl=1',
+    title: 'Aura 10/10 - Meesaya Murukku 2',
+    artist: 'Hiphop Tamizha, Adhi, Jeeva, Santhosh Narayanan',
+    album: 'Meesaya Murukku 2',
+    artwork: 'https://c.saavncdn.com/290/Aura-10-10-From-Meesaya-Murukku-2-Tamil-2026-20260303073304-500x500.jpg',
+  },
+];
 
-export default function App() {
+function App() {
+  const [isPlayerReady, setIsPlayerReady] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const playbackState = usePlaybackState();
+
   useEffect(() => {
     const setup = async () => {
-      await GliphPlayer.setupPlayer({
-        android: { appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification }
-      });
-      await GliphPlayer.add(tracks);
-      await GliphPlayer.play();
+      try {
+        console.log('[GliphPlayer] Starting setup...');
+
+        if (Platform.OS === 'android' && (Platform.Version as number) >= 33) {
+          await PermissionsAndroid.request('android.permission.POST_NOTIFICATIONS' as any);
+        }
+
+        await GliphPlayer.setupPlayer({
+          waitForBuffer: false,
+          minBuffer: 15,
+          maxBuffer: 60,
+          playBuffer: 1.5,
+          backBuffer: 15,
+          progressUpdateEventInterval: 1.0,
+          maxCacheSize: 500,
+          android: {
+            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+          },
+        });
+
+        await GliphPlayer.updateOptions({
+          progressUpdateEventInterval: 1.0,
+          capabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+            Capability.SeekTo,
+            Capability.Stop,
+          ],
+          compactCapabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+          ],
+          notificationIcon: 'ic_launcher',
+        });
+
+        await GliphPlayer.add(tracks);
+        await GliphPlayer.setVolume(1.0);
+        await GliphPlayer.seekTo(0);
+        await GliphPlayer.play();
+        
+        GliphPlayer.addEventListener(Event.PlaybackError, (err) => {
+          setError(\`Playback Error: \${err.message}\`);
+        });
+
+        setIsPlayerReady(true);
+      } catch (e: any) {
+        setError(e.message || 'Unknown error during setup');
+      }
     };
+
     setup();
   }, []);
 
-  return <MusicPlayer tracks={tracks} uiConfig={{ accentColor: '#1DB954' }} />;
+  if (error) {
+    return (
+      <View style={[styles.root, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+        <Text style={{ color: '#ff4444', fontSize: 16, textAlign: 'center' }}>{\`Setup Error: \${error}\`}</Text>
+        <TouchableOpacity 
+          onPress={() => { setError(null); setIsPlayerReady(false); }}
+          style={{ marginTop: 20, padding: 10, backgroundColor: '#333', borderRadius: 8 }}
+        >
+          <Text style={{ color: '#fff' }}>Retry Setup</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (!isPlayerReady) {
+    return (
+      <View style={[styles.root, { justifyContent: 'center', alignItems: 'center' }]}>
+        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
+        <Text style={{ color: '#fff' }}>Initializing Player...</Text>
+        <Text style={{ color: '#555', marginTop: 10 }}>{\`State: \${playbackState?.state ?? 'initializing...'}\`}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.root}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
+      <MusicPlayer
+        tracks={tracks}
+        initialTrackId="leo-badass"
+        uiConfig={{
+          accentColor: '#1DB954',
+          titleColor: '#ffffff',
+          artistColor: '#b3b3b3',
+          timeColor: '#ffffffff',
+          fontFamily: Platform.OS === 'ios' ? 'Helvetica' : 'system',
+          artworkPadding: 90,
+          titleFontSize: 28,
+          artistFontSize: 18,
+          marqueeSpeed: 40,
+        }}
+      />
+    </View>
+  );
 }
-\`\`\``,
+
+export default App;`,
       props: [
         { name: 'tracks', type: 'MusicPlayerTrack[]', default: 'required', desc: 'Array of track objects with id, url, title, artist, album, and artwork.' },
         { name: 'initialTrackId', type: 'string', default: 'tracks[0].id', desc: 'ID of the track to start with.' },
