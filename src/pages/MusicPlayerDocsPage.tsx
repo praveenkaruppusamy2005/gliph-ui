@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   ChevronRight, 
   Menu,
@@ -15,7 +14,6 @@ type DocSection =
   | 'New Architecture';
 
 export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
-  const navigate = useNavigate();
   const isDark = theme === 'dark';
   const [activeSection, setActiveSection] = useState<DocSection>('Introduction');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
