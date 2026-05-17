@@ -1,7 +1,7 @@
 import type { Category, CategoryData } from '../types';
 import { Headphones, Radio, Volume2, Disc3 } from 'lucide-react';
 
-export const CATEGORY_IDS: Category[] = ['navbar', 'scale', 'time', 'date', 'weight', 'value', 'calendar', 'music-player'];
+export const CATEGORY_IDS: Category[] = ['navbar', 'scale', 'time', 'date', 'weight', 'value', 'calendar'];
 
 export const CATEGORY_CONTENT: Record<Category, CategoryData> = {
   navbar: {

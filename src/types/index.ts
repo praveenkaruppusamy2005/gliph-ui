@@ -1,6 +1,6 @@
 export type Platform = 'react-native' | 'flutter';
 export type Theme = 'light' | 'dark';
-export type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar' | 'navbar' | 'music-player';
+export type Category = 'time' | 'weight' | 'value' | 'date' | 'scale' | 'calendar' | 'navbar';
 
 export interface PickerProp {
   name: string;

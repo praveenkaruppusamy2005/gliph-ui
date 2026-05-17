@@ -12,7 +12,6 @@ export const SIDEBAR_COMPONENTS = [
   { id: 'weight', title: 'Weight Picker', icon: <Scale size={18} className="rotate-90" /> },
   { id: 'value', title: 'Value Picker', icon: <ListFilter size={18} className="rotate-90" /> },
   { id: 'calendar', title: 'Calendar Picker', icon: <Calendar size={18} /> },
-  { id: 'music-player', title: 'Gliph Player', icon: <Headphones size={18} /> },
 ];
 
 export function ComponentsPage({ platform, theme }: { platform: Platform, theme: Theme }) {
