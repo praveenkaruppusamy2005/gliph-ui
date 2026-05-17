@@ -5,7 +5,6 @@ import { Header } from './components/Header';
 import { HomePage } from './pages/HomePage';
 import { ComponentsPage } from './pages/ComponentsPage';
 import { MusicPlayerDocsPage } from './pages/MusicPlayerDocsPage';
-import { PricingPage } from './pages/PricingPage';
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -70,7 +69,6 @@ export default function App() {
             {/* Shared Pages */}
             <Route path="/musicplayer" element={<MusicPlayerDocsPage theme={theme} toggleTheme={toggleTheme} />} />
             <Route path="/react-native-gliph-player" element={<MusicPlayerDocsPage theme={theme} toggleTheme={toggleTheme} />} />
-            <Route path="/pricing" element={<PricingPage theme={theme} />} />
             
             {/* Fallback */}
             <Route path="*" element={<HomePage platform="react-native" theme={theme} />} />

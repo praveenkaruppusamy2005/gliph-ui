@@ -80,6 +80,15 @@ export function Header({ theme, toggleTheme }: { theme: Theme, toggleTheme: () =
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
+          {/* Desktop Platform Switch */}
+          <Link
+            to={isRN ? '/flutter' : '/'}
+            className={`hidden lg:flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all border ${isDark ? 'border-white/10 bg-white/5 text-white/90 hover:bg-white/10' : 'border-black/10 bg-black/5 text-slate-900 hover:bg-black/10'}`}
+          >
+            {isRN ? <Smartphone size={16} className="text-[#38bdf8]" /> : <Code2 size={16} className="text-[#61dafb]" />}
+            {isRN ? "Flutter" : "React Native"}
+          </Link>
+
           {!isDocsRoute && (
             <Link
               className={`hidden sm:flex rounded-full px-5 py-2 text-sm font-bold shadow-xl transition duration-200 hover:-translate-y-0.5 cursor-pointer ${isDark ? 'bg-white text-black hover:bg-zinc-200' : 'bg-slate-900 text-white hover:bg-slate-800'}`}
