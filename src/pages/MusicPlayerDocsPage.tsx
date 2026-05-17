@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   Menu,
   X,
-  Search,
   Sun,
   Moon,
   Home
