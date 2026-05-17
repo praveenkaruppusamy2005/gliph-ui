@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Clock, Scale, ListFilter, Calendar, Headphones } from 'lucide-react';
+import { Clock, Scale, ListFilter, Calendar } from 'lucide-react';
 import type { Platform, Theme, Category } from '../types';
 import { CategoryDetails } from '../components/CategoryDetails';
 
