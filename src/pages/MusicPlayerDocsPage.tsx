@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
 import { 
   ChevronRight, 
+  ChevronLeft,
   Menu,
   X,
-  Search
+  Search,
+  Sun,
+  Moon,
+  Home
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { Theme } from '../types';
 import { CodeBlock } from '../components/CodeBlock';
 
@@ -13,7 +18,7 @@ type DocSection =
   | 'Complete Integration' | 'Controlling Playback' | 'Reactive State' | 'Background & Lock Screen'
   | 'New Architecture';
 
-export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
+export function MusicPlayerDocsPage({ theme, toggleTheme }: { theme: Theme, toggleTheme: () => void }) {
   const isDark = theme === 'dark';
   const [activeSection, setActiveSection] = useState<DocSection>('Introduction');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -39,8 +44,15 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
   ];
 
   const Sidebar = () => (
-    <div className={`h-full w-full lg:w-64 flex-shrink-0 ${isDark ? 'bg-[#0a0a0a]' : 'bg-white'}`}>
-      <div className="sticky top-20 flex flex-col gap-8 pb-12 pt-8 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto">
+    <div className={`h-full w-full lg:w-64 flex-shrink-0 flex flex-col ${isDark ? 'bg-[#0a0a0a]' : 'bg-white'}`}>
+      <div className="sticky top-0 flex flex-col gap-8 pb-12 pt-8 lg:h-screen lg:overflow-y-auto">
+        
+        <div className="px-6 pb-4 border-b border-white/5">
+          <Link to="/" className={`flex items-center gap-2 text-sm font-bold transition hover:-translate-x-1 ${isDark ? 'text-white' : 'text-black'}`}>
+            <ChevronLeft size={16} /> Back to Gliph UI
+          </Link>
+        </div>
+
         {navGroups.map((group) => (
           <div key={group.title} className="flex flex-col gap-3">
             <h4 className={`text-sm font-bold uppercase tracking-widest px-6 ${isDark ? 'text-white/40' : 'text-black/40'}`}>
@@ -63,6 +75,16 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
             </div>
           </div>
         ))}
+
+        <div className="mt-auto px-6 pt-8 pb-4">
+          <button
+            onClick={toggleTheme}
+            className={`flex w-full items-center justify-center gap-3 py-3 rounded-xl border font-bold transition-all ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-black/10 bg-black/5 text-black hover:bg-black/10'}`}
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            {isDark ? "Light Mode" : "Dark Mode"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -171,7 +193,7 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
   );
 
   const FullImplementationContent = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl w-full">
       <h1 className={`text-4xl font-bold mb-6 ${isDark ? 'text-white' : 'text-black'}`}>🚀 Full Implementation Example</h1>
       <p className={`text-lg mb-8 ${isDark ? 'text-white/80' : 'text-black/80'}`}>
         Want to skip straight to the code? Here is a complete, production-ready implementation containing both the main app setup (<code className="text-sm">App.tsx</code>) and the user interface (<code className="text-sm">MusicPlayer.tsx</code>).
@@ -384,7 +406,7 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
   );
 
   const ArchitectureContent = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl w-full">
       <h1 className={`text-4xl font-bold mb-6 ${isDark ? 'text-white' : 'text-black'}`}>🏗️ New Architecture</h1>
       <p className={`text-lg leading-relaxed mb-6 ${isDark ? 'text-white/80' : 'text-black/80'}`}>
         Gliph Player is built for the future. It is completely optimized for React Native 0.71+ and relies heavily on the New Architecture.
@@ -398,7 +420,7 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
   );
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDark ? 'bg-[#0a0a0a]' : 'bg-white'}`}>
+    <div className={`min-h-screen w-full max-w-[100vw] overflow-x-hidden flex flex-col ${isDark ? 'bg-[#0a0a0a]' : 'bg-white'}`}>
       
       {/* Mobile Header / Search */}
       <div className={`lg:hidden flex items-center justify-between p-4 border-b sticky top-0 z-50 ${isDark ? 'border-white/10 bg-[#0a0a0a]/90 backdrop-blur' : 'border-black/10 bg-white/90 backdrop-blur'}`}>
@@ -406,12 +428,12 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
         <span className={`font-bold ${isDark ? 'text-white' : 'text-black'}`}>Gliph Player Docs</span>
-        <button className={`p-2 ${isDark ? 'text-white' : 'text-black'}`}>
-          <Search size={20} />
-        </button>
+        <Link to="/" className={`p-2 rounded-lg ${isDark ? 'text-white' : 'text-black'}`}>
+          <Home size={20} />
+        </Link>
       </div>
 
-      <div className="flex flex-1 relative">
+      <div className="flex flex-1 relative w-full min-w-0">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block border-r border-white/10">
           <Sidebar />
@@ -428,7 +450,7 @@ export function MusicPlayerDocsPage({ theme }: { theme: Theme }) {
         )}
 
         {/* Main Content */}
-        <main className={`flex-1 overflow-x-hidden p-6 lg:p-12 lg:pl-16 ${isDark ? 'bg-[#0a0a0a]' : 'bg-white'}`}>
+        <main className={`flex-1 min-w-0 p-6 lg:p-12 lg:pl-16 ${isDark ? 'bg-[#0a0a0a]' : 'bg-white'}`}>
           {activeSection === 'Introduction' && <IntroContent />}
           {activeSection === 'Installation' && <InstallationContent />}
           {activeSection === 'Full Implementation' && <FullImplementationContent />}

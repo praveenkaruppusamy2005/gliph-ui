@@ -8,7 +8,7 @@ export const CATEGORY_CONTENT: Record<Category, CategoryData> = {
     title: 'Navbar',
     description: 'A premium, animated glassmorphism navbar with spring physics and custom icon support.',
     reactNative: {
-      previewGif: 'https://www.dropbox.com/scl/fi/jtgtmlmuzhcrce569ml8a/SVID_20260510_170411_1.gif?rlkey=al5h4its78i3q2cun7xjfkdj0&st=o9e36gp1&dl=1',
+      previewGif: 'https://www.dropbox.com/scl/fi/jtgtmlmuzhcrce569ml8a/SVID_20260510_170411_1.gif?rlkey=al5h4its78i3q2cun7xjfkdj0&st=o9e36gp1&raw=1',
       usage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
@@ -109,8 +109,8 @@ const styles = StyleSheet.create({
     variants: [
       {
         name: 'Floating',
-        reactNativePreview: 'https://www.dropbox.com/scl/fi/4itsw2gk2jbro5urcpfmv/SVID_20260510_175553_1.gif?rlkey=zzz269muydo8udcpgxuaoy2tf&st=hzf5acaa&dl=1',
-        flutterPreview: 'https://www.dropbox.com/scl/fi/yttjp5wexsyz5utnqg3g3/SVID_20260510_221611_2.mp4?rlkey=1ux0ay9ysxp8fkwghriyqkqny&st=wrpv81ew&dl=1',
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/4itsw2gk2jbro5urcpfmv/SVID_20260510_175553_1.gif?rlkey=zzz269muydo8udcpgxuaoy2tf&st=hzf5acaa&raw=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/yttjp5wexsyz5utnqg3g3/SVID_20260510_221611_2.mp4?rlkey=1ux0ay9ysxp8fkwghriyqkqny&st=wrpv81ew&raw=1',
         reactNativeUsage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
@@ -220,8 +220,8 @@ class _MyAppState extends State<MyApp> {
       },
       {
         name: 'Classic',
-        reactNativePreview: 'https://www.dropbox.com/scl/fi/p5rfxpwd6nukl60uz68z7/SVID_20260510_175614_1.mp4?rlkey=6wwnt6wja6v8oje3x1ot4g94r&st=pi7e1wfs&dl=1',
-        flutterPreview: 'https://www.dropbox.com/scl/fi/mhrx3jd8imyqkyeylfoib/SVID_20260510_221703_1.mp4?rlkey=jcog8hhbyochnl5lec37wac05&st=zauzyI0n&dl=1',
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/p5rfxpwd6nukl60uz68z7/SVID_20260510_175614_1.mp4?rlkey=6wwnt6wja6v8oje3x1ot4g94r&st=pi7e1wfs&raw=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/mhrx3jd8imyqkyeylfoib/SVID_20260510_221703_1.mp4?rlkey=jcog8hhbyochnl5lec37wac05&st=zauzyI0n&raw=1',
         reactNativeUsage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
@@ -313,8 +313,8 @@ class _MyAppState extends State<MyApp> {
       },
       {
         name: 'Minimal',
-        reactNativePreview: 'https://www.dropbox.com/scl/fi/swztrtal3ao8zhv8x50tc/SVID_20260510_175630_1.mp4?rlkey=3omvdiea8nixxdg60urc94tfe&st=87unlzl7&dl=1',
-        flutterPreview: 'https://www.dropbox.com/scl/fi/pf5fd0kuqwdi1dac8cyxc/SVID_20260510_221859_1.mp4?rlkey=nip0gurj6q6x4d3qxyoha1y6o&st=ki8pjalg&dl=1',
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/swztrtal3ao8zhv8x50tc/SVID_20260510_175630_1.mp4?rlkey=3omvdiea8nixxdg60urc94tfe&st=87unlzl7&raw=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/pf5fd0kuqwdi1dac8cyxc/SVID_20260510_221859_1.mp4?rlkey=nip0gurj6q6x4d3qxyoha1y6o&st=ki8pjalg&raw=1',
         reactNativeUsage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
@@ -420,8 +420,8 @@ class _MyAppState extends State<MyApp> {
       },
       {
         name: 'IOS',
-        reactNativePreview: 'https://www.dropbox.com/scl/fi/2bx3b0gfbrrod6xwd5cdq/SVID_20260510_175648_1.mp4?rlkey=31v8wz8hir01sgmj32ydiox7t&st=67pt0s3g&dl=1',
-        flutterPreview: 'https://www.dropbox.com/scl/fi/xb5k2wbd5457f74qmbef2/SVID_20260510_221935_1.mp4?rlkey=l221u8t3nods46x2uekqppfk8&st=au5vdnsg&dl=1',
+        reactNativePreview: 'https://www.dropbox.com/scl/fi/2bx3b0gfbrrod6xwd5cdq/SVID_20260510_175648_1.mp4?rlkey=31v8wz8hir01sgmj32ydiox7t&st=67pt0s3g&raw=1',
+        flutterPreview: 'https://www.dropbox.com/scl/fi/xb5k2wbd5457f74qmbef2/SVID_20260510_221935_1.mp4?rlkey=l221u8t3nods46x2uekqppfk8&st=au5vdnsg&raw=1',
         reactNativeUsage: `import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Navbar } from 'gliph-ui';
@@ -530,7 +530,7 @@ class _MyAppState extends State<MyApp> {
       }
     ],
     flutter: {
-      previewGif: 'https://www.dropbox.com/scl/fi/yttjp5wexsyz5utnqg3g3/SVID_20260510_221611_2.mp4?rlkey=1ux0ay9ysxp8fkwghriyqkqny&st=wrpv81ew&dl=1',
+      previewGif: 'https://www.dropbox.com/scl/fi/yttjp5wexsyz5utnqg3g3/SVID_20260510_221611_2.mp4?rlkey=1ux0ay9ysxp8fkwghriyqkqny&st=wrpv81ew&raw=1',
       usage: `import 'package:flutter/material.dart';
 import 'package:gliph_ui/gliph_ui.dart';
 
@@ -632,7 +632,7 @@ class _MyAppState extends State<MyApp> {
     title: 'Scale Picker',
     description: 'A horizontal ruler-style picker for height, weight, and other linear measurements.',
     reactNative: {
-      previewGif: 'https://www.dropbox.com/scl/fi/cevifhhaubqobza5ft1pw/SVID_20260508_222010_1.gif?rlkey=950pp5hlbaqol46bbkohrrp8h&st=hu4gpr3r&dl=1',
+      previewGif: 'https://www.dropbox.com/scl/fi/cevifhhaubqobza5ft1pw/SVID_20260508_222010_1.gif?rlkey=950pp5hlbaqol46bbkohrrp8h&st=hu4gpr3r&raw=1',
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
 import { ScalePicker } from 'gliph-ui';
@@ -696,7 +696,7 @@ export default function App() {
       ]
     },
     flutter: {
-      previewGif: 'https://www.dropbox.com/scl/fi/xoiawxojcd31ai29frr26/SVID_20260508_220213_1.gif?rlkey=rhgmopbi22o69yvhvtezxjk6e&st=t4y8zqva&dl=1',
+      previewGif: 'https://www.dropbox.com/scl/fi/xoiawxojcd31ai29frr26/SVID_20260508_220213_1.gif?rlkey=rhgmopbi22o69yvhvtezxjk6e&st=t4y8zqva&raw=1',
       usage: `import 'package:flutter/material.dart';
 import 'package:gliph_ui/gliph_ui.dart';
 
@@ -784,7 +784,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
   time: {
     title: 'Time Picker',
     description: 'A 12-hour or 24-hour time selector with smooth momentum scrolling.',
-    previewGif: 'https://www.dropbox.com/scl/fi/hs4nqtoggmg0wa36ezf4g/SVID_20260508_125930_1.gif?rlkey=gzg001e5qun2hbmqf5fg6y8mj&st=etfyjqc3&dl=1',
+    previewGif: 'https://www.dropbox.com/scl/fi/hs4nqtoggmg0wa36ezf4g/SVID_20260508_125930_1.gif?rlkey=gzg001e5qun2hbmqf5fg6y8mj&st=etfyjqc3&raw=1',
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
@@ -946,7 +946,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
   weight: {
     title: 'Weight Picker',
     description: 'A dedicated numeric picker for weights, including whole numbers, decimals, and units.',
-    previewGif: "https://www.dropbox.com/scl/fi/b6iq20hqdv91hdtyayexi/SVID_20260508_131439_1.gif?rlkey=0h1fp00rtrxotbjqxvgqsrkim&st=nj32h4zb&dl=1",
+    previewGif: "https://www.dropbox.com/scl/fi/b6iq20hqdv91hdtyayexi/SVID_20260508_131439_1.gif?rlkey=0h1fp00rtrxotbjqxvgqsrkim&st=nj32h4zb&raw=1",
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
@@ -1106,7 +1106,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
   value: {
     title: 'Value Picker',
     description: 'Simple momentum-scrolling picker for any list of items.',
-    previewGif: "https://www.dropbox.com/scl/fi/sgprz1zdibw2uie1ktc0n/SVID_20260508_132953_1-1.gif?rlkey=33g2lt9mk1e9cgck5h5zenjoc&st=o6sqvllk&dl=1",
+    previewGif: "https://www.dropbox.com/scl/fi/sgprz1zdibw2uie1ktc0n/SVID_20260508_132953_1-1.gif?rlkey=33g2lt9mk1e9cgck5h5zenjoc&st=o6sqvllk&raw=1",
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
@@ -1257,7 +1257,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
   date: {
     title: 'Date Picker',
     description: 'Dynamic date selector with leap-year awareness.',
-    previewGif: "https://www.dropbox.com/scl/fi/pi4c6rbd6urk66wgetzed/SVID_20260508_134712_1.gif?rlkey=2ngcbm6kupts4bzrvpng9uile&st=v540tqlz&dl=1",
+    previewGif: "https://www.dropbox.com/scl/fi/pi4c6rbd6urk66wgetzed/SVID_20260508_134712_1.gif?rlkey=2ngcbm6kupts4bzrvpng9uile&st=v540tqlz&raw=1",
     reactNative: {
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
@@ -1412,7 +1412,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
     title: 'Calendar Picker',
     description: 'A full-featured monthly calendar with animated day selection, year dropdown, and min/max date constraints.',
     reactNative: {
-      previewGif: 'https://www.dropbox.com/scl/fi/awi0fk291sgrtyu49ez0j/SVID_20260509_093240_1.gif?rlkey=qxd0mlunj9n1rb5z4rcail8sv&st=ce8k0sfa&dl=1',
+      previewGif: 'https://www.dropbox.com/scl/fi/awi0fk291sgrtyu49ez0j/SVID_20260509_093240_1.gif?rlkey=qxd0mlunj9n1rb5z4rcail8sv&st=ce8k0sfa&raw=1',
       usage: `import React, { useState } from 'react';
 import { View } from 'react-native';
 import { CalendarPicker } from 'gliph-ui';
@@ -1480,7 +1480,7 @@ export default function App() {
       ]
     },
     flutter: {
-      previewGif: 'https://www.dropbox.com/scl/fi/0fu21vlqhvze8xgy65p7i/SVID_20260509_104006_1.gif?rlkey=bis04b2arr84x3laeactp8ila&st=iip6zn5v&dl=1',
+      previewGif: 'https://www.dropbox.com/scl/fi/0fu21vlqhvze8xgy65p7i/SVID_20260509_104006_1.gif?rlkey=bis04b2arr84x3laeactp8ila&st=iip6zn5v&raw=1',
       usage: `import 'package:flutter/material.dart';
 import 'package:gliph_ui/gliph_ui.dart';
 
@@ -1584,7 +1584,7 @@ class _PickerShowcaseState extends State<PickerShowcase> {
     title: 'React Native Gliph Player',
     description: 'A cinematic React Native audio player with background playback, lock-screen controls, mini-player mode, glass UI, animated transitions, and production-ready customization.',
     reactNative: {
-      previewGif: 'https://www.dropbox.com/scl/fi/placeholder-music-player.gif?rlkey=placeholder&st=placeholder&dl=1',
+      previewGif: 'https://www.dropbox.com/scl/fi/placeholder-music-player.gif?rlkey=placeholder&st=placeholder&raw=1',
       usage: `// PREREQUISITES:
 // 1. Install the package
 // npm install react-native-gliph-player
@@ -1608,7 +1608,7 @@ import { MusicPlayer } from './components/music-player';
 const tracks = [
   {
     id: 'leo-badass',
-    url: 'https://dl.dropboxusercontent.com/scl/fi/odjabq0j82svow4znyn4b/Badass-Leo-320-Kbps.mp3?rlkey=4yidwu60qtowjst8t6q2txs0u&st=drn5lwb9&dl=1',
+    url: 'https://dl.dropboxusercontent.com/scl/fi/odjabq0j82svow4znyn4b/Badass-Leo-320-Kbps.mp3?rlkey=4yidwu60qtowjst8t6q2txs0u&st=drn5lwb9&raw=1',
     title: 'Badass (Leo) - Leo Das is a Badass',
     artist: 'Anirudh Ravichander, Vishnu Edavan, Lokesh Kanagaraj, Seven Screen Studio',
     album: 'Leo',
@@ -1616,7 +1616,7 @@ const tracks = [
   },
   {
     id: 'aura-10-10',
-    url: 'https://dl.dropboxusercontent.com/scl/fi/wr1aakslyq6nzzllcfmg0/Aura-10-10.mp3?rlkey=jmz4jcdl1mhzk8zbabjiu0j5m&st=xd8c3k50&dl=1',
+    url: 'https://dl.dropboxusercontent.com/scl/fi/wr1aakslyq6nzzllcfmg0/Aura-10-10.mp3?rlkey=jmz4jcdl1mhzk8zbabjiu0j5m&st=xd8c3k50&raw=1',
     title: 'Aura 10/10 - Meesaya Murukku 2',
     artist: 'Hiphop Tamizha, Adhi, Jeeva, Santhosh Narayanan, Anirudh',
     album: 'Meesaya Murukku 2',

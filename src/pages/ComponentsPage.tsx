@@ -4,7 +4,7 @@ import { Clock, Scale, ListFilter, Calendar, Headphones } from 'lucide-react';
 import type { Platform, Theme, Category } from '../types';
 import { CategoryDetails } from '../components/CategoryDetails';
 
-const SIDEBAR_COMPONENTS = [
+export const SIDEBAR_COMPONENTS = [
   { id: 'navbar', title: 'Navbar', icon: <ListFilter size={18} /> },
   { id: 'scale', title: 'Scale Picker', icon: <Scale size={18} /> },
   { id: 'time', title: 'Time Picker', icon: <Clock size={18} /> },
@@ -33,7 +33,7 @@ export function ComponentsPage({ platform, theme }: { platform: Platform, theme:
 
   return (
     <section className="flex flex-col lg:flex-row gap-12 lg:gap-20">
-      <aside className="w-full lg:w-64 lg:shrink-0 pt-10">
+      <aside className="hidden lg:block w-64 shrink-0 pt-10">
         <div className="mb-8 px-3">
           <h3 className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/30'}`}>
             Pickers & Inputs
@@ -56,10 +56,15 @@ export function ComponentsPage({ platform, theme }: { platform: Platform, theme:
         </nav>
       </aside>
 
-      <div className="w-full max-w-5xl pt-10 pb-32">
+      <div className="w-full min-w-0 max-w-5xl pt-10 pb-32">
         {activeCategory === null ? (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col items-start justify-center min-h-[60vh]">
-            <h2 className={`text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-black'}`}>Components</h2>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col items-start justify-center min-h-[60vh] relative">
+            <div className="absolute -left-20 top-10 w-72 h-72 bg-blue-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+            <div className="absolute right-10 bottom-20 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+            
+            <h2 className={`text-4xl font-bold mb-4 tracking-tight ${isDark ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400' : 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600'}`}>
+              Components Collection
+            </h2>
             <p className={`text-lg max-w-lg ${isDark ? 'text-white/50' : 'text-black/50'}`}>
               Select a component from the sidebar to view its documentation, usage examples, and props.
             </p>

@@ -50,10 +50,11 @@ export default function App() {
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-[#050505] text-white' : 'bg-white text-black'}`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Header theme={theme} toggleTheme={toggleTheme} />
-        
+    <div className={`min-h-screen transition-colors duration-500 relative overflow-hidden ${theme === 'dark' ? 'text-white bg-[#0a0a0a]' : 'text-slate-900 bg-slate-50'}`}>
+      
+      <Header theme={theme} toggleTheme={toggleTheme} />
+      
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <main>
           <Routes>
             {/* React Native Routes */}
@@ -67,8 +68,8 @@ export default function App() {
             <Route path="/flutter/components/:categoryId" element={<ComponentsPage platform="flutter" theme={theme} />} />
             
             {/* Shared Pages */}
-            <Route path="/musicplayer" element={<MusicPlayerDocsPage theme={theme} />} />
-            <Route path="/react-native-gliph-player" element={<MusicPlayerDocsPage theme={theme} />} />
+            <Route path="/musicplayer" element={<MusicPlayerDocsPage theme={theme} toggleTheme={toggleTheme} />} />
+            <Route path="/react-native-gliph-player" element={<MusicPlayerDocsPage theme={theme} toggleTheme={toggleTheme} />} />
             <Route path="/pricing" element={<PricingPage theme={theme} />} />
             
             {/* Fallback */}

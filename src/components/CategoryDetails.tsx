@@ -58,7 +58,7 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
       </button>
 
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
-        <h2 className={`text-4xl font-bold leading-tight sm:text-5xl tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
+        <h2 className={`text-4xl font-bold leading-tight sm:text-5xl tracking-tight ${isDark ? 'text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40' : 'text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-500'}`}>
           {data.title}
         </h2>
 
@@ -296,9 +296,9 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
           </div>
         )}
 
-        <div className="grid gap-12 lg:grid-cols-[1fr_400px]">
-          <div className="space-y-12">
-            <section>
+        <div className="grid gap-12 lg:grid-cols-[1fr_400px] min-w-0">
+          <div className="space-y-12 min-w-0">
+            <section className="min-w-0">
               <h4 className={`text-sm font-bold uppercase tracking-widest mb-6 ${isDark ? 'text-white/30' : 'text-black/30'}`}>Usage</h4>
               <CodeBlock code={getCode()} language={platform === 'flutter' ? 'dart' : (rnLanguage === 'tsx' ? 'tsx' : 'jsx')} theme={theme} />
             </section>

@@ -24,7 +24,8 @@ body,
 
 body {
   min-height: 100vh;
-  background: #030304;
+  /* Remove hardcoded background so App.tsx can handle it dynamically */
+  background: transparent;
 }
 
 button {
@@ -41,7 +42,6 @@ a {
   color: #ffffff;
 }
 
-
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -49,4 +49,51 @@ a {
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* Custom Animations for Premium UI */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 10s infinite alternate ease-in-out;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.5);
 }
