@@ -3,6 +3,7 @@ import { ChevronLeft, Code2, Smartphone, PlaySquare } from 'lucide-react';
 import type { Category, Platform, Theme } from '../types';
 import { CATEGORY_CONTENT } from '../data/categories';
 import { CodeBlock } from './CodeBlock';
+import { AdBanner } from './AdBanner';
 
 export function CategoryDetails({ category, platform, onBack, theme }: { category: Category, platform: Platform, onBack: () => void, theme: Theme }) {
   const data = CATEGORY_CONTENT[category];
@@ -338,6 +339,11 @@ export function CategoryDetails({ category, platform, onBack, theme }: { categor
           <aside className="space-y-8">
              {/* Component Specific Notes could go here */}
           </aside>
+        </div>
+        
+        <div className={`mt-16 border-t pt-8 ${isDark ? 'border-white/5' : 'border-zinc-200'}`}>
+          <p className="text-center text-[10px] uppercase font-bold tracking-widest opacity-35 mb-2">Advertisement</p>
+          <AdBanner adSlot="9364237744" />
         </div>
       </div>
     </div>

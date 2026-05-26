@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Clock, Scale, ListFilter, Calendar } from 'lucide-react';
 import type { Platform, Theme, Category } from '../types';
 import { CategoryDetails } from '../components/CategoryDetails';
+import { AdBanner } from '../components/AdBanner';
 
 export const SIDEBAR_COMPONENTS = [
   { id: 'navbar', title: 'Navbar', icon: <ListFilter size={18} /> },
@@ -57,16 +58,45 @@ export function ComponentsPage({ platform, theme }: { platform: Platform, theme:
 
       <div className="w-full min-w-0 max-w-5xl pt-10 pb-32">
         {activeCategory === null ? (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col items-start justify-center min-h-[60vh] relative">
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col items-start justify-start min-h-[60vh] relative pt-6">
             <div className="absolute -left-20 top-10 w-72 h-72 bg-blue-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
             <div className="absolute right-10 bottom-20 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
             
             <h2 className={`text-4xl font-bold mb-4 tracking-tight ${isDark ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400' : 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600'}`}>
               Components Collection
             </h2>
-            <p className={`text-lg max-w-lg ${isDark ? 'text-white/50' : 'text-black/50'}`}>
-              Select a component from the sidebar to view its documentation, usage examples, and props.
+            <p className={`text-lg max-w-xl ${isDark ? 'text-white/50' : 'text-black/50'}`}>
+              Select a component from the sidebar to view its documentation, usage examples, and props, or browse the directory below:
             </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10 w-full">
+              {SIDEBAR_COMPONENTS.map((comp) => (
+                <button
+                  key={comp.id}
+                  onClick={() => openCategory(comp.id as Category)}
+                  className={`flex flex-col items-start p-6 rounded-2xl border text-left transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-98 cursor-pointer ${
+                    isDark 
+                      ? 'bg-zinc-900/40 border-zinc-800/80 hover:bg-zinc-900 hover:border-zinc-700 text-white shadow-xl shadow-black/30' 
+                      : 'bg-white border-zinc-200/80 hover:bg-zinc-50 hover:border-zinc-300 text-slate-900 shadow-md shadow-slate-100/50'
+                  }`}
+                >
+                  <div className={`p-3 rounded-xl mb-4 ${
+                    isDark ? 'bg-zinc-800 text-pink-400' : 'bg-slate-100 text-pink-600'
+                  }`}>
+                    {comp.icon}
+                  </div>
+                  <h4 className="font-extrabold text-base tracking-tight">{comp.title}</h4>
+                  <p className={`text-xs mt-2 leading-relaxed ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>
+                    Premium {platform === 'react-native' ? 'React Native' : 'Flutter'} {comp.title.toLowerCase()} implementation.
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            <div className={`mt-16 border-t pt-8 w-full ${isDark ? 'border-white/5' : 'border-zinc-200'}`}>
+              <p className="text-center text-[10px] uppercase font-bold tracking-widest opacity-35 mb-2">Advertisement</p>
+              <AdBanner adSlot="9364237744" />
+            </div>
           </div>
         ) : (
           <CategoryDetails 

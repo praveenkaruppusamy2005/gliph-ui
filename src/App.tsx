@@ -5,6 +5,13 @@ import { Header } from './components/Header';
 import { HomePage } from './pages/HomePage';
 import { ComponentsPage } from './pages/ComponentsPage';
 import { MusicPlayerDocsPage } from './pages/MusicPlayerDocsPage';
+import { BlogPage } from './pages/BlogPage';
+import { BlogPostPage } from './pages/BlogPostPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { TermsOfServicePage } from './pages/TermsOfServicePage';
+import { AboutPage } from './pages/AboutPage';
+import { Footer } from './components/Footer';
+import { BLOG_POSTS } from './data/blog';
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -37,6 +44,25 @@ export default function App() {
     } else if (currentPath.startsWith('/flutter')) {
       document.title = "Gliph UI - Premium Flutter Components";
       description?.setAttribute('content', 'Premium Flutter components with smooth animations and glassmorphism design. Copy-paste ready for your next app.');
+    } else if (currentPath === '/blog') {
+      document.title = "Gliph UI Blog - Mobile Development & Optimization Guides";
+      description?.setAttribute('content', 'Guides, tutorials, and deep-dives into mobile styling, Flutter painting, and React Native animations.');
+    } else if (currentPath.startsWith('/blog/')) {
+      const postId = currentPath.split('/blog/')[2] || currentPath.split('/blog/')[1];
+      const post = BLOG_POSTS.find(p => p.id === postId);
+      if (post) {
+        document.title = `${post.title} - Gliph UI Blog`;
+        description?.setAttribute('content', post.summary);
+      }
+    } else if (currentPath === '/privacy-policy') {
+      document.title = "Privacy Policy - Gliph UI";
+      description?.setAttribute('content', 'Privacy Policy for Gliph UI open-source mobile components library.');
+    } else if (currentPath === '/terms-of-service') {
+      document.title = "Terms of Service - Gliph UI";
+      description?.setAttribute('content', 'Terms of Service for using Gliph UI open-source code and components.');
+    } else if (currentPath === '/about') {
+      document.title = "About Us & Contact - Gliph UI";
+      description?.setAttribute('content', 'Learn about Gliph UI component vision and contact our development team.');
     } else {
       document.title = "Gliph UI - Beautiful React Native & Flutter Components";
       description?.setAttribute('content', 'The open-source library for premium mobile UI. Animated pickers, cinematic players, and glassmorphism components.');
@@ -70,11 +96,20 @@ export default function App() {
             <Route path="/musicplayer" element={<MusicPlayerDocsPage theme={theme} toggleTheme={toggleTheme} />} />
             <Route path="/react-native-gliph-player" element={<MusicPlayerDocsPage theme={theme} toggleTheme={toggleTheme} />} />
             
+            {/* Blog & Resources */}
+            <Route path="/blog" element={<BlogPage theme={theme} />} />
+            <Route path="/blog/:postId" element={<BlogPostPage theme={theme} />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage theme={theme} />} />
+            <Route path="/terms-of-service" element={<TermsOfServicePage theme={theme} />} />
+            <Route path="/about" element={<AboutPage theme={theme} />} />
+
             {/* Fallback */}
             <Route path="*" element={<HomePage platform="react-native" theme={theme} />} />
           </Routes>
         </main>
       </div>
+
+      <Footer theme={theme} />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { Link } from 'react-router-dom';
 import type { Theme } from '../types';
 import { CodeBlock } from '../components/CodeBlock';
+import { AdBanner } from '../components/AdBanner';
 
 type DocSection = 
   | 'Introduction' | 'Installation' | 'Full Implementation'
@@ -458,6 +459,11 @@ export function MusicPlayerDocsPage({ theme, toggleTheme }: { theme: Theme, togg
           {activeSection === 'Reactive State' && <ReactiveStateContent />}
           {activeSection === 'Background & Lock Screen' && <BackgroundLockScreenContent />}
           {activeSection === 'New Architecture' && <ArchitectureContent />}
+
+          <div className={`mt-16 border-t pt-8 ${isDark ? 'border-white/5' : 'border-zinc-200'}`}>
+            <p className="text-center text-[10px] uppercase font-bold tracking-widest opacity-35 mb-2">Advertisement</p>
+            <AdBanner adSlot="9364237744" />
+          </div>
         </main>
       </div>
     </div>
