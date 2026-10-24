@@ -701,7 +701,7 @@ function Site({ user, signOut, view, setView }) {
               <div className="foot-hr-col">
                 <div className="foot-hr-col-head">Get started</div>
                 <button onClick={() => setView('pricing')} className="foot-hr-link">Pricing</button>
-                <button className="foot-hr-link" onClick={() => { window.history.replaceState({}, "", "/?plan=day"); setView("pricing"); }}>Pay ₹210 / day</button>
+                <button className="foot-hr-link" onClick={() => { window.history.replaceState({}, "", "/?plan=day"); setView("pricing"); }}>Pay ₹1 / day</button>
               </div>
               <div className="foot-hr-col">
                 <div className="foot-hr-col-head">Support</div>
@@ -986,7 +986,7 @@ function PricingPage({ user, signOut }) {
   const [error, setError] = useState('');
   const [methods, setMethods] = useState({
     phonepe: true,
-    dayPrice: 210,
+    dayPrice: 1,
   });
 
   useEffect(() => {
