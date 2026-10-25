@@ -307,6 +307,8 @@ a {
   top: calc(100% + 12px);
   right: 0;
   width: 300px;
+  max-height: min(75vh, 560px);
+  overflow-y: auto;
   background: rgba(255,255,255,.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -340,6 +342,13 @@ a {
 .prof-empty {
   font-size: 13px;
   color: var(--ink2);
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.prof-error {
+  font-size: 12px;
+  color: #a52822;
   line-height: 1.5;
   margin: 0 0 8px;
 }
@@ -404,6 +413,193 @@ a {
 }
 
 .prof-out:hover { background: var(--bg2); color: var(--ink); }
+
+.prof-history-link {
+  width: 100%;
+  margin: 2px 0 4px;
+  padding: 9px 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.prof-history-link:hover { background: var(--bg2); }
+
+.account-page {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 10vh 10vw;
+  background: rgba(18, 24, 30, .28);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.account-card {
+  width: 80vw;
+  height: 80vh;
+  max-width: 1440px;
+  overflow: auto;
+  padding: clamp(22px, 4vw, 56px);
+  border: 1px solid rgba(255, 255, 255, .8);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .22);
+}
+
+.account-hero {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.account-hero h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 400;
+  letter-spacing: -1px;
+  line-height: 1.05;
+}
+
+.account-hero p {
+  margin: 14px auto 22px;
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.account-section {
+  margin-top: 34px;
+}
+
+.account-section h2 {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 400;
+}
+
+.account-empty {
+  margin: 12px 0;
+  color: var(--ink2);
+  font-size: 14px;
+}
+
+.account-error {
+  padding: 12px 16px;
+  border: 1px solid #f1c7c4;
+  border-radius: 10px;
+  background: #fff5f4;
+  color: #a52822;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.account-codes,
+.payment-list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-code,
+.payment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.account-code > div,
+.payment-main,
+.payment-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.account-code strong,
+.payment-item code {
+  color: var(--ink);
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 15px;
+  letter-spacing: .3px;
+}
+
+.account-code span,
+.payment-main span,
+.payment-main small {
+  color: var(--ink2);
+  font-size: 12px;
+}
+
+.payment-main code {
+  width: fit-content;
+  margin-top: 3px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  background: var(--bg2);
+}
+
+.payment-meta {
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.payment-meta > strong { font-size: 15px; }
+
+.payment-status {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--bg2);
+  color: var(--ink2);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.payment-status.status-success {
+  background: #e7f7ed;
+  color: #1a6b35;
+}
+
+.payment-status.status-failed,
+.payment-status.status-cancelled {
+  background: #fff0ef;
+  color: #a52822;
+}
+
+@media (max-width: 560px) {
+  .account-card {
+    width: 80vw;
+    height: 80vh;
+    padding: 18px 14px;
+    border-radius: 18px;
+  }
+
+  .account-code,
+  .payment-item {
+    align-items: flex-start;
+    padding: 13px;
+  }
+
+  .payment-item { flex-direction: column; }
+  .payment-meta { align-items: flex-start; flex-direction: row; gap: 10px; }
+}
 
 /* pill buttons — HackerRank style */
 .ghostbtn {
@@ -534,6 +730,10 @@ a {
 
 .view-fade {
   animation: viewIn .55s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.view-fade--account {
+  animation: none;
 }
 
 @keyframes viewIn {
@@ -2648,6 +2848,28 @@ section {
 
 .gate-ctas {
   width: 100%;
+}
+
+.gate-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 11px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .8);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+
+.gate-download:hover {
+  background: #fff;
+  border-color: var(--ink3);
+  transform: translateY(-1px);
 }
 
 .gatebtn {

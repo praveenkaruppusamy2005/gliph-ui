@@ -30,6 +30,21 @@ function rememberCode(entry) {
   localStorage.setItem('sv_codes', JSON.stringify(list.slice(0, 24)));
 }
 
+async function fetchAccountApi(path) {
+  await auth.authStateReady();
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error('Sign in again to view your account.');
+  const token = await currentUser.getIdToken();
+  const response = await fetch(`${API_BASE}${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || 'Could not load account data.');
+  }
+  return data;
+}
+
 function authErrorText(e) {
   const code = e?.code || '';
   if (code.includes('popup-closed-by-user') || code.includes('cancelled-popup-request'))
@@ -514,6 +529,10 @@ function LoginGate({ onSignedIn }) {
             <GoogleG /> {busy ? 'connecting…' : 'Continue with Google'}
           </button>
         </div>
+        <a className="gate-download" href="/SecureWebView-Setup.exe">
+          <I d={Gk.download} size={18} />
+          Download for Windows
+        </a>
         {err && <p className="gate-error">{err}</p>}
         <p className="gate-fine">Windows 10/11 · 64-bit</p>
       </div>
@@ -538,9 +557,11 @@ function Ava({ user, sm }) {
   );
 }
 
-function ProfileMenu({ user, signOut }) {
+function ProfileMenu({ user, signOut, setView }) {
   const [open, setOpen] = useState(false);
   const [codes, setCodes] = useState(() => readLocalCodes());
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const box = useRef(null);
 
   useEffect(() => {
@@ -555,21 +576,25 @@ function ProfileMenu({ user, signOut }) {
     async function load() {
       const local = readLocalCodes();
       setCodes(local);
-      if (!user?.email) return;
+      setLoadError('');
+      setLoading(true);
       try {
-        const r = await fetch(`${API_BASE}/api/my-codes?email=` + encodeURIComponent(user.email));
-        const d = await r.json();
-        if (cancelled || !d.ok) return;
+        const d = await fetchAccountApi('/api/my-codes');
+        if (cancelled) return;
         const remote = d.codes || [];
         remote.forEach(rememberCode);
         const merged = {};
         [...readLocalCodes(), ...remote].forEach(c => { if (c?.key) merged[c.key] = { ...merged[c.key], ...c }; });
         setCodes(Object.values(merged).sort((a, b) => (b.created || 0) - (a.created || 0)));
-      } catch { /* keep local */ }
+      } catch (error) {
+        if (!cancelled) setLoadError(error.message || 'Could not load codes from your account.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     load();
     return () => { cancelled = true; };
-  }, [user?.email, open]);
+  }, [open]);
 
   const copy = async (key) => {
     try { await navigator.clipboard.writeText(key); } catch { /* ignore */ }
@@ -594,7 +619,9 @@ function ProfileMenu({ user, signOut }) {
             </div>
           </div>
           <div className="prof-label">Your codes</div>
-          {codes.length === 0 && (
+          {loading && <p className="prof-empty">Loading your codes…</p>}
+          {loadError && <p className="prof-error">{loadError}</p>}
+          {!loading && codes.length === 0 && (
             <p className="prof-empty">No activation codes are linked to this account.</p>
           )}
           {active.map(c => (
@@ -614,10 +641,137 @@ function ProfileMenu({ user, signOut }) {
               </span>
             </div>
           ))}
+          {codes.length > 4 && (
+            <p className="prof-empty">Showing active codes and up to 4 expired codes.</p>
+          )}
+          <button className="prof-history-link" onClick={() => { setOpen(false); setView('account'); }}>
+            View all codes &amp; payment history →
+          </button>
           <button className="prof-out" onClick={signOut}>Sign out</button>
         </div>
       )}
     </div>
+  );
+}
+
+function PaymentHistoryPage({ user, setView }) {
+  const [payments, setPayments] = useState([]);
+  const [codes, setCodes] = useState(() => readLocalCodes());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [copied, setCopied] = useState('');
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    let cancelled = false;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setView('home');
+    };
+    window.addEventListener('keydown', onKeyDown);
+    async function load() {
+      setLoading(true);
+      setError('');
+      const results = await Promise.allSettled([
+        fetchAccountApi('/api/payment-history'),
+        fetchAccountApi('/api/my-codes'),
+      ]);
+      if (cancelled) return;
+      const [historyResult, codesResult] = results;
+      if (historyResult.status === 'fulfilled') {
+        setPayments(historyResult.value.payments || []);
+      } else {
+        setError(historyResult.reason?.message || 'Could not load payment history.');
+      }
+      if (codesResult.status === 'fulfilled') {
+        const remote = codesResult.value.codes || [];
+        remote.forEach(rememberCode);
+        const merged = {};
+        [...readLocalCodes(), ...remote].forEach(code => {
+          if (code?.key) merged[code.key] = { ...merged[code.key], ...code };
+        });
+        setCodes(Object.values(merged).sort((a, b) => (b.created || 0) - (a.created || 0)));
+      } else if (historyResult.status === 'rejected') {
+        setError(codesResult.reason?.message || 'Could not load your activation codes.');
+      }
+      setLoading(false);
+    }
+    load();
+    return () => {
+      cancelled = true;
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [setView]);
+
+  const copy = async (key) => {
+    try {
+      await navigator.clipboard.writeText(key);
+      setCopied(key);
+      setTimeout(() => setCopied(''), 1800);
+    } catch {
+      setError('Could not copy the code. Select and copy it manually.');
+    }
+  };
+
+  return (
+    <main className="account-page">
+      <section className="account-card" role="dialog" aria-modal="true" aria-labelledby="account-title">
+        <header className="account-hero">
+          <div className="guide-kicker">Account</div>
+          <h1 id="account-title">Codes &amp; payment history</h1>
+          <p>Activation codes and the status of your payments for {user.email || user.name}.</p>
+          <button className="ghostbtn" onClick={() => setView('home')}>← Back to home</button>
+        </header>
+
+        {error && <p className="account-error" role="alert">{error}</p>}
+        {loading && <p className="account-empty">Loading account history…</p>}
+
+        <section className="account-section">
+          <h2>Your activation codes</h2>
+          {!loading && codes.length === 0 && <p className="account-empty">No codes found for this account yet.</p>}
+          <div className="account-codes">
+            {codes.map(code => {
+              const active = code.expires > Date.now();
+              return (
+                <article className="account-code" key={code.key}>
+                  <div>
+                    <strong>{code.key}</strong>
+                    <span>{active ? `${fmt(code.expires - Date.now())} left` : 'Expired'}{code.trial ? ' · Trial' : ''}</span>
+                  </div>
+                  <button type="button" className="ghostbtn" onClick={() => copy(code.key)}>
+                    {copied === code.key ? 'Copied ✓' : 'Copy code'}
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="account-section">
+          <h2>Payments</h2>
+          {!loading && payments.length === 0 && !error && (
+            <p className="account-empty">No payments are linked to this account yet.</p>
+          )}
+          <div className="payment-list">
+            {payments.map(payment => (
+              <article className="payment-item" key={payment.orderId}>
+                <div className="payment-main">
+                  <strong>{payment.trial ? 'Trial pass' : 'Day pass'}</strong>
+                  <span>{new Date(payment.paidAt || payment.created).toLocaleString()}</span>
+                  <small>Order {payment.orderId}</small>
+                  {payment.code && <code>{payment.code}</code>}
+                </div>
+                <div className="payment-meta">
+                  <strong>₹{payment.amount.toFixed(2)}</strong>
+                  <span className={`payment-status status-${payment.status.toLowerCase()}`}>{payment.status}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </section>
+    </main>
   );
 }
 
@@ -628,6 +782,7 @@ function ProfileMenu({ user, signOut }) {
 function Site({ user, signOut, view, setView }) {
   // navbar turns solid once the page scrolls
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -664,20 +819,23 @@ function Site({ user, signOut, view, setView }) {
               <button onClick={() => setView('home')} className={view === 'home' ? 'active' : ''}>Home</button>
               <button onClick={() => setView('pricing')} className={view === 'pricing' ? 'active' : ''}>Pricing</button>
               <button onClick={() => setView('guide')} className={view === 'guide' ? 'active' : ''}>How to use</button>
+              <button onClick={() => setView('account')} className={view === 'account' ? 'active' : ''}>Payments</button>
             </div>
           </div>
           <div className="nav-right">
-            <ProfileMenu user={user} signOut={doSignOut} />
+            <ProfileMenu user={user} signOut={doSignOut} setView={setView} />
             <a className="ghostbtn" href="/SecureWebView-Setup.exe">Download</a>
             {view !== 'pricing' && <button className="fillbtn" onClick={() => setView('pricing')}>Get a code →</button>}
           </div>
       </nav>
 
-      <div key={view} className="view-fade">
+      <div key={view} className={'view-fade' + (view === 'account' ? ' view-fade--account' : '')}>
         {view === 'home' ? (
           <HomePage setView={setView} />
         ) : view === 'guide' ? (
           <GuidePage setView={setView} />
+        ) : view === 'account' ? (
+          <PaymentHistoryPage user={user} setView={setView} />
         ) : (
           <PricingPage user={user} signOut={doSignOut} />
         )}
