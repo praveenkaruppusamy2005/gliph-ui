@@ -38,11 +38,29 @@ async function fetchAccountApi(path) {
   const response = await fetch(`${API_BASE}${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  const data = await response.json();
+  const body = await response.text();
+  let data;
+  try {
+    data = body ? JSON.parse(body) : null;
+  } catch {
+    throw new Error(`Account service returned an invalid response (HTTP ${response.status}).`);
+  }
+  if (!data) {
+    throw new Error(`Account service returned an empty response (HTTP ${response.status}).`);
+  }
   if (!response.ok || !data.ok) {
     throw new Error(data.error || 'Could not load account data.');
   }
   return data;
+}
+
+function codesFromPayments(payments = []) {
+  return payments.filter(payment => payment.code).map(payment => ({
+    key: payment.code,
+    expires: payment.expires,
+    created: payment.paidAt || payment.created,
+    trial: payment.trial,
+  }));
 }
 
 function authErrorText(e) {
@@ -560,8 +578,10 @@ function Ava({ user, sm }) {
 function ProfileMenu({ user, signOut, setView }) {
   const [open, setOpen] = useState(false);
   const [codes, setCodes] = useState(() => readLocalCodes());
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const [paymentError, setPaymentError] = useState('');
   const box = useRef(null);
 
   useEffect(() => {
@@ -577,20 +597,37 @@ function ProfileMenu({ user, signOut, setView }) {
       const local = readLocalCodes();
       setCodes(local);
       setLoadError('');
+      setPaymentError('');
       setLoading(true);
-      try {
-        const d = await fetchAccountApi('/api/my-codes');
-        if (cancelled) return;
-        const remote = d.codes || [];
+      const [codesResult, paymentsResult] = await Promise.allSettled([
+        fetchAccountApi('/api/my-codes'),
+        fetchAccountApi('/api/payment-history'),
+      ]);
+      if (cancelled) return;
+      const paymentRows = paymentsResult.status === 'fulfilled'
+        ? paymentsResult.value.payments || []
+        : [];
+      if (codesResult.status === 'fulfilled') {
+        const remote = codesResult.value.codes || [];
         remote.forEach(rememberCode);
         const merged = {};
-        [...readLocalCodes(), ...remote].forEach(c => { if (c?.key) merged[c.key] = { ...merged[c.key], ...c }; });
+        [...readLocalCodes(), ...remote, ...codesFromPayments(paymentRows)]
+          .forEach(c => { if (c?.key) merged[c.key] = { ...merged[c.key], ...c }; });
         setCodes(Object.values(merged).sort((a, b) => (b.created || 0) - (a.created || 0)));
-      } catch (error) {
-        if (!cancelled) setLoadError(error.message || 'Could not load codes from your account.');
-      } finally {
-        if (!cancelled) setLoading(false);
+      } else if (paymentRows.some(payment => payment.code)) {
+        const merged = {};
+        [...readLocalCodes(), ...codesFromPayments(paymentRows)]
+          .forEach(c => { if (c?.key) merged[c.key] = { ...merged[c.key], ...c }; });
+        setCodes(Object.values(merged).sort((a, b) => (b.created || 0) - (a.created || 0)));
+      } else {
+        setLoadError(codesResult.reason?.message || 'Could not load codes from your account.');
       }
+      if (paymentsResult.status === 'fulfilled') {
+        setPayments(paymentRows);
+      } else {
+        setPaymentError(paymentsResult.reason?.message || 'Could not load payment history.');
+      }
+      setLoading(false);
     }
     load();
     return () => { cancelled = true; };
@@ -644,8 +681,23 @@ function ProfileMenu({ user, signOut, setView }) {
           {codes.length > 4 && (
             <p className="prof-empty">Showing active codes and up to 4 expired codes.</p>
           )}
+          <div className="prof-label">Recent payments</div>
+          {paymentError && <p className="prof-error">{paymentError}</p>}
+          {!loading && !paymentError && payments.length === 0 && (
+            <p className="prof-empty">No payments found for this account.</p>
+          )}
+          {payments.slice(0, 3).map(payment => (
+            <div className="prof-payment" key={payment.orderId}>
+              <span>
+                <strong>{payment.trial ? 'Trial pass' : 'Day pass'}</strong>
+                <em>{payment.status}</em>
+                {payment.code && <code>{payment.code}</code>}
+              </span>
+              <b>₹{Number(payment.amount || 0).toFixed(2)}</b>
+            </div>
+          ))}
           <button className="prof-history-link" onClick={() => { setOpen(false); setView('account'); }}>
-            View all codes &amp; payment history →
+            View full code &amp; payment history →
           </button>
           <button className="prof-out" onClick={signOut}>Sign out</button>
         </div>
@@ -687,7 +739,16 @@ function PaymentHistoryPage({ user, setView }) {
         const remote = codesResult.value.codes || [];
         remote.forEach(rememberCode);
         const merged = {};
-        [...readLocalCodes(), ...remote].forEach(code => {
+        const paymentCodes = historyResult.status === 'fulfilled'
+          ? codesFromPayments(historyResult.value.payments || [])
+          : [];
+        [...readLocalCodes(), ...remote, ...paymentCodes].forEach(code => {
+          if (code?.key) merged[code.key] = { ...merged[code.key], ...code };
+        });
+        setCodes(Object.values(merged).sort((a, b) => (b.created || 0) - (a.created || 0)));
+      } else if (historyResult.status === 'fulfilled') {
+        const merged = {};
+        [...readLocalCodes(), ...codesFromPayments(historyResult.value.payments || [])].forEach(code => {
           if (code?.key) merged[code.key] = { ...merged[code.key], ...code };
         });
         setCodes(Object.values(merged).sort((a, b) => (b.created || 0) - (a.created || 0)));
